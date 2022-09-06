@@ -1,6 +1,9 @@
 function main() {
     const canvas = document.querySelector("canvas.webgl");
-    const renderer = new THREE.WebGLRenderer({ canvas });
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    renderer.setClearColor(0xdddddd, 1);
+    // renderer.setSize(window.innerWidth, window.innerHeight);
+    // document.body.appendChild(renderer.domElement);
 
     const fov = 80;
     const aspect = 2;  // the canvas default
@@ -19,21 +22,29 @@ function main() {
     light.position.set(-1, 2, 4);
     scene.add(light);
 
-    scene.add(createCube(
+    const cube = createCube(
         new THREE.Vector3(1, 1, 1),
-        new THREE.Vector3(1, 0, 0),
+        new THREE.Vector3(0, 0, 0),
         0x44aa88
-    ))
+    )
+
+    scene.add(cube)
 
     function render(time) {
+        requestAnimationFrame(render);
         time *= 0.001;  // convert time to seconds
 
-        // cube.rotation.x = time;
-        // cube.rotation.y = time;
+        cube.rotation.x = time;
+        cube.rotation.y = time;
 
         renderer.render(scene, camera);
 
-        requestAnimationFrame(render);
+
+        if (resizeRendererToDisplaySize(renderer)) {
+            const canvas = renderer.domElement;
+            camera.aspect = canvas.clientWidth / canvas.clientHeight;
+            camera.updateProjectionMatrix();
+        }
     }
     requestAnimationFrame(render);
 }
@@ -48,3 +59,14 @@ function createCube(size, pos, color) {
 
     return cube;
 }
+
+function resizeRendererToDisplaySize(renderer) {
+    const canvas = renderer.domElement;
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+    const needResize = canvas.width !== width || canvas.height !== height;
+    if (needResize) {
+      renderer.setSize(width, height, false);
+    }
+    return needResize;
+  }
