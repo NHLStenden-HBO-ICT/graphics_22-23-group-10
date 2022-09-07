@@ -6,7 +6,7 @@ function main() {
     // document.body.appendChild(renderer.domElement);
 
     const fov = 80;
-    const aspect = 2;  // the canvas default
+    const aspect = 2;
     const near = 0.1;
     const far = 5;
     const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
@@ -32,7 +32,7 @@ function main() {
 
     function render(time) {
         requestAnimationFrame(render);
-        time *= 0.001;  // convert time to seconds
+        time *= 0.001;
 
         cube.rotation.x = time;
         cube.rotation.y = time;
