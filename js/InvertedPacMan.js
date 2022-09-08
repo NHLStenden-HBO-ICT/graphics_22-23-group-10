@@ -1,8 +1,8 @@
 // import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.118/build/three.module.js';
 // import { OrbitControls } from "../node_modules/three/examples/jsm/controls/OrbitControls.js";
 
-import * as THREE from "../../node_modules/three/build/three.module";
-import { OrbitControls } from '../node_modules/three/examples/jsm/controls/OrbitControls';
+import * as THREE from 'https://unpkg.com/three@0.125.0/build/three.module.js';
+import { OrbitControls } from 'https://unpkg.com/three@0.125.0/examples/jsm/controls/OrbitControls.js';
 
 class InvertedPacman{
     constructor(){
@@ -30,7 +30,7 @@ class InvertedPacman{
         this._camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
         this._camera.position.set(5, 10, 15);
 
-        new OrbitControls(this._camera, this._renderer);
+        new OrbitControls(this._camera, this._renderer.domElement);
 
         this._scene = new THREE.Scene();
 
