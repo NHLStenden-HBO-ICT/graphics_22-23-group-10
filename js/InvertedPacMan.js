@@ -1,4 +1,8 @@
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.118/build/three.module.js';
+// import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.118/build/three.module.js';
+// import { OrbitControls } from "../node_modules/three/examples/jsm/controls/OrbitControls.js";
+
+import * as THREE from "../../node_modules/three/build/three.module";
+import { OrbitControls } from '../node_modules/three/examples/jsm/controls/OrbitControls';
 
 class InvertedPacman{
     constructor(){
@@ -13,6 +17,8 @@ class InvertedPacman{
         this._renderer.setPixelRatio(window.devicePixelRatio);
         this._renderer.setSize(innerWidth, innerHeight);
 
+        this._renderer.shadowMap.enabled = true;
+
         window.addEventListener("resize", () => {
             this._OnWindowResize();
         }, false);
@@ -24,25 +30,31 @@ class InvertedPacman{
         this._camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
         this._camera.position.set(5, 10, 15);
 
+        new OrbitControls(this._camera, this._renderer);
+
         this._scene = new THREE.Scene();
 
         let light = new THREE.DirectionalLight(0xFFFFFF);
-        light.position.set(100, 100, 100);
+        light.position.set(-10, 25, -10);
         light.target.position.set(0, 0, 0);
         light.castShadow = true;
         light.shadow.bias = -0.01;
         light.shadow.mapSize.width = 2048;
         light.shadow.mapSize.height = 2048;
-        light.shadow.camera.near = 1.0;
-        light.shadow.camera.far = 500;
+        light.shadow.camera.near = 0.1;
+        light.shadow.camera.far = 1000;
         light.shadow.camera.left = 200;
         light.shadow.camera.right = -200;
         light.shadow.camera.top = 200;
         light.shadow.camera.bottom = -200;
         this._scene.add(light);
-        light = new THREE.AmbientLight(0x404040);
-        this._scene.add(light);
 
+        const helper = new THREE.CameraHelper(light.shadow.camera);
+        this._scene.add(helper);
+        // light = new THREE.AmbientLight(0x404040);
+        // this._scene.add(light);
+
+        //Add a ground plane
         const plane = new THREE.Mesh(
         new THREE.PlaneGeometry(100, 100, 1, 1),
         new THREE.MeshPhongMaterial({
@@ -53,16 +65,18 @@ class InvertedPacman{
         plane.rotation.x = -Math.PI /2;
         this._scene.add(plane);
 
+        //Add a temporary cube for testing
         const cube = this.createCube(
             new THREE.Vector3(1, 1, 1),
             new THREE.Vector3(0, 0.5, 0),
             0xff0000
             );
-        
+        cube.castShadow = true;
+        cube.receiveShadow = true;
         this._scene.add(cube);
+        
         this._RAF();
-
-        console.log(this._scene.children)
+        this._camera.lookAt(new THREE.Vector3());
     }
 
     createCube(size, pos, color) {
@@ -86,7 +100,6 @@ class InvertedPacman{
         this._renderer.render(this._scene, this._camera);
         time *= 0.001;
 
-        this._camera.lookAt(new THREE.Vector3());
 
 
         this._RAF();
