@@ -38,21 +38,15 @@ class InvertedPacman{
         light.position.set(-10, 25, -10);
         light.target.position.set(0, 0, 0);
         light.castShadow = true;
-        light.shadow.bias = -0.01;
+        // console.log(light.shadow.bias);
         light.shadow.mapSize.width = 2048;
         light.shadow.mapSize.height = 2048;
         light.shadow.camera.near = 0.1;
         light.shadow.camera.far = 1000;
-        light.shadow.camera.left = 200;
-        light.shadow.camera.right = -200;
-        light.shadow.camera.top = 200;
-        light.shadow.camera.bottom = -200;
         this._scene.add(light);
 
-        const helper = new THREE.CameraHelper(light.shadow.camera);
-        this._scene.add(helper);
-        // light = new THREE.AmbientLight(0x404040);
-        // this._scene.add(light);
+        light = new THREE.AmbientLight(0x404040);
+        this._scene.add(light);
 
         //Add a ground plane
         const plane = new THREE.Mesh(
@@ -99,8 +93,6 @@ class InvertedPacman{
         requestAnimationFrame(() => {
         this._renderer.render(this._scene, this._camera);
         time *= 0.001;
-
-
 
         this._RAF();
         });
