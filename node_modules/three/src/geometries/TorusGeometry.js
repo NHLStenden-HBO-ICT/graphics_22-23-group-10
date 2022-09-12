@@ -7,7 +7,6 @@ class TorusGeometry extends BufferGeometry {
 	constructor( radius = 1, tube = 0.4, radialSegments = 8, tubularSegments = 6, arc = Math.PI * 2 ) {
 
 		super();
-
 		this.type = 'TorusGeometry';
 
 		this.parameters = {
@@ -99,12 +98,6 @@ class TorusGeometry extends BufferGeometry {
 
 	}
 
-	static fromJSON( data ) {
-
-		return new TorusGeometry( data.radius, data.tube, data.radialSegments, data.tubularSegments, data.arc );
-
-	}
-
 }
 
-export { TorusGeometry };
+export { TorusGeometry, TorusGeometry as TorusBufferGeometry };

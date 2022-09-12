@@ -8,7 +8,6 @@ class CylinderGeometry extends BufferGeometry {
 	constructor( radiusTop = 1, radiusBottom = 1, height = 1, radialSegments = 8, heightSegments = 1, openEnded = false, thetaStart = 0, thetaLength = Math.PI * 2 ) {
 
 		super();
-
 		this.type = 'CylinderGeometry';
 
 		this.parameters = {
@@ -264,13 +263,7 @@ class CylinderGeometry extends BufferGeometry {
 
 	}
 
-	static fromJSON( data ) {
-
-		return new CylinderGeometry( data.radiusTop, data.radiusBottom, data.height, data.radialSegments, data.heightSegments, data.openEnded, data.thetaStart, data.thetaLength );
-
-	}
-
 }
 
 
-export { CylinderGeometry };
+export { CylinderGeometry, CylinderGeometry as CylinderBufferGeometry };

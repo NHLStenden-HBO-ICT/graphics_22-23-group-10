@@ -14,7 +14,6 @@ class DirectionalLightHelper extends Object3D {
 	constructor( light, size, color ) {
 
 		super();
-
 		this.light = light;
 		this.light.updateMatrixWorld();
 

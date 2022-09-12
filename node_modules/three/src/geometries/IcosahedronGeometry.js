@@ -30,13 +30,7 @@ class IcosahedronGeometry extends PolyhedronGeometry {
 
 	}
 
-	static fromJSON( data ) {
-
-		return new IcosahedronGeometry( data.radius, data.detail );
-
-	}
-
 }
 
 
-export { IcosahedronGeometry };
+export { IcosahedronGeometry, IcosahedronGeometry as IcosahedronBufferGeometry };
