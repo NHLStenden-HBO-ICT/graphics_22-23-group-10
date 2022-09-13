@@ -1,8 +1,7 @@
-// import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.118/build/three.module.js';
-// import { OrbitControls } from "../node_modules/three/examples/jsm/controls/OrbitControls.js";
-
 import * as THREE from '../node_modules/three/build/three.module.js';
 import { OrbitControls } from '../node_modules/three/examples/jsm/controls/OrbitControls.js';
+import { GLTFLoader } from '../node_modules/three/examples/jsm/loaders/GLTFLoader.js';
+import { PlayerControls } from './playerControls.js';
 
 class InvertedPacman{
     constructor(){
@@ -18,6 +17,7 @@ class InvertedPacman{
         this._renderer.setSize(innerWidth, innerHeight);
 
         this._renderer.shadowMap.enabled = true;
+        this._renderer.shadowMap.type = THREE.PCFShadowMap;
 
         window.addEventListener("resize", () => {
             this._OnWindowResize();
@@ -30,20 +30,24 @@ class InvertedPacman{
         this._camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
         this._camera.position.set(5, 10, 15);
 
-        new OrbitControls(this._camera, this._renderer.domElement);
-
         this._scene = new THREE.Scene();
 
         let light = new THREE.DirectionalLight(0xFFFFFF);
         light.position.set(-10, 25, -10);
         light.target.position.set(0, 0, 0);
         light.castShadow = true;
-        // console.log(light.shadow.bias);
-        light.shadow.mapSize.width = 2048;
-        light.shadow.mapSize.height = 2048;
+        light.shadow.mapSize.width = 4096 * 2;
+        light.shadow.mapSize.height = 4096 * 2;
         light.shadow.camera.near = 0.1;
         light.shadow.camera.far = 1000;
+        light.shadow.camera.left = -50;
+        light.shadow.camera.right = 50;
+        light.shadow.camera.top = 50;
+        light.shadow.camera.bottom = -50;
+        light.shadow.bias = -0.001;
         this._scene.add(light);
+
+        this._scene.add(new THREE.CameraHelper(light.shadow.camera));
 
         light = new THREE.AmbientLight(0x404040);
         this._scene.add(light);
@@ -59,10 +63,11 @@ class InvertedPacman{
         plane.rotation.x = -Math.PI /2;
         this._scene.add(plane);
 
+        
         //Add a temporary cube for testing
         const cube = this.createCube(
             new THREE.Vector3(1, 1, 1),
-            new THREE.Vector3(0, 0.5, 0),
+            new THREE.Vector3(3, 3.5, -3),
             0xff0000
             );
         cube.castShadow = true;
@@ -71,6 +76,47 @@ class InvertedPacman{
         
         this._RAF();
         this._camera.lookAt(new THREE.Vector3());
+        
+        this.createPlayer(this);
+    }
+
+    createPlayer(game){
+        new GLTFLoader().load('../models/ghost.gltf', function (gltf){
+            const model = gltf.scene;
+            model.scale.set(0.1, 0.1, 0.1);
+            // model.translateY(0.5);
+            // model.translateX(5);
+            model.rotateY(90);
+            model.traverse(function (object){
+                if (object.isMesh) {
+                    object.castShadow = true;
+                    object.receiveShadow = true;
+                }
+            })
+            const controls = new OrbitControls(game._camera, game._renderer.domElement);
+            // controls.enablePan = false;
+            // controls.enableZoom = false;
+            game._scene.add(model)
+            const playerControls = new PlayerControls(model, controls, game._camera);
+        });
+
+
+        
+
+
+        const keysPressed = {};
+
+        document.addEventListener('keydown' , (event) => {
+            if (event.shiftKey) {
+                //Shift
+            } else {
+                (keysPressed)[event.key.toLowerCase()] = true
+            }
+        }, false);
+
+        document.addEventListener('keyup' , (event) => {
+            (keysPressed)[event.key.toLowerCase()] = false
+        }, false);
     }
 
     createCube(size, pos, color) {
@@ -87,7 +133,7 @@ class InvertedPacman{
         this._camera.aspect = window.innerWidth / window.innerHeight;
         this._camera.updateProjectionMatrix();
         this._renderer.setSize(window.innerWidth, window.innerHeight);
-        }
+    }
     
     _RAF(time) {
         requestAnimationFrame(() => {
@@ -99,4 +145,4 @@ class InvertedPacman{
     }
 }
 
-const game = new InvertedPacman();
+new InvertedPacman();
