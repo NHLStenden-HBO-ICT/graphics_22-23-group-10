@@ -170,7 +170,7 @@
 	"scene": 0,
 	"scenes": [
 		{
-			"name": "Sketchfab_Scene",
+			"name": "Sketchfabscene",
 			"nodes": [0]
 		}
 	],
