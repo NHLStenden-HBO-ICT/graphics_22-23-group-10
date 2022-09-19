@@ -15,7 +15,7 @@ export class Player {
 	#MODELPATH = "../models/ghost.gltf";
 
 	#walkVelocity = 6;
-	#runVelocity = 10;
+	#runVelocity = 50;
 
 	#ready = false;
 	#currentAction = this.Actions.IDLE;

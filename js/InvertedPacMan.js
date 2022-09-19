@@ -25,6 +25,14 @@ class InvertedPacman {
 
 		this.renderer.shadowMap.enabled = true;
 		this.renderer.shadowMap.type = THREE.PCFShadowMap;
+
+		window.addEventListener(
+			"resize",
+			() => {
+				this._OnWindowResize();
+			},
+			false
+		);
 	}
 
 	_initScene() {
@@ -69,6 +77,12 @@ class InvertedPacman {
 		addEventListener("playerLoaded", () => {
 			this.scene.add(this.player.getPlayerModel);
 		});
+	}
+
+	_OnWindowResize() {
+		this.player.camera.aspect = window.innerWidth / window.innerHeight;
+		this.player.camera.updateProjectionMatrix();
+		this.renderer.setSize(window.innerWidth, window.innerHeight);
 	}
 
 	clock = new THREE.Clock();
