@@ -7,30 +7,34 @@ export class Player {
 	Actions = Object.freeze({
 		IDLE: Symbol(0),
 		WALK: Symbol(1),
+		RUN: Symbol(2),
 	});
 
 	playerLoaded = new Event("playerLoaded");
 
 	#MODELPATH = "../models/ghost.gltf";
 
+	#walkVelocity = 6;
+	#runVelocity = 10;
+
 	#ready = false;
 	#currentAction = this.Actions.IDLE;
 	#walkDirection = new THREE.Vector3();
 	#rotateAngle = new THREE.Vector3(0, 1, 0);
 	#rotateQuaternion = new THREE.Quaternion();
-	#walkVelocity = 6;
 
-	#keysPressed = { w: false, a: false, s: false, d: false };
+	#keysPressed = { w: false, a: false, s: false, d: false, shift: false };
 	W = "w";
 	A = "a";
 	S = "s";
 	D = "d";
+	SHIFT = "shift";
 	DIRECTIONS = [this.W, this.A, this.S, this.D];
 
 	#playerModel;
 	camera;
 	#orbitControls;
-	#lockControls;
+	// #lockControls;
 
 	get getPlayerModel() {
 		return this.#playerModel;
@@ -55,14 +59,17 @@ export class Player {
 			(key) => this.#keysPressed[key] == true
 		);
 
+		this.#currentAction = this.Actions.IDLE;
+
 		// Set state
 		if (directionPressed) {
 			this.#currentAction = this.Actions.WALK;
-		} else {
-			this.#currentAction = this.Actions.IDLE;
+		}
+		if (this.#keysPressed.shift) {
+			this.#currentAction = this.Actions.RUN;
 		}
 
-		if (this.#currentAction == this.Actions.WALK) {
+		if (this.#currentAction != this.Actions.IDLE) {
 			// Calculate camera direction
 			let cameraDirection = Math.atan2(
 				this.camera.position.x - this.#playerModel.position.x,
@@ -89,7 +96,15 @@ export class Player {
 			this.#walkDirection.applyAxisAngle(this.#rotateAngle, directionOffset);
 
 			// Set velocity
-			const velocity = this.#walkVelocity;
+			let velocity;
+			switch (this.#currentAction) {
+				case this.Actions.WALK:
+					velocity = this.#walkVelocity;
+					break;
+				case this.Actions.RUN:
+					velocity = this.#runVelocity;
+					break;
+			}
 
 			// Move player
 			const moveX = this.#walkDirection.x * velocity * delta;
@@ -161,15 +176,6 @@ export class Player {
 			},
 			false
 		);
-
-		// let self = this;
-		// document.onclick = function () {
-		// 	if (self.#lockControls.isLocked) {
-		// 		self.#lockControls.unlock();
-		// 	} else {
-		// 		self.#lockControls.lock();
-		// 	}
-		// };
 	}
 
 	directionOffset(keysPressed) {
