@@ -122,7 +122,6 @@ class InvertedPacman {
 			this.skybox.update(delta, this.sun);
 
 			this._RAF();
-			console.log(THREE.getFPS());
 		});
 	}
 }
