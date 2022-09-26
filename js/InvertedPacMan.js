@@ -1,5 +1,9 @@
+import { OrbitControls } from "../node_modules/three/examples/jsm/controls/OrbitControls.js";
 import * as THREE from "../node_modules/three/build/three.module.js";
 import { Player } from "./Player.js";
+import { Skybox } from "./Skybox.js";
+
+THREE.Cache.enabled = true;
 
 class InvertedPacman {
 	constructor() {
@@ -14,12 +18,13 @@ class InvertedPacman {
 		this._initRenderer();
 		this._initScene();
 		this._initPlayer(this.renderer.domElement);
+		// this._initDebugCam();
 	}
 
 	_initRenderer() {
 		const canvas = document.querySelector("canvas.webgl");
 		this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-		this.renderer.setClearColor(0xd4e6f1, 1);
+		// this.renderer.setClearColor(0xd4e6f1, 1);
 		this.renderer.setPixelRatio(window.devicePixelRatio);
 		this.renderer.setSize(innerWidth, innerHeight);
 
@@ -65,10 +70,16 @@ class InvertedPacman {
 				color: 0x336600,
 			})
 		);
-		plane.castShadow = false;
+		// plane.castShadow = false;
 		plane.receiveShadow = true;
 		plane.rotation.x = -Math.PI / 2;
 		this.scene.add(plane);
+
+		this.skybox = new Skybox();
+
+		addEventListener("skyboxLoaded", () => {
+			this.scene.add(this.skybox.object3d);
+		});
 	}
 
 	_initPlayer(rendererDomElement) {
@@ -77,6 +88,18 @@ class InvertedPacman {
 		addEventListener("playerLoaded", () => {
 			this.scene.add(this.player.getPlayerModel);
 		});
+	}
+
+	_initDebugCam() {
+		const fov = 80;
+		const aspect = 2;
+		const near = 0.1;
+		const far = 1000.0;
+		this.camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+		this.camera.position.set(0, 10, 10);
+		this.camera.lookAt(new THREE.Vector3());
+
+		this.controls = new OrbitControls(this.camera, this.renderer.domElement);
 	}
 
 	_OnWindowResize() {
@@ -90,6 +113,7 @@ class InvertedPacman {
 	_RAF(time) {
 		requestAnimationFrame(() => {
 			this.renderer.render(this.scene, this.player.camera);
+			// this.renderer.render(this.scene, this.camera);
 
 			let delta = this.clock.getDelta();
 			this.player.update(delta);
