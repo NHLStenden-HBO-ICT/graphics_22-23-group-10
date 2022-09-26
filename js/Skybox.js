@@ -5,6 +5,8 @@ import { loadShader } from "./ShaderLoader.js";
 export class Skybox {
 	skyboxLoaded = new Event("skyboxLoaded");
 
+	#ready = false;
+
 	#SUNSPEED = 0.1;
 
 	skyGeometry;
@@ -30,10 +32,15 @@ export class Skybox {
 			const geom = new THREE.SphereGeometry(200);
 			self.skyGeometry = new THREE.Mesh(geom, material);
 			dispatchEvent(self.skyboxLoaded);
+			self.#ready = true;
 		}
 	}
 
 	update(delta, sun) {
+		if (!this.#ready) {
+			return;
+		}
+
 		this.#sunVector.applyAxisAngle(this.#sunAxis, this.#SUNSPEED * delta);
 		this.skyGeometry.material.uniforms.sunPosition.value = this.#sunVector;
 		sun.position.set(this.#sunVector.x, this.#sunVector.y, this.#sunVector.z);
