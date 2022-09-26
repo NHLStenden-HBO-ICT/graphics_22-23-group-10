@@ -19,6 +19,7 @@ class InvertedPacman {
 		this._initScene();
 		this._initPlayer(this.renderer.domElement);
 		// this._initDebugCam();
+		this._OnWindowResize();
 	}
 
 	_initRenderer() {
@@ -43,24 +44,24 @@ class InvertedPacman {
 	_initScene() {
 		this.scene = new THREE.Scene();
 
-		let light = new THREE.DirectionalLight(0xffffff);
-		light.position.set(-10, 25, -10);
-		light.target.position.set(0, 0, 0);
-		light.castShadow = true;
-		light.shadow.mapSize.width = 4096 * 2;
-		light.shadow.mapSize.height = 4096 * 2;
-		light.shadow.camera.near = 0.1;
-		light.shadow.camera.far = 1000;
-		light.shadow.camera.left = -50;
-		light.shadow.camera.right = 50;
-		light.shadow.camera.top = 50;
-		light.shadow.camera.bottom = -50;
-		light.shadow.bias = -0.001;
-		this.scene.add(light);
+		this.sun = new THREE.DirectionalLight(0xffffff);
+		this.sun.position.set(0, 1, 0);
+		this.sun.target.position.set(0, 0, 0);
+		this.sun.castShadow = true;
+		this.sun.shadow.mapSize.width = 4096 * 2;
+		this.sun.shadow.mapSize.height = 4096 * 2;
+		this.sun.shadow.camera.near = 0.1;
+		this.sun.shadow.camera.far = 1000;
+		this.sun.shadow.camera.left = -50;
+		this.sun.shadow.camera.right = 50;
+		this.sun.shadow.camera.top = 50;
+		this.sun.shadow.camera.bottom = -50;
+		this.sun.shadow.bias = -0.0001;
+		this.scene.add(this.sun);
 
-		this.scene.add(new THREE.CameraHelper(light.shadow.camera));
+		// this.scene.add(new THREE.CameraHelper(light.shadow.camera));
 
-		light = new THREE.HemisphereLight(0x404040, 0x12782d, 0.5);
+		let light = new THREE.HemisphereLight(0x404040, 0x12782d, 0.5);
 		this.scene.add(light);
 
 		//Add a ground plane
@@ -78,7 +79,7 @@ class InvertedPacman {
 		this.skybox = new Skybox();
 
 		addEventListener("skyboxLoaded", () => {
-			this.scene.add(this.skybox.object3d);
+			this.scene.add(this.skybox.skyGeometry);
 		});
 	}
 
@@ -110,15 +111,18 @@ class InvertedPacman {
 
 	clock = new THREE.Clock();
 
-	_RAF(time) {
+	_RAF() {
 		requestAnimationFrame(() => {
 			this.renderer.render(this.scene, this.player.camera);
 			// this.renderer.render(this.scene, this.camera);
-
 			let delta = this.clock.getDelta();
+			// delta = THREE.getDelta();
+
 			this.player.update(delta);
+			this.skybox.update(delta, this.sun);
 
 			this._RAF();
+			console.log(THREE.getFPS());
 		});
 	}
 }
