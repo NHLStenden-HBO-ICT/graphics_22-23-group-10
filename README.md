@@ -1,3 +1,3 @@
 # Inverted Pacman
 
-Probeer het op onze [Github Pages](https://nhlstenden-hbo-ict-se.github.io/graphics_22-23-group-10/)
+Inverted Pacman is een game waar jij niet Pacman bent, maar het spookje! Het is de bedoeling dat jij achter Pacman aan gaat en hem te pakken krijgt. Maar pas op, want zodra het nacht is, wordt muteert Pacman. Hij krijgt dan grote smerige tanden en zal dan ook achter jou aan komen! Wie van de twee overleeft het?
