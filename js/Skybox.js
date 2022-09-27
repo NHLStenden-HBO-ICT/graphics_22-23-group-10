@@ -7,12 +7,12 @@ export class Skybox {
 
 	#ready = false;
 
-	#SUNSPEED = 0.1;
+	#SUNSPEED = 0.005;
 
 	skyGeometry;
 
 	#sunAxis = new THREE.Vector3(1, 0, 0);
-	#sunVector = new THREE.Vector3(0, 500, 0);
+	#sunVector = new THREE.Vector3(0, -10, -500);
 
 	constructor() {
 		loadShader("skybox", onShaderLoaded);

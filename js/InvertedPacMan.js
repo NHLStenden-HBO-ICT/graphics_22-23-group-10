@@ -2,6 +2,7 @@ import { OrbitControls } from "../node_modules/three/examples/jsm/controls/Orbit
 import * as THREE from "../node_modules/three/build/three.module.js";
 import { Player } from "./Player.js";
 import { Skybox } from "./Skybox.js";
+import { LevelLoader } from "./LevelLoader.js";
 
 THREE.Cache.enabled = true;
 
@@ -59,10 +60,20 @@ class InvertedPacman {
 		this.sun.shadow.bias = -0.0001;
 		this.scene.add(this.sun);
 
-		// this.scene.add(new THREE.CameraHelper(light.shadow.camera));
-
 		let light = new THREE.HemisphereLight(0x404040, 0x12782d, 0.5);
 		this.scene.add(light);
+
+		this.skybox = new Skybox();
+
+		addEventListener("skyboxLoaded", () => {
+			this.scene.add(this.skybox.skyGeometry);
+		});
+
+		LevelLoader.load("test");
+
+		//TEMP FLOOR
+
+		// this.scene.add(new THREE.CameraHelper(light.shadow.camera));
 
 		//Add a ground plane
 		const plane = new THREE.Mesh(
@@ -75,12 +86,6 @@ class InvertedPacman {
 		plane.receiveShadow = true;
 		plane.rotation.x = -Math.PI / 2;
 		this.scene.add(plane);
-
-		this.skybox = new Skybox();
-
-		addEventListener("skyboxLoaded", () => {
-			this.scene.add(this.skybox.skyGeometry);
-		});
 	}
 
 	_initPlayer(rendererDomElement) {
