@@ -7,6 +7,8 @@ import { Pacman } from "./Pacman.js";
 
 THREE.Cache.enabled = true;
 
+const LEVEL_TO_LOAD = "test";
+
 class InvertedPacman {
 	constructor() {
 		this._init();
@@ -74,7 +76,7 @@ class InvertedPacman {
 
 		// this.scene.add(new THREE.CameraHelper(this.sun.shadow.camera));
 
-		Level.load("test");
+		Level.load(LEVEL_TO_LOAD);
 
 		addEventListener("levelLoaded", () => {
 			this.scene.add(Level.getLevel);
@@ -97,12 +99,12 @@ class InvertedPacman {
 		});
 	}
 
-	_initPacman(){
+	_initPacman() {
 		this.pacman = new Pacman();
 
 		addEventListener("pacmanLoaded", () => {
 			this.scene.add(this.pacman.getPacmanModel);
-		})
+		});
 	}
 
 	_initDebugCam() {

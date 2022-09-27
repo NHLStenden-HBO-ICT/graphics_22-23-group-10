@@ -41,11 +41,9 @@ export class Player {
 		return this.#playerModel;
 	}
 
-	get getPlayerPos(){
-		if(this.#ready)
-			return this.getPlayerModel.position;
-		else
-			return new THREE.Vector3();
+	get getPlayerPos() {
+		if (this.#ready) return this.getPlayerModel.position;
+		else return new THREE.Vector3();
 	}
 
 	get isReady() {
