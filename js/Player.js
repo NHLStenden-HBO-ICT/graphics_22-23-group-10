@@ -40,6 +40,13 @@ export class Player {
 		return this.#playerModel;
 	}
 
+	get getPlayerPos(){
+		if(this.#ready)
+			return this.getPlayerModel.position;
+		else 
+			return new THREE.Vector3();
+	}
+
 	constructor(rendererDomElement) {
 		this._loadPlayer();
 		this._initCamera(rendererDomElement);

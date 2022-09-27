@@ -94,10 +94,10 @@ class InvertedPacman {
 	}
 
 	_initPacman(){
-		this.Pacman = new Pacman();
+		this.pacman = new Pacman();
 
 		addEventListener("pacmanLoaded", () => {
-			this.scene.add(this.Pacman.getPacmanModel);
+			this.scene.add(this.pacman.getPacmanModel);
 		})
 	}
 
@@ -129,6 +129,9 @@ class InvertedPacman {
 			// delta = THREE.getDelta();
 
 			this.player.update(delta);
+
+			this.pacman.update(delta, this.player.getPlayerPos);
+
 			this.skybox.update(delta, this.sun);
 
 			this._RAF();

@@ -7,7 +7,7 @@ export class Skybox {
 
 	#ready = false;
 
-	#SUNSPEED = 0.1;
+	#SUNSPEED = 0;
 
 	skyGeometry;
 
