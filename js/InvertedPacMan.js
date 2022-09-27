@@ -2,6 +2,7 @@ import { OrbitControls } from "../node_modules/three/examples/jsm/controls/Orbit
 import * as THREE from "../node_modules/three/build/three.module.js";
 import { Player } from "./Player.js";
 import { Skybox } from "./Skybox.js";
+import { Pacman } from "./Pacman.js";
 
 THREE.Cache.enabled = true;
 
@@ -18,6 +19,7 @@ class InvertedPacman {
 		this._initRenderer();
 		this._initScene();
 		this._initPlayer(this.renderer.domElement);
+		this._initPacman();
 		// this._initDebugCam();
 		this._OnWindowResize();
 	}
@@ -89,6 +91,14 @@ class InvertedPacman {
 		addEventListener("playerLoaded", () => {
 			this.scene.add(this.player.getPlayerModel);
 		});
+	}
+
+	_initPacman(){
+		this.Pacman = new Pacman();
+
+		addEventListener("pacmanLoaded", () => {
+			this.scene.add(this.Pacman.getPacmanModel);
+		})
 	}
 
 	_initDebugCam() {

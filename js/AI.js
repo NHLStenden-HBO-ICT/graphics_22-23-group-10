@@ -1,5 +1,3 @@
-import * as THREE from "three/build/three.module.js";
-
-class Ai{
+export class Ai{
     //add general code for the AI (pathfinding etc)
 }
