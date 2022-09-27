@@ -7,12 +7,12 @@ export class Skybox {
 
 	#ready = false;
 
-	#SUNSPEED = 0;
+	#SUNSPEED = 0.005;
 
 	skyGeometry;
 
 	#sunAxis = new THREE.Vector3(1, 0, 0);
-	#sunVector = new THREE.Vector3(0, 500, 0);
+	#sunVector = new THREE.Vector3(0, -10, -500);
 
 	constructor() {
 		loadShader("skybox", onShaderLoaded);
@@ -29,7 +29,7 @@ export class Skybox {
 				sunPosition: { value: new THREE.Vector3(0, 1, 0) },
 			};
 
-			const geom = new THREE.SphereGeometry(200);
+			const geom = new THREE.SphereGeometry(1000);
 			self.skyGeometry = new THREE.Mesh(geom, material);
 			dispatchEvent(self.skyboxLoaded);
 			self.#ready = true;

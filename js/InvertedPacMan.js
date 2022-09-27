@@ -2,6 +2,7 @@ import { OrbitControls } from "../node_modules/three/examples/jsm/controls/Orbit
 import * as THREE from "../node_modules/three/build/three.module.js";
 import { Player } from "./Player.js";
 import { Skybox } from "./Skybox.js";
+import { Level } from "./Level.js";
 import { Pacman } from "./Pacman.js";
 
 THREE.Cache.enabled = true;
@@ -13,15 +14,16 @@ class InvertedPacman {
 		this._RAF();
 	}
 
+	addToScene(object) {
+		this.scene.add(object);
+	}
+
 	_init() {
 		console.log("Initializing Inverted Pacman...");
 
 		this._initRenderer();
 		this._initScene();
-		this._initPlayer(this.renderer.domElement);
-		this._initPacman();
 		// this._initDebugCam();
-		this._OnWindowResize();
 	}
 
 	_initRenderer() {
@@ -50,38 +52,36 @@ class InvertedPacman {
 		this.sun.position.set(0, 1, 0);
 		this.sun.target.position.set(0, 0, 0);
 		this.sun.castShadow = true;
-		this.sun.shadow.mapSize.width = 4096 * 2;
-		this.sun.shadow.mapSize.height = 4096 * 2;
+		this.sun.shadow.mapSize.width = 4096 * 10;
+		this.sun.shadow.mapSize.height = 4096 * 10;
 		this.sun.shadow.camera.near = 0.1;
 		this.sun.shadow.camera.far = 1000;
-		this.sun.shadow.camera.left = -50;
-		this.sun.shadow.camera.right = 50;
-		this.sun.shadow.camera.top = 50;
-		this.sun.shadow.camera.bottom = -50;
+		this.sun.shadow.camera.left = -500;
+		this.sun.shadow.camera.right = 500;
+		this.sun.shadow.camera.top = 500;
+		this.sun.shadow.camera.bottom = -500;
 		this.sun.shadow.bias = -0.0001;
 		this.scene.add(this.sun);
 
-		// this.scene.add(new THREE.CameraHelper(light.shadow.camera));
-
 		let light = new THREE.HemisphereLight(0x404040, 0x12782d, 0.5);
 		this.scene.add(light);
-
-		//Add a ground plane
-		const plane = new THREE.Mesh(
-			new THREE.PlaneGeometry(100, 100, 1, 1),
-			new THREE.MeshPhongMaterial({
-				color: 0x336600,
-			})
-		);
-		// plane.castShadow = false;
-		plane.receiveShadow = true;
-		plane.rotation.x = -Math.PI / 2;
-		this.scene.add(plane);
 
 		this.skybox = new Skybox();
 
 		addEventListener("skyboxLoaded", () => {
 			this.scene.add(this.skybox.skyGeometry);
+		});
+
+		// this.scene.add(new THREE.CameraHelper(this.sun.shadow.camera));
+
+		Level.load("test");
+
+		addEventListener("levelLoaded", () => {
+			this.scene.add(Level.getLevel);
+
+			this._initPlayer(this.renderer.domElement);
+
+			this._initPacman();
 		});
 	}
 
@@ -90,6 +90,10 @@ class InvertedPacman {
 
 		addEventListener("playerLoaded", () => {
 			this.scene.add(this.player.getPlayerModel);
+
+			this._OnWindowResize();
+
+			this.ready = true;
 		});
 	}
 
@@ -123,6 +127,10 @@ class InvertedPacman {
 
 	_RAF() {
 		requestAnimationFrame(() => {
+			if (!this.ready) {
+				this._RAF();
+				return;
+			}
 			this.renderer.render(this.scene, this.player.camera);
 			// this.renderer.render(this.scene, this.camera);
 			let delta = this.clock.getDelta();
