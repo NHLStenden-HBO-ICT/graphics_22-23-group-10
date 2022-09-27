@@ -29,7 +29,7 @@ export class Skybox {
 				sunPosition: { value: new THREE.Vector3(0, 1, 0) },
 			};
 
-			const geom = new THREE.SphereGeometry(200);
+			const geom = new THREE.SphereGeometry(1000);
 			self.skyGeometry = new THREE.Mesh(geom, material);
 			dispatchEvent(self.skyboxLoaded);
 			self.#ready = true;

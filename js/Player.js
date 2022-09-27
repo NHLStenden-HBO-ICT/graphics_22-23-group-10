@@ -2,6 +2,7 @@ import { GLTFLoader } from "../node_modules/three/examples/jsm/loaders/GLTFLoade
 import * as THREE from "../node_modules/three/build/three.module.js";
 import { OrbitControls } from "../node_modules/three/examples/jsm/controls/OrbitControls.js";
 import { PointerLockControls } from "../node_modules/three/examples/jsm/controls/PointerLockControls.js";
+import { Level } from "./Level.js";
 
 export class Player {
 	Actions = Object.freeze({
@@ -40,10 +41,17 @@ export class Player {
 		return this.#playerModel;
 	}
 
+	get isReady() {
+		return this.#ready;
+	}
+
 	constructor(rendererDomElement) {
-		this._loadPlayer();
-		this._initCamera(rendererDomElement);
+		this._loadPlayer(rendererDomElement);
 		this._initListeners();
+	}
+
+	setPosition(x, y, z) {
+		this.#playerModel.position.set(x, y, z);
 	}
 
 	update(delta) {
@@ -127,10 +135,12 @@ export class Player {
 		const fov = 80;
 		const aspect = 2;
 		const near = 0.1;
-		const far = 1000.0;
+		const far = 1500.0;
 		this.camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-		this.camera.position.set(0, 10, 10);
-		this.camera.lookAt(new THREE.Vector3());
+
+		this.camera.position.y = 15;
+
+		// console.log(Level.getPlayerSpawn);
 
 		this.#orbitControls = new OrbitControls(this.camera, rendererDomElement);
 		this.#orbitControls.enableDamping = true;
@@ -138,13 +148,18 @@ export class Player {
 		this.#orbitControls.enablePan = false;
 		this.#orbitControls.enableZoom = false;
 
+		let pos = Level.getPlayerSpawn;
+		this._updateCamera(pos.x, pos.z);
+
 		// this.#lockControls = new PointerLockControls(this.camera, document.body);
 	}
 
-	_loadPlayer() {
+	_loadPlayer(rendererDomElement) {
 		let self = this;
 		new GLTFLoader().load(this.#MODELPATH, function (model) {
 			const mesh = model.scene;
+			mesh.position.x = Level.getPlayerSpawn.x;
+			mesh.position.z = Level.getPlayerSpawn.z;
 			self.#playerModel = mesh;
 
 			mesh.scale.set(0.1, 0.1, 0.1); // TEMPORARY
@@ -157,6 +172,7 @@ export class Player {
 			});
 
 			self.#ready = true;
+			self._initCamera(rendererDomElement);
 			dispatchEvent(self.playerLoaded);
 		});
 	}

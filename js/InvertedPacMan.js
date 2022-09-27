@@ -2,7 +2,7 @@ import { OrbitControls } from "../node_modules/three/examples/jsm/controls/Orbit
 import * as THREE from "../node_modules/three/build/three.module.js";
 import { Player } from "./Player.js";
 import { Skybox } from "./Skybox.js";
-import { LevelLoader } from "./LevelLoader.js";
+import { Level } from "./Level.js";
 
 THREE.Cache.enabled = true;
 
@@ -22,17 +22,7 @@ class InvertedPacman {
 
 		this._initRenderer();
 		this._initScene();
-		this._initPlayer(this.renderer.domElement);
 		// this._initDebugCam();
-		this._OnWindowResize();
-
-		const self = this;
-		LevelLoader.load("test");
-
-		addEventListener("levelLoaded", () => {
-			this.scene.add(LevelLoader.level);
-			console.log("LevelLoaded");
-		});
 	}
 
 	_initRenderer() {
@@ -61,14 +51,14 @@ class InvertedPacman {
 		this.sun.position.set(0, 1, 0);
 		this.sun.target.position.set(0, 0, 0);
 		this.sun.castShadow = true;
-		this.sun.shadow.mapSize.width = 4096 * 2;
-		this.sun.shadow.mapSize.height = 4096 * 2;
+		this.sun.shadow.mapSize.width = 4096 * 10;
+		this.sun.shadow.mapSize.height = 4096 * 10;
 		this.sun.shadow.camera.near = 0.1;
 		this.sun.shadow.camera.far = 1000;
-		this.sun.shadow.camera.left = -50;
-		this.sun.shadow.camera.right = 50;
-		this.sun.shadow.camera.top = 50;
-		this.sun.shadow.camera.bottom = -50;
+		this.sun.shadow.camera.left = -500;
+		this.sun.shadow.camera.right = 500;
+		this.sun.shadow.camera.top = 500;
+		this.sun.shadow.camera.bottom = -500;
 		this.sun.shadow.bias = -0.0001;
 		this.scene.add(this.sun);
 
@@ -81,23 +71,15 @@ class InvertedPacman {
 			this.scene.add(this.skybox.skyGeometry);
 		});
 
-		this.scene.add(createWall(1, 1));
+		// this.scene.add(new THREE.CameraHelper(this.sun.shadow.camera));
 
-		//TEMP FLOOR
+		Level.load("test");
 
-		// this.scene.add(new THREE.CameraHelper(light.shadow.camera));
+		addEventListener("levelLoaded", () => {
+			this.scene.add(Level.getLevel);
 
-		//Add a ground plane
-		const plane = new THREE.Mesh(
-			new THREE.PlaneGeometry(100, 100, 1, 1),
-			new THREE.MeshPhongMaterial({
-				color: 0x336600,
-			})
-		);
-		// plane.castShadow = false;
-		plane.receiveShadow = true;
-		plane.rotation.x = -Math.PI / 2;
-		this.scene.add(plane);
+			this._initPlayer(this.renderer.domElement);
+		});
 	}
 
 	_initPlayer(rendererDomElement) {
@@ -105,6 +87,10 @@ class InvertedPacman {
 
 		addEventListener("playerLoaded", () => {
 			this.scene.add(this.player.getPlayerModel);
+
+			this._OnWindowResize();
+
+			this.ready = true;
 		});
 	}
 
@@ -130,6 +116,10 @@ class InvertedPacman {
 
 	_RAF() {
 		requestAnimationFrame(() => {
+			if (!this.ready) {
+				this._RAF();
+				return;
+			}
 			this.renderer.render(this.scene, this.player.camera);
 			// this.renderer.render(this.scene, this.camera);
 			let delta = this.clock.getDelta();
@@ -144,13 +134,3 @@ class InvertedPacman {
 }
 
 new InvertedPacman();
-
-function createWall(x, y) {
-	let wall = new THREE.Mesh(
-		new THREE.BoxGeometry(1, 1, 1),
-		new THREE.MeshPhongMaterial()
-	);
-	wall.receiveShadow = true;
-	wall.castShadow = true;
-	return wall;
-}
