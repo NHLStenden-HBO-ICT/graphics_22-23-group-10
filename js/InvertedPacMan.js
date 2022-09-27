@@ -13,6 +13,10 @@ class InvertedPacman {
 		this._RAF();
 	}
 
+	addToScene(object) {
+		this.scene.add(object);
+	}
+
 	_init() {
 		console.log("Initializing Inverted Pacman...");
 
@@ -21,6 +25,14 @@ class InvertedPacman {
 		this._initPlayer(this.renderer.domElement);
 		// this._initDebugCam();
 		this._OnWindowResize();
+
+		const self = this;
+		LevelLoader.load("test");
+
+		addEventListener("levelLoaded", () => {
+			this.scene.add(LevelLoader.level);
+			console.log("LevelLoaded");
+		});
 	}
 
 	_initRenderer() {
@@ -69,7 +81,7 @@ class InvertedPacman {
 			this.scene.add(this.skybox.skyGeometry);
 		});
 
-		LevelLoader.load("test");
+		this.scene.add(createWall(1, 1));
 
 		//TEMP FLOOR
 
@@ -132,3 +144,13 @@ class InvertedPacman {
 }
 
 new InvertedPacman();
+
+function createWall(x, y) {
+	let wall = new THREE.Mesh(
+		new THREE.BoxGeometry(1, 1, 1),
+		new THREE.MeshPhongMaterial()
+	);
+	wall.receiveShadow = true;
+	wall.castShadow = true;
+	return wall;
+}

@@ -5,10 +5,21 @@ const LEVELFOLDER = "../levels/";
 const FLOOR = 0;
 const WALL = 1;
 
+const SCALE_FACTOR = 5;
+
 export class LevelLoader {
-	static load(levelName) {
+	static #levelData;
+	static level = new THREE.Object3D();
+	static isLevelLoaded = false;
+	static levelLoaded = new Event("levelLoaded");
+
+	get getLevelData() {
+		if (this.isLevelLoaded) return this.#levelData;
+		else return [];
+	}
+
+	static load(levelName, add) {
 		const level = LEVELFOLDER + levelName + ".png";
-		console.log(level);
 
 		let canvas = document.createElement("canvas");
 		let context = canvas.getContext("2d");
@@ -18,7 +29,7 @@ export class LevelLoader {
 			canvas.width = img.width;
 			canvas.height = img.height;
 
-			let levelData = initLevelData(img.width);
+			this.#levelData = initLevelData(img.width);
 
 			context.drawImage(img, 0, 0);
 			// console.log(img.width, img.height, canvas.width, canvas.height);
@@ -31,6 +42,8 @@ export class LevelLoader {
 					if (equals(data, [0, 0, 0, 255])) {
 						// Black
 						tile = WALL;
+						const wall = createWall(x, y);
+						this.level.add(wall);
 					} else if (equals(data, [255, 255, 255, 255])) {
 						// White
 						tile = FLOOR;
@@ -40,10 +53,11 @@ export class LevelLoader {
 						// set spawpoint
 					}
 
-					levelData[x][y] = tile;
+					this.#levelData[x][y] = tile;
 				}
 			}
-			console.log(levelData);
+			this.isLevelLoaded = true;
+			dispatchEvent(this.levelLoaded);
 		};
 
 		img.src = level;
@@ -59,3 +73,15 @@ function initLevelData(n) {
 }
 
 const equals = (a, b) => a.length === b.length && a.every((v, i) => v === b[i]); // Compares 2 objects
+
+function createWall(x, y) {
+	let wall = new THREE.Mesh(
+		new THREE.BoxGeometry(SCALE_FACTOR, SCALE_FACTOR, SCALE_FACTOR),
+		new THREE.MeshPhongMaterial()
+	);
+	wall.receiveShadow = true;
+	wall.castShadow = true;
+	wall.position.x = x * SCALE_FACTOR;
+	wall.position.z = y * SCALE_FACTOR;
+	return wall;
+}
