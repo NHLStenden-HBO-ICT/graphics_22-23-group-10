@@ -40,6 +40,10 @@ export class Level {
 		else return undefined;
 	}
 
+	static get getScaleFactor() {
+		return SCALE_FACTOR;
+	}
+
 	static load(levelName) {
 		const level = LEVELFOLDER + levelName + ".png";
 
@@ -72,7 +76,6 @@ export class Level {
 					} else if (equals(data, [255, 0, 0, 255])) {
 						// RED | Player spawnpoint
 						tile = FLOOR;
-						// TODO: set player spawpoint
 						this.#playerSpawn = new THREE.Vector3(
 							x * SCALE_FACTOR,
 							0,
@@ -81,7 +84,6 @@ export class Level {
 					} else if (equals(data, [0, 255, 0, 255])) {
 						// GREEN | Pacman spawnpoint
 						tile = FLOOR;
-						// TODO: set pacman spawpoint
 						this.#pacmanSpawn = new THREE.Vector3(
 							x * SCALE_FACTOR,
 							0,
