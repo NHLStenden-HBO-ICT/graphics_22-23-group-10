@@ -84,5 +84,7 @@ export class Pacman extends Ai {
 		const moveZ = this.#walkDirection.z * velocity * delta;
 		this.#PacmanModel.position.x += moveX;
 		this.#PacmanModel.position.z += moveZ;
+        
+        this.pathfinding();
 	}
 }
