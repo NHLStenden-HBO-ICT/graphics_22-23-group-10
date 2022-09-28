@@ -2,8 +2,8 @@ import * as THREE from "../node_modules/three/build/three.module.js";
 
 const LEVELFOLDER = "../levels/";
 
-const FLOOR = 0;
-const WALL = 1;
+const FLOOR = 1;
+const WALL = 0;
 
 const SCALE_FACTOR = 5;
 
