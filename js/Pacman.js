@@ -12,7 +12,7 @@ export class Pacman extends Ai {
 	#PacmanModel;
 
 	#ready = false;
-	#walkVelocity = 6;
+	#walkVelocity = 8;
 	#walkDirection = new THREE.Vector3();
 	#rotateAngle = new THREE.Vector3(0, 1, 0);
 	#rotateQuaternion = new THREE.Quaternion();
@@ -34,7 +34,7 @@ export class Pacman extends Ai {
 			mesh.position.z = Level.getPacmanSpawn.z;
 			self.#PacmanModel = mesh;
 
-			mesh.scale.set(5, 5, 5); // TEMPORARY
+			mesh.scale.set(1, 1, 1); // TEMPORARY
 
 			mesh.traverse(function (obj) {
 				if (obj.isMesh) {
@@ -64,7 +64,10 @@ export class Pacman extends Ai {
 		let directionAngle = Math.atan2(p1.x - p2.x, p1.z - p2.z);
 
 		// Rotate pacman
-		this.#rotateQuaternion.setFromAxisAngle(this.#rotateAngle, directionAngle + Math.PI * -0.5);
+		this.#rotateQuaternion.setFromAxisAngle(
+			this.#rotateAngle,
+			directionAngle + Math.PI * -0.5
+		);
 
 		// console.log(this.#playerModel.quaternion);
 		this.#PacmanModel.quaternion.rotateTowards(this.#rotateQuaternion, 0.2);
@@ -77,52 +80,45 @@ export class Pacman extends Ai {
 		this.#rotateAngle.normalize();
 		// console.log(this.#walkDirection);
 
-		let velocity = this.#walkVelocity;
+		const velocity = this.#walkVelocity;
 
-		// Move pacman
-		// const moveX1 = this.#walkDirection.x * velocity * delta;
-		// const moveZ1 = this.#walkDirection.z * velocity * delta;
-		// this.#PacmanModel.position.x += moveX1;
-		// this.#PacmanModel.position.z += moveZ1;
-        
-		const ScaleF = Level.getScaleFactor;
+		const SF = Level.getScaleFactor;
 
-		// position of the pacman object
-		// let pacmanPos = new THREE.Vector3();
-		// pacmanPos.copy(this.#PacmanModel.position);
-		let pacmanPos = this.#PacmanModel.position;
-		
-		// scale player and pacman acording to real coordinates
-		pacmanPos = new THREE.Vector3(pacmanPos.x / ScaleF, 0, pacmanPos.z / ScaleF)
-		playerPos = new THREE.Vector3(playerPos.x / ScaleF, 0, playerPos.z / ScaleF)
+		const pacmanPos = new THREE.Vector3(
+			this.#PacmanModel.position.x / SF,
+			0,
+			this.#PacmanModel.position.z / SF
+		).round();
 
-		// returns current path from pacman to player in gridnodes
-        let result = this.pathfinding(pacmanPos, playerPos);
-		console.log(result.length)
+		const ghostPos = new THREE.Vector3(
+			playerPos.x / SF,
+			0,
+			playerPos.z / SF
+		).round();
 
-		if (result.length == 0){
+		let path = this.getPath(pacmanPos, ghostPos);
+		if (path.length == 0) {
 			return;
 		}
 
-		let nextNode = result[0];
-		let nodeVector = new THREE.Vector3(nextNode.x, 0, nextNode.y);
-		//console.log(nodeVector);
+		const nextPos = new THREE.Vector3(path[0].x, 0, path[0].y);
 
-		let dir = new THREE.Vector3(nodeVector.x - pacmanPos.x, 0, nodeVector.z - pacmanPos.z)
-		dir.normalize();
-		//let dir = nodeVector.sub(pacmanPos).normalize();
-		
-		// check if pacman has reached a node 
-		if(this.isPositionReached(this.#PacmanModel.position, nodeVector)){
+		if (this.isPositionReached(pacmanPos, nextPos)) {
 			console.log("Position reached");
-			result.shift();
+			// path.shift()
 		}
-		this.#PacmanModel.position.divideScalar(ScaleF);
-		console.log("Pacman pos", this.#PacmanModel.position)
-		
-		console.log("Direcion", dir);
+
+		const dir = new THREE.Vector3(
+			nextPos.x - pacmanPos.x,
+			0,
+			nextPos.z - pacmanPos.z
+		).normalize();
+		console.log(this.#PacmanModel.position);
+
 		const moveX = dir.x * velocity * delta;
 		const moveZ = dir.z * velocity * delta;
+		// const moveX = 0;
+		// const moveZ = 0;
 		this.#PacmanModel.position.x += moveX;
 		this.#PacmanModel.position.z += moveZ;
 	}
