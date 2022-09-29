@@ -138,13 +138,13 @@ const equals = (a, b) => a.length === b.length && a.every((v, i) => v === b[i]);
 
 function createWall(x, y) {
 	let wall = new THREE.Mesh(
-		new THREE.BoxGeometry(SCALE_FACTOR, SCALE_FACTOR * 2, SCALE_FACTOR),
+		new THREE.BoxGeometry(SCALE_FACTOR, SCALE_FACTOR * 0.1, SCALE_FACTOR),
 		new THREE.MeshPhongMaterial()
 	);
 	wall.receiveShadow = true;
 	wall.castShadow = true;
 	wall.position.x = x * SCALE_FACTOR;
-	wall.position.y = SCALE_FACTOR;
+	wall.position.y = 0;
 	wall.position.z = y * SCALE_FACTOR;
 	return wall;
 }
