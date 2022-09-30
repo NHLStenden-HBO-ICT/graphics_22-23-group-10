@@ -5,6 +5,7 @@ import { Astar } from "./Astar.js";
 export class Graph {
 	constructor(gridIn) {
 		this.nodes = [];
+		this.rotationToNextNode = 0;
 		this.diagonal = !!this.diagonalOption;
 		this.dontCrossCorners = !!this.dontCrossCornersOption;
 		this.grid = [];
@@ -39,7 +40,15 @@ export class Graph {
 		return Level.getLevelData[x][y] == 1;
 	}
 	neighbors(node) {
-		var x = node.x, y = node.y, neighbors = [], grid = this.grid, s0 = false, d0 = false, s1 = false, d1 = false, s2 = false, d2 = false, s3 = false, d3 = false;
+		var 
+		x = node.x, 
+		y = node.y, 
+		neighbors = [], 
+		grid = this.grid, 
+		s0 = false, d0 = false, 
+		s1 = false, d1 = false, 
+		s2 = false, d2 = false, 
+		s3 = false, d3 = false;
 
 
 		// North

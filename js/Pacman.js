@@ -2,6 +2,7 @@ import { GLTFLoader } from "../node_modules/three/examples/jsm/loaders/GLTFLoade
 import * as THREE from "../node_modules/three/build/three.module.js";
 import { Ai } from "./AI.js";
 import { Level } from "./Level.js";
+import { Graph } from "./Astar/Graph.js";
 
 export class Pacman extends Ai {
 	//add code for pacman (movement related, model, animation)
@@ -56,21 +57,6 @@ export class Pacman extends Ai {
 		if (!this.#ready) {
 			return;
 		}
-		//console.log(this.#PacmanModel.position);
-
-		// direction to player in radians
-		let p1 = playerPos;
-		let p2 = this.#PacmanModel.position;
-		let directionAngle = Math.atan2(p1.x - p2.x, p1.z - p2.z);
-
-		// Rotate pacman
-		this.#rotateQuaternion.setFromAxisAngle(
-			this.#rotateAngle,
-			directionAngle + Math.PI * -0.5
-		);
-
-		// console.log(this.#playerModel.quaternion);
-		this.#PacmanModel.quaternion.rotateTowards(this.#rotateQuaternion, 0.2);
 
 		// Calculate direction
 		let p11 = playerPos;
@@ -109,12 +95,25 @@ export class Pacman extends Ai {
 			0,
 			nextPos.z - this.#PacmanModel.position.z / SF
 		).normalize();
-		// console.log(this.#PacmanModel.position);
+
+
+		// let p1 = playerPos;
+		let p2 = this.#PacmanModel.position;
+
+		let directionAngle = Math.atan2(dir.x, dir.z); // Rotate towards 
+		// let directionAngle = Math.atan2(p1.x - p2.x, p1.z - p2.z); // Rotate towards Player
+
+		// Rotate pacman
+		this.#rotateQuaternion.setFromAxisAngle(
+			this.#rotateAngle,
+			directionAngle + Math.PI * -0.5
+		);
+
+		// console.log(this.#playerModel.quaternion);
+		this.#PacmanModel.quaternion.rotateTowards(this.#rotateQuaternion, 0.2);
 
 		const moveX = dir.x * velocity * delta;
 		const moveZ = dir.z * velocity * delta;
-		// const moveX = 0;
-		// const moveZ = 0;
 		this.#PacmanModel.position.x += moveX;
 		this.#PacmanModel.position.z += moveZ;
 	}
