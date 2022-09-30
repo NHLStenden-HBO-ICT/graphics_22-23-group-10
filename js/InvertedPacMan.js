@@ -91,7 +91,7 @@ class InvertedPacman {
 		this.player = new Player(rendererDomElement);
 
 		addEventListener("playerLoaded", () => {
-			this.scene.add(this.player.getPlayerModel);
+			this.scene.add(this.player.getModel);
 
 			this._OnWindowResize();
 
@@ -140,7 +140,7 @@ class InvertedPacman {
 
 			this.player.update(delta);
 
-			this.pacman.update(delta, this.player.getPlayerPos);
+			this.pacman.update(delta, this.player.getPosition);
 
 			this.skybox.update(delta, this.sun);
 
