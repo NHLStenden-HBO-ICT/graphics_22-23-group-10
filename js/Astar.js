@@ -1,3 +1,4 @@
+import { Level } from "./Level.js";
 export class Astar {
 	// _definition(){
 	//   /* global module, define */
@@ -183,71 +184,81 @@ Graph.prototype.markDirty = function (node) {
 	this.dirtyNodes.push(node);
 };
 
+Graph.prototype.isWalkableAt = function(x, y) {
+  return this.isInside(x, y) && Level.getLevelData[x][y] == 1; // 1 is a floor thus walkable
+};
+
+Graph.prototype.isInside = function(x, y) {
+  return (x >= 0 && x < this.grid[y].length) && (y >= 0 && y < this.grid[x].length);
+};
+
 Graph.prototype.neighbors = function(node) {
-  var neighbors = [],
-      x = node.x,
+  var x = node.x,
       y = node.y,
-      grid = this.grid,
+      neighbors = [],
       s0 = false, d0 = false,
       s1 = false, d1 = false,
       s2 = false, d2 = false,
-      s3 = false, d3 = false;
+      s3 = false, d3 = false,
+      grid = this.grid;
+
+
+  // North
+	if (this.isWalkableAt(x, y - 1)) {
+		neighbors.push(grid[x][y - 1]);
+    s0 = true;
+	}
+
+  // East
+	if (this.isWalkableAt(x + 1, y)) {
+		neighbors.push(grid[x + 1][y]);
+    s1 = true;
+	}
+
+  // South
+	if (this.isWalkableAt(x, y + 1)) {
+		neighbors.push(grid[x][y + 1]);
+    s2 = true;
+	}
 
 	// West
-	if (grid[x - 1] && grid[x - 1][y]) {
-		ret.push(grid[x - 1][y]);
+	if (this.isWalkableAt(x - 1, y)) {
+		neighbors.push(grid[x - 1][y]);
+    s3 = true;
 	}
-
-	// East
-	if (grid[x + 1] && grid[x + 1][y]) {
-		ret.push(grid[x + 1][y]);
-	}
-
-	// South
-	if (grid[x] && grid[x][y - 1]) {
-		ret.push(grid[x][y - 1]);
-	}
-
-	// North
-	if (grid[x] && grid[x][y + 1]) {
-		ret.push(grid[x][y + 1]);
-	}
-
+	
 	if (this.diagonal) {
+
+    // do not allow diagonal movement when close to objects
+    if (this.dontCrossCorners) {
+      d0 = s3 && s0;
+      d1 = s0 && s1;
+      d2 = s1 && s2;
+      d3 = s2 && s3;
+    }
+
+    // Northwest
+		if (d0 && this.isWalkableAt(x - 1, y - 1)) {
+			neighbors.push(grid[x - 1][y - 1]);
+		}
+
+    // Northeast
+		if (d1 &&  this.isWalkableAt(x + 1, y - 1)) {
+			neighbors.push(grid[x + 1][y - 1]);
+		}
+
+    // Southeast
+		if (d2 &&  this.isWalkableAt(x + 1, y + 1)) {
+			neighbors.push(grid[x + 1][y + 1]);
+		}
+
 		// Southwest
-		if (grid[x - 1] && grid[x - 1][y - 1]) {
-			ret.push(grid[x - 1][y - 1]);
-		}
-
-		// Southeast
-		if (grid[x + 1] && grid[x + 1][y - 1]) {
-			ret.push(grid[x + 1][y - 1]);
-		}
-
-		// Northwest
-		if (grid[x - 1] && grid[x - 1][y + 1]) {
-			ret.push(grid[x - 1][y + 1]);
-		}
-
-		// Northeast
-		if (grid[x + 1] && grid[x + 1][y + 1]) {
-			ret.push(grid[x + 1][y + 1]);
+		if (d3 &&  this.isWalkableAt(x - 1, y + 1)) {
+			neighbors.push(grid[x - 1][y + 1]);
 		}
 	}
 
-  if (this.dontCrossCorners) {
-    d0 = s3 && s0;
-    d1 = s0 && s1;
-    d2 = s1 && s2;
-    d3 = s2 && s3;
-  } else {
-      d0 = s3 || s0;
-      d1 = s0 || s1;
-      d2 = s1 || s2;
-      d3 = s2 || s3;
-  }
-
-  return ret;
+  return neighbors;
 };
 
 Graph.prototype.toString = function () {
