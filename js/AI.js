@@ -13,6 +13,7 @@ export class Ai {
 		// console.log(pacmanPos);
 
 		let graph = new Graph(Level.getLevelData);
+		graph.diagonal = true;
 
 		var start = graph.grid[pacmanPos.x][pacmanPos.z];
 		var end = graph.grid[playerPos.x][playerPos.z];
