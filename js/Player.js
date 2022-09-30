@@ -13,7 +13,7 @@ export class Player {
 
 	playerLoaded = new Event("playerLoaded");
 
-	#MODELPATH = "../models/ghost.gltf";
+	#MODELPATH = "../models/pacman.gltf";
 
 	#walkVelocity = 6;
 	#runVelocity = 50;
@@ -167,7 +167,7 @@ export class Player {
 			mesh.position.z = Level.getPlayerSpawn.z;
 			self.#playerModel = mesh;
 
-			mesh.scale.set(0.1, 0.1, 0.1); // TEMPORARY
+			mesh.scale.set(1, 1, 1); // TEMPORARY
 
 			mesh.traverse(function (obj) {
 				if (obj.isMesh) {

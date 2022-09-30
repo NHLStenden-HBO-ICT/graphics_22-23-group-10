@@ -88,15 +88,11 @@ export class Pacman extends Ai {
 			this.#PacmanModel.position.x / SF,
 			0,
 			this.#PacmanModel.position.z / SF
-		).round();
+		);
 
-		const ghostPos = new THREE.Vector3(
-			playerPos.x / SF,
-			0,
-			playerPos.z / SF
-		).round();
+		const ghostPos = new THREE.Vector3(playerPos.x / SF, 0, playerPos.z / SF);
 
-		let path = this.getPath(pacmanPos, ghostPos);
+		let path = this.getPath(pacmanPos.round(), ghostPos.round());
 		if (path.length == 0) {
 			return;
 		}
@@ -109,11 +105,11 @@ export class Pacman extends Ai {
 		}
 
 		const dir = new THREE.Vector3(
-			nextPos.x - pacmanPos.x,
+			nextPos.x - this.#PacmanModel.position.x / SF,
 			0,
-			nextPos.z - pacmanPos.z
+			nextPos.z - this.#PacmanModel.position.z / SF
 		).normalize();
-		console.log(this.#PacmanModel.position);
+		// console.log(this.#PacmanModel.position);
 
 		const moveX = dir.x * velocity * delta;
 		const moveZ = dir.z * velocity * delta;
