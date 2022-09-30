@@ -23,6 +23,7 @@ export class Astar{
     this.gridIn = Array;
 
     this.diagonalOption = Boolean;
+    this.dontCrossCornersOption = Boolean;
 
   }
   
@@ -34,7 +35,7 @@ export class Astar{
 
     graph.cleanDirty();
     options = options || {};
-    var heuristic = options.heuristic || this.manhattan;
+    var heuristic = options.heuristic || this.diagonal;
     var closest = this.closestOption || false;
 
     var openHeap = getHeap();
@@ -150,6 +151,7 @@ export function Graph(gridIn, options) {
   this.options = options || {};
   this.nodes = [];
   this.diagonal = !!this.diagonalOption;
+  this.dontCrossCorners = !!this.dontCrossCornersOption;
   this.grid = [];
   for (var x = 0; x < gridIn.length; x++) {
     this.grid[x] = [];
@@ -182,10 +184,14 @@ Graph.prototype.markDirty = function(node) {
 };
 
 Graph.prototype.neighbors = function(node) {
-  var ret = [];
-  var x = node.x;
-  var y = node.y;
-  var grid = this.grid;
+  var neighbors = [],
+      x = node.x,
+      y = node.y,
+      grid = this.grid,
+      s0 = false, d0 = false,
+      s1 = false, d1 = false,
+      s2 = false, d2 = false,
+      s3 = false, d3 = false;
 
   // West
   if (grid[x - 1] && grid[x - 1][y]) {
@@ -227,6 +233,18 @@ Graph.prototype.neighbors = function(node) {
     if (grid[x + 1] && grid[x + 1][y + 1]) {
       ret.push(grid[x + 1][y + 1]);
     }
+  }
+
+  if (this.dontCrossCorners) {
+    d0 = s3 && s0;
+    d1 = s0 && s1;
+    d2 = s1 && s2;
+    d3 = s2 && s3;
+  } else {
+      d0 = s3 || s0;
+      d1 = s0 || s1;
+      d2 = s1 || s2;
+      d3 = s2 || s3;
   }
 
   return ret;

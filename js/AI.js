@@ -17,11 +17,14 @@ export class Ai {
 		var start = graph.grid[pacmanPos.x][pacmanPos.z];
 		var end = graph.grid[playerPos.x][playerPos.z];
 
+		graph.diagonal = true;
+		graph.dontCrossCorners = true;
 		var result = this.astar.search(graph, start, end);
-
+		
 		return result;
 	}
 
+	// not used atm
 	isPositionReached(pos, targetpos) {
 		let deltaPos = new THREE.Vector3(
 			pos.x - targetpos.x,

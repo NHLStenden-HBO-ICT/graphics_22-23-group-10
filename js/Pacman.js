@@ -103,10 +103,10 @@ export class Pacman extends Ai {
 
 		const nextPos = new THREE.Vector3(path[0].x, 0, path[0].y);
 
-		if (this.isPositionReached(pacmanPos, nextPos)) {
-			console.log("Position reached");
-			// path.shift()
-		}
+		// if (this.isPositionReached(pacmanPos, nextPos)) {
+		// 	console.log("Position reached");
+		// 	// path.shift()
+		// }
 
 		const dir = new THREE.Vector3(
 			nextPos.x - pacmanPos.x,
