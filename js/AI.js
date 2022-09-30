@@ -1,4 +1,5 @@
-import { Astar, Graph } from "./Astar.js";
+import { Astar } from "./Astar/Astar.js";
+import { Graph } from "./Astar/Graph.js";
 import { Level } from "./Level.js";
 import * as THREE from "../node_modules/three/build/three.module.js";
 
@@ -17,6 +18,7 @@ export class Ai {
 
 		var start = graph.grid[pacmanPos.x][pacmanPos.z];
 		var end = graph.grid[playerPos.x][playerPos.z];
+		console.log(graph.grid[0].length);
 
 		graph.diagonal = true;
 		graph.dontCrossCorners = true;
