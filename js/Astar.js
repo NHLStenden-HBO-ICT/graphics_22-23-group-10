@@ -22,13 +22,9 @@ export class Astar {
 
 		this.gridIn = Array;
 
-<<<<<<< HEAD
     this.diagonalOption = Boolean;
     this.dontCrossCornersOption = Boolean;
-=======
-		this.diagonalOption = Boolean;
-	}
->>>>>>> 770d0dd11bd5951e3740718a4a8c9cf5d5def13a
+  }
 
 	search(graph, start, end, options) {
 		this.graph = graph;
@@ -36,17 +32,10 @@ export class Astar {
 		this.end = end;
 		this.options = options;
 
-<<<<<<< HEAD
     graph.cleanDirty();
     options = options || {};
     var heuristic = options.heuristic || this.diagonal;
     var closest = this.closestOption || false;
-=======
-		graph.cleanDirty();
-		options = options || {};
-		var heuristic = options.heuristic || this.manhattan;
-		var closest = this.closestOption || false;
->>>>>>> 770d0dd11bd5951e3740718a4a8c9cf5d5def13a
 
 		var openHeap = getHeap();
 		var closestNode = start; // set the start node to be the closest if required
@@ -159,7 +148,6 @@ function getHeap() {
 }
 
 export function Graph(gridIn, options) {
-<<<<<<< HEAD
   this.options = options || {};
   this.nodes = [];
   this.diagonal = !!this.diagonalOption;
@@ -167,14 +155,6 @@ export function Graph(gridIn, options) {
   this.grid = [];
   for (var x = 0; x < gridIn.length; x++) {
     this.grid[x] = [];
-=======
-	this.options = options || {};
-	this.nodes = [];
-	this.diagonal = !!this.diagonalOption;
-	this.grid = [];
-	for (var x = 0; x < gridIn.length; x++) {
-		this.grid[x] = [];
->>>>>>> 770d0dd11bd5951e3740718a4a8c9cf5d5def13a
 
 		for (var y = 0, row = gridIn[x]; y < row.length; y++) {
 			var node = new GridNode(x, y, row[y]);
@@ -203,7 +183,6 @@ Graph.prototype.markDirty = function (node) {
 	this.dirtyNodes.push(node);
 };
 
-<<<<<<< HEAD
 Graph.prototype.neighbors = function(node) {
   var neighbors = [],
       x = node.x,
@@ -213,13 +192,6 @@ Graph.prototype.neighbors = function(node) {
       s1 = false, d1 = false,
       s2 = false, d2 = false,
       s3 = false, d3 = false;
-=======
-Graph.prototype.neighbors = function (node) {
-	var ret = [];
-	var x = node.x;
-	var y = node.y;
-	var grid = this.grid;
->>>>>>> 770d0dd11bd5951e3740718a4a8c9cf5d5def13a
 
 	// West
 	if (grid[x - 1] && grid[x - 1][y]) {
@@ -263,7 +235,6 @@ Graph.prototype.neighbors = function (node) {
 		}
 	}
 
-<<<<<<< HEAD
   if (this.dontCrossCorners) {
     d0 = s3 && s0;
     d1 = s0 && s1;
@@ -277,9 +248,6 @@ Graph.prototype.neighbors = function (node) {
   }
 
   return ret;
-=======
-	return ret;
->>>>>>> 770d0dd11bd5951e3740718a4a8c9cf5d5def13a
 };
 
 Graph.prototype.toString = function () {
