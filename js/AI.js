@@ -18,12 +18,12 @@ export class Ai {
 
 		var start = graph.grid[pacmanPos.x][pacmanPos.z];
 		var end = graph.grid[playerPos.x][playerPos.z];
-		console.log(graph.grid[0].length);
+		// console.log(graph.grid[0].length);
 
 		graph.diagonal = true;
 		graph.dontCrossCorners = true;
 		var result = this.astar.search(graph, start, end);
-		
+
 		return result;
 	}
 
