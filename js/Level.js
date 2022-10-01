@@ -1,4 +1,5 @@
 import * as THREE from "../node_modules/three/build/three.module.js";
+import { Wall } from "./Wall.js";
 
 const LEVELFOLDER = "../levels/";
 
@@ -13,6 +14,7 @@ export class Level {
 	static #isLevelLoaded = false;
 	static #playerSpawn = new THREE.Vector3();
 	static #pacmanSpawn = new THREE.Vector3();
+	static collidableObjects = [];
 
 	static levelLoaded = new Event("levelLoaded");
 
@@ -68,8 +70,8 @@ export class Level {
 					if (equals(data, [0, 0, 0, 255])) {
 						// BLACK | Wall
 						tile = WALL;
-						const wall = createWall(x, y);
-						this.#level.add(wall);
+						const wall = new Wall(x, y);
+						this.#level.add(wall.model);
 					} else if (equals(data, [255, 255, 255, 255])) {
 						// WHITE | Floor
 						tile = FLOOR;
@@ -120,6 +122,7 @@ export class Level {
 			dispatchEvent(this.levelLoaded);
 
 			canvas.remove();
+			// console.log(this.collidableObjects);
 		};
 
 		img.src = level;
