@@ -2,7 +2,11 @@ import * as THREE from "../../node_modules/three/build/three.module.js";
 
 export class Collision {
 	model;
-	boundingBox;
+	#size = new THREE.Vector3();
+
+	get size() {
+		return this.#size;
+	}
 
 	ready = false;
 
@@ -10,8 +14,10 @@ export class Collision {
 		return this.ready;
 	}
 
-	constructor(pos) {
-		// this.#position.x = pos.x;
-		// this.#position.z = pos.z;
+	constructor() {}
+
+	setBoundingBox(geometry) {
+		geometry.computeBoundingBox();
+		geometry.boundingBox.getSize(this.#size);
 	}
 }

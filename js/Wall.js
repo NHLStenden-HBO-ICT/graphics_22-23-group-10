@@ -3,8 +3,8 @@ import { StaticBody } from "./CollisionSystem/StaticBody.js";
 import { Level } from "./Level.js";
 
 export class Wall extends StaticBody {
-	constructor(posX, posZ, width, depth) {
-		super(posX, posZ, width, depth);
+	constructor(posX, posZ) {
+		super();
 
 		const SCALE_FACTOR = Level.getScaleFactor;
 
@@ -12,12 +12,13 @@ export class Wall extends StaticBody {
 			new THREE.BoxGeometry(SCALE_FACTOR, SCALE_FACTOR * 2, SCALE_FACTOR),
 			new THREE.MeshPhongMaterial()
 		);
-		this.model.layers.enable(1);
+		// this.model.layers.enable(1);
 		this.model.receiveShadow = true;
 		this.model.castShadow = true;
 		this.model.position.x = posX * SCALE_FACTOR;
 		this.model.position.y = SCALE_FACTOR;
 		this.model.position.z = posZ * SCALE_FACTOR;
-		this.setBoundingBox(this.model);
+		this.setBoundingBox(this.model.geometry);
+		this.calcExtents();
 	}
 }

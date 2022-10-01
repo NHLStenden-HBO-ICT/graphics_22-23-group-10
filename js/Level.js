@@ -122,7 +122,7 @@ export class Level {
 			dispatchEvent(this.levelLoaded);
 
 			canvas.remove();
-			console.log(this.collidableObjects);
+			// console.log(this.collidableObjects);
 		};
 
 		img.src = level;

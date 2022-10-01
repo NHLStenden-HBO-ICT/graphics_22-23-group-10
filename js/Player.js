@@ -17,7 +17,7 @@ export class Player extends DynamicBody {
 	#MODELPATH = "../models/ghost.glb";
 
 	#walkVelocity = 6;
-	#runVelocity = 50;
+	#runVelocity = 10;
 
 	ready = false;
 	#currentAction = this.Actions.IDLE;
@@ -127,16 +127,16 @@ export class Player extends DynamicBody {
 				0,
 				this.#walkDirection.z * velocity * delta
 			);
-			this.moveAndCollide(movementVector);
+			this.moveAndCollide(movementVector, this.camera);
 
 			// Move camera
-			this._updateCamera(movementVector);
+			// this._updateCamera(movementVector);
 		}
 	}
 
-	_updateCamera(move) {
-		this.camera.position.x += move.x;
-		this.camera.position.z += move.z;
+	_updateCamera(moveX, moveZ) {
+		this.camera.position.x += moveX;
+		this.camera.position.z += moveZ;
 		this.#orbitControls.target = this.model.position;
 	}
 
@@ -147,7 +147,7 @@ export class Player extends DynamicBody {
 		const far = 1500.0;
 		this.camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 
-		this.camera.position.y = 15;
+		// this.camera.position.y = 15;
 
 		// console.log(Level.getPlayerSpawn);
 
@@ -158,7 +158,8 @@ export class Player extends DynamicBody {
 		this.#orbitControls.enableZoom = false;
 
 		let pos = Level.getPlayerSpawn;
-		this._updateCamera(pos);
+		pos.z -= 12;
+		this._updateCamera(pos.x, pos.z);
 
 		// this.#lockControls = new PointerLockControls(this.camera, document.body);
 	}
@@ -180,7 +181,7 @@ export class Player extends DynamicBody {
 
 			self.ready = true;
 			self._initCamera(rendererDomElement);
-			self.setBoundingBox(mesh);
+			self.setBoundingBox(mesh.children[0].children[0].geometry); // Ugly hardcoding, but oh well
 			dispatchEvent(self.playerLoaded);
 		});
 	}
