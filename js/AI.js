@@ -2,10 +2,11 @@ import { Astar } from "./Astar/Astar.js";
 import { Graph } from "./Astar/Graph.js";
 import { Level } from "./Level.js";
 import * as THREE from "../node_modules/three/build/three.module.js";
+import { DynamicBody } from "./CollisionSystem/DynamicBody.js";
 
 const THRESHOLD = 0.2;
 
-export class Ai {
+export class Ai extends DynamicBody {
 	//add general code for the AI (pathfinding etc)
 
 	astar = new Astar();

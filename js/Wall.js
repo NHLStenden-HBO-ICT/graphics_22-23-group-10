@@ -18,7 +18,7 @@ export class Wall extends StaticBody {
 		this.model.position.x = posX * SCALE_FACTOR;
 		this.model.position.y = SCALE_FACTOR;
 		this.model.position.z = posZ * SCALE_FACTOR;
-		this.setBoundingBox(this.model.geometry);
+		this.calculateExtents(this.model.geometry);
 		this.calcExtents();
 	}
 }

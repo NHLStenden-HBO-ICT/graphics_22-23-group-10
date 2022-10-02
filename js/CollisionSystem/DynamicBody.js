@@ -9,9 +9,9 @@ export class DynamicBody extends Collision {
 		super();
 	}
 
-	get getPosition() {
-		if (this.ready) return this.model.position;
-		else return new THREE.Vector3();
+	move(movement) {
+		this.model.position.x += movement.x;
+		this.model.position.z += movement.z;
 	}
 
 	moveAndCollide(movement, camera) {
@@ -73,7 +73,7 @@ export class DynamicBody extends Collision {
 		}
 		this.model.position.x += moveX;
 		this.model.position.z += moveZ;
-		camera.position.x += moveX;
-		camera.position.z += moveZ;
+		// camera.position.x += moveX;
+		// camera.position.z += moveZ;
 	}
 }

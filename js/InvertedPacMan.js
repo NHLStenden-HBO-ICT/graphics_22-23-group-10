@@ -7,9 +7,11 @@ import { Pacman } from "./Pacman.js";
 
 THREE.Cache.enabled = true;
 
-const LEVEL_TO_LOAD = "test";
+const LEVEL_TO_LOAD = "test2";
 
 class InvertedPacman {
+	playerPacmanCollision = new Event("playerPacmanCollision");
+
 	constructor() {
 		this._init();
 
@@ -74,8 +76,6 @@ class InvertedPacman {
 			this.scene.add(this.skybox.skyGeometry);
 		});
 
-		// this.scene.add(new THREE.CameraHelper(this.sun.shadow.camera));
-
 		Level.load(LEVEL_TO_LOAD);
 
 		addEventListener("levelLoaded", () => {
@@ -84,7 +84,24 @@ class InvertedPacman {
 			this._initPlayer(this.renderer.domElement);
 
 			this._initPacman();
+
+			// this._addDebugShapes();
 		});
+	}
+
+	_addDebugShapes() {
+		this.playerBoxHelper = new THREE.Box3Helper(
+			this.player.boundingBox,
+			0xff0000
+		);
+		this.pacmanBoxHelper = new THREE.Box3Helper(
+			this.pacman.boundingBox,
+			0xff0000
+		);
+		this.scene.add(this.playerBoxHelper);
+		this.scene.add(this.pacmanBoxHelper);
+
+		// this.scene.add(new THREE.CameraHelper(this.sun.shadow.camera));
 	}
 
 	_initPlayer(rendererDomElement) {
@@ -92,6 +109,7 @@ class InvertedPacman {
 
 		addEventListener("playerLoaded", () => {
 			this.scene.add(this.player.getModel);
+			this.scene.add(this.player.getCameraBase);
 
 			this._OnWindowResize();
 
@@ -125,6 +143,22 @@ class InvertedPacman {
 		this.renderer.setSize(window.innerWidth, window.innerHeight);
 	}
 
+	checkPlayerPacmanCollision() {
+		if (!this.player.ready || !this.pacman.ready) {
+			return;
+		}
+
+		this.player.boundingBox.setFromObject(this.player.model);
+		this.pacman.boundingBox.setFromObject(this.pacman.model);
+
+		// this.playerBoxHelper.box = this.player.boundingBox;
+		// this.pacmanBoxHelper.box = this.pacman.boundingBox;
+
+		if (this.player.boundingBox.intersectsBox(this.pacman.boundingBox)) {
+			dispatchEvent(this.playerPacmanCollision);
+		}
+	}
+
 	clock = new THREE.Clock();
 
 	_RAF() {
@@ -143,6 +177,8 @@ class InvertedPacman {
 			this.pacman.update(delta, this.player.getPosition);
 
 			this.skybox.update(delta, this.sun);
+
+			this.checkPlayerPacmanCollision();
 
 			this._RAF();
 		});

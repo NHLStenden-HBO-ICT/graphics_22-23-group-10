@@ -10,16 +10,14 @@ export class Pacman extends Ai {
 	pacmanLoaded = new Event("pacmanLoaded");
 
 	#MODELPATH = "../models/Duck.glb";
-	#PacmanModel;
 
-	#ready = false;
 	#walkVelocity = 8;
 	#walkDirection = new THREE.Vector3();
 	#rotateAngle = new THREE.Vector3(0, 1, 0);
 	#rotateQuaternion = new THREE.Quaternion();
 
 	get getPacmanModel() {
-		return this.#PacmanModel;
+		return this.model;
 	}
 
 	constructor() {
@@ -33,9 +31,9 @@ export class Pacman extends Ai {
 			const mesh = model.scene;
 			mesh.position.x = Level.getPacmanSpawn.x;
 			mesh.position.z = Level.getPacmanSpawn.z;
-			self.#PacmanModel = mesh;
+			self.model = mesh;
 
-			mesh.scale.set(1, 1, 1); // TEMPORARY
+			// mesh.scale.set(1, 1, 1); // TEMPORARY
 
 			mesh.traverse(function (obj) {
 				if (obj.isMesh) {
@@ -44,7 +42,7 @@ export class Pacman extends Ai {
 				}
 			});
 
-			self.#ready = true;
+			self.ready = true;
 			dispatchEvent(self.pacmanLoaded);
 		});
 	}
@@ -54,13 +52,13 @@ export class Pacman extends Ai {
 	}
 
 	_movePacman(delta, playerPos) {
-		if (!this.#ready) {
+		if (!this.ready) {
 			return;
 		}
 
 		// Calculate direction
 		let p11 = playerPos;
-		let p22 = this.#PacmanModel.position;
+		let p22 = this.model.position;
 		this.#walkDirection = new THREE.Vector3(p11.x - p22.x, 0, p11.z - p22.z);
 		this.#walkDirection.normalize();
 		this.#rotateAngle.normalize();
@@ -71,9 +69,9 @@ export class Pacman extends Ai {
 		const SF = Level.getScaleFactor;
 
 		const pacmanPos = new THREE.Vector3(
-			this.#PacmanModel.position.x / SF,
+			this.model.position.x / SF,
 			0,
-			this.#PacmanModel.position.z / SF
+			this.model.position.z / SF
 		);
 
 		const ghostPos = new THREE.Vector3(playerPos.x / SF, 0, playerPos.z / SF);
@@ -85,23 +83,13 @@ export class Pacman extends Ai {
 
 		const nextPos = new THREE.Vector3(path[0].x, 0, path[0].y);
 
-		// if (this.isPositionReached(pacmanPos, nextPos)) {
-		// 	console.log("Position reached");
-		// 	// path.shift()
-		// }
-
 		const dir = new THREE.Vector3(
-			nextPos.x - this.#PacmanModel.position.x / SF,
+			nextPos.x - this.model.position.x / SF,
 			0,
-			nextPos.z - this.#PacmanModel.position.z / SF
+			nextPos.z - this.model.position.z / SF
 		).normalize();
 
-
-		// let p1 = playerPos;
-		let p2 = this.#PacmanModel.position;
-
-		let directionAngle = Math.atan2(dir.x, dir.z); // Rotate towards 
-		// let directionAngle = Math.atan2(p1.x - p2.x, p1.z - p2.z); // Rotate towards Player
+		let directionAngle = Math.atan2(dir.x, dir.z); // Get angle to next point
 
 		// Rotate pacman
 		this.#rotateQuaternion.setFromAxisAngle(
@@ -109,12 +97,14 @@ export class Pacman extends Ai {
 			directionAngle + Math.PI * -0.5
 		);
 
-		// console.log(this.#playerModel.quaternion);
-		this.#PacmanModel.quaternion.rotateTowards(this.#rotateQuaternion, 0.2);
+		this.model.quaternion.rotateTowards(this.#rotateQuaternion, 0.2);
 
-		const moveX = dir.x * velocity * delta;
-		const moveZ = dir.z * velocity * delta;
-		this.#PacmanModel.position.x += moveX;
-		this.#PacmanModel.position.z += moveZ;
+		const movementVector = new THREE.Vector3(
+			dir.x * velocity * delta,
+			0,
+			dir.z * velocity * delta
+		);
+
+		this.move(movementVector);
 	}
 }
