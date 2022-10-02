@@ -17,7 +17,7 @@ export class Player extends DynamicBody {
 	#MODELPATH = "../models/ghost.glb";
 
 	#walkVelocity = 6;
-	#runVelocity = 10;
+	#runVelocity = 20;
 
 	ready = false;
 	#currentAction = this.Actions.IDLE;
