@@ -9,7 +9,7 @@ export class Pacman extends Ai {
 
 	pacmanLoaded = new Event("pacmanLoaded");
 
-	#MODELPATH = "../models/Duck.glb";
+	#MODELPATH = "../models/pacmanEvil.glb";
 	#PacmanModel;
 
 	#ready = false;
@@ -17,6 +17,9 @@ export class Pacman extends Ai {
 	#walkDirection = new THREE.Vector3();
 	#rotateAngle = new THREE.Vector3(0, 1, 0);
 	#rotateQuaternion = new THREE.Quaternion();
+
+	#mixer;
+	#clock = new THREE.Clock();
 
 	get getPacmanModel() {
 		return this.#PacmanModel;
@@ -35,7 +38,7 @@ export class Pacman extends Ai {
 			mesh.position.z = Level.getPacmanSpawn.z;
 			self.#PacmanModel = mesh;
 
-			mesh.scale.set(1, 1, 1); // TEMPORARY
+			mesh.scale.set(3, 3, 3); // TEMPORARY
 
 			mesh.traverse(function (obj) {
 				if (obj.isMesh) {
@@ -44,6 +47,13 @@ export class Pacman extends Ai {
 				}
 			});
 
+			// animation related
+			self.#mixer = new THREE.AnimationMixer(mesh);
+			const clips = model.animations;
+			const clip = THREE.AnimationClip.findByName(clips, "Walk.002");
+			const action = self.#mixer.clipAction(clip);
+			action.play();			
+
 			self.#ready = true;
 			dispatchEvent(self.pacmanLoaded);
 		});
@@ -51,8 +61,11 @@ export class Pacman extends Ai {
 
 	update(delta, playerPos) {
 		this._movePacman(delta, playerPos);
-	}
 
+		// update animations
+		this.#mixer.update(delta);
+	}
+	
 	_movePacman(delta, playerPos) {
 		if (!this.#ready) {
 			return;
@@ -106,7 +119,7 @@ export class Pacman extends Ai {
 		// Rotate pacman
 		this.#rotateQuaternion.setFromAxisAngle(
 			this.#rotateAngle,
-			directionAngle + Math.PI * -0.5
+			directionAngle
 		);
 
 		// console.log(this.#playerModel.quaternion);
