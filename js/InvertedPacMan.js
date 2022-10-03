@@ -1,5 +1,6 @@
 import { OrbitControls } from "../node_modules/three/examples/jsm/controls/OrbitControls.js";
 import * as THREE from "../node_modules/three/build/three.module.js";
+import { Menu } from "./Menu";
 import { Player } from "./Player.js";
 import { Skybox } from "./Skybox.js";
 import { Level } from "./Level.js";
@@ -13,8 +14,15 @@ class InvertedPacman {
 	playerPacmanCollision = new Event("playerPacmanCollision");
 
 	constructor() {
-		this._init();
+		this.menu = new Menu();
+		document.getElementById('play_button').addEventListener('click', () => {
+			this.startGame();
+			document.getElementById('main_menu').remove();
+		});
+	}
 
+	startGame() {
+		this._init();
 		this._RAF();
 	}
 

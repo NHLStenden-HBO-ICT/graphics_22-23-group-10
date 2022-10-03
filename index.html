@@ -1,14 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Inverted Pacman</title>
-		<link href="css/styles.css" rel="stylesheet" type="text/css" />
-	</head>
-	<body>
-		<script type="module" src="./js/InvertedPacMan.js"></script>
-		<canvas class="webgl" id="webgl"></canvas>
-	</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inverted Pacman</title>
+    <link href="css/styles.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+    <canvas class="webgl" id="webgl"></canvas>
+    <div class="main_menu noselect" id="main_menu">
+      <div class="main_menu_container">
+        <!-- PACMAN TITLE -->
+        <h1 class="game_title">NAMCAP</h1>
+        <div class="menu_controls">
+          <button class="play_button" id="play_button">PLAY</button>
+          <button class="help_button" id="help_button">HELP</button>
+        </div>
+      </div>
+      <div class="pacman">
+        <img class="img_pacman" src="./assets/img/Pacman.png" alt="" />
+      </div>
+      <div class="ghost">
+        <img class="img_ghost" src="./assets/img/Ghost.png" alt="" />
+        <img
+          id="pupil"
+          class="img_pupil"
+          src="./assets/img/Pupil2.png"
+          alt=""
+        />
+      </div>
+    </div>
+    <script type="module" src="./js/InvertedPacMan.js"></script>
+  </body>
 </html>
