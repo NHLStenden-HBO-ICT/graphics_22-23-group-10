@@ -1,7 +1,5 @@
 import { GLTFLoader } from "../node_modules/three/examples/jsm/loaders/GLTFLoader.js";
 import * as THREE from "../node_modules/three/build/three.module.js";
-import { OrbitControls } from "../node_modules/three/examples/jsm/controls/OrbitControls.js";
-import { PointerLockControls } from "../node_modules/three/examples/jsm/controls/PointerLockControls.js";
 import { Level } from "./Level.js";
 import { DynamicBody } from "./CollisionSystem/DynamicBody.js";
 import { Camera } from "./Camera.js";
