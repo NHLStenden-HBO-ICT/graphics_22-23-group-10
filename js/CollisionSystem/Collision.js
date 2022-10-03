@@ -23,6 +23,7 @@ export class Collision {
 
 	calculateExtents(geometry) {
 		geometry.computeBoundingBox();
+		this.boundingBox.setFromObject(this.model);
 		geometry.boundingBox.getSize(this.#size);
 	}
 }

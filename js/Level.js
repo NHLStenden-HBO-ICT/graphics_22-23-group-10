@@ -14,7 +14,8 @@ export class Level {
 	static #isLevelLoaded = false;
 	static #playerSpawn = new THREE.Vector3();
 	static #pacmanSpawn = new THREE.Vector3();
-	static collidableObjects = [];
+	static collisionObjects = [];
+	static cModelObjects = [];
 
 	static levelLoaded = new Event("levelLoaded");
 
@@ -50,14 +51,14 @@ export class Level {
 		const level = LEVELFOLDER + levelName + ".png";
 
 		let canvas = document.createElement("canvas");
-		let context = canvas.getContext("2d");
+		let context = canvas.getContext("2d", { willReadFrequently: true });
 
 		let img = new Image();
 		img.onload = () => {
 			canvas.width = img.width;
 			canvas.height = img.height;
 
-			this.#levelData = initLevelData(img.width);
+			this.#levelData = this.initLevelData(img.width);
 
 			context.drawImage(img, 0, 0);
 			// console.log(img.width, img.height, canvas.width, canvas.height);
@@ -71,6 +72,7 @@ export class Level {
 						// BLACK | Wall
 						tile = WALL;
 						const wall = new Wall(x, y);
+						wall.model.name = "" + x + " " + y;
 						this.#level.add(wall.model);
 					} else if (equals(data, [255, 255, 255, 255])) {
 						// WHITE | Floor
@@ -110,6 +112,8 @@ export class Level {
 				})
 			);
 
+			floor.layers.enable(1);
+
 			// Position mesh correctly
 			floor.position.x = floorDepth / 2 - SCALE_FACTOR / 2;
 			floor.position.y = -floorHeight;
@@ -117,37 +121,63 @@ export class Level {
 
 			floor.receiveShadow = true;
 			this.#level.add(floor);
+			this.cModelObjects.push(floor);
+
+			this.setCollisionList();
 
 			this.#isLevelLoaded = true;
 			dispatchEvent(this.levelLoaded);
 
 			canvas.remove();
-			// console.log(this.collidableObjects);
+			// console.log(this.collisionObjects);
+
+			this.addHelpers();
 		};
 
 		img.src = level;
 	}
-}
 
-function initLevelData(n) {
-	let array = [];
-	for (let i = 0; i < n; i++) {
-		array[i] = [];
+	static addToLevel(obj) {
+		this.#level.add(obj);
 	}
-	return array;
+
+	static setCollisionList() {
+		for (let i = 0; i < this.collisionObjects.length; i++) {
+			this.cModelObjects.push(this.collisionObjects[i].model);
+		}
+	}
+
+	static initLevelData(n) {
+		let array = [];
+		for (let i = 0; i < n; i++) {
+			array[i] = [];
+		}
+		return array;
+	}
+
+	static addHelpers() {
+		for (let i = 0; i < this.collisionObjects.length; i++) {
+			let helper = new THREE.Box3Helper(
+				this.collisionObjects[i].boundingBox,
+				0xff0000
+			);
+
+			this.#level.add(helper);
+		}
+	}
 }
 
 const equals = (a, b) => a.length === b.length && a.every((v, i) => v === b[i]); // Compares 2 objects
 
-function createWall(x, y) {
-	let wall = new THREE.Mesh(
-		new THREE.BoxGeometry(SCALE_FACTOR, SCALE_FACTOR * 0.1, SCALE_FACTOR),
-		new THREE.MeshPhongMaterial()
-	);
-	wall.receiveShadow = true;
-	wall.castShadow = true;
-	wall.position.x = x * SCALE_FACTOR;
-	wall.position.y = 0;
-	wall.position.z = y * SCALE_FACTOR;
-	return wall;
-}
+// function createWall(x, y) {
+// 	let wall = new THREE.Mesh(
+// 		new THREE.BoxGeometry(SCALE_FACTOR, SCALE_FACTOR * 0.1, SCALE_FACTOR),
+// 		new THREE.MeshPhongMaterial()
+// 	);
+// 	wall.receiveShadow = true;
+// 	wall.castShadow = true;
+// 	wall.position.x = x * SCALE_FACTOR;
+// 	wall.position.y = 0;
+// 	wall.position.z = y * SCALE_FACTOR;
+// 	return wall;
+// }
