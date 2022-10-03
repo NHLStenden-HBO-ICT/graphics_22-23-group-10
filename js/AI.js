@@ -2,10 +2,11 @@ import { Astar } from "./Astar/Astar.js";
 import { Graph } from "./Astar/Graph.js";
 import { Level } from "./Level.js";
 import * as THREE from "../node_modules/three/build/three.module.js";
+import { DynamicBody } from "./CollisionSystem/DynamicBody.js";
 
 const THRESHOLD = 0.2;
 
-export class Ai {
+export class Ai extends DynamicBody {
 	//add general code for the AI (pathfinding etc)
 
 	astar = new Astar();
@@ -18,12 +19,12 @@ export class Ai {
 
 		var start = graph.grid[pacmanPos.x][pacmanPos.z];
 		var end = graph.grid[playerPos.x][playerPos.z];
-		console.log(graph.grid[0].length);
+		// console.log(graph.grid[0].length);
 
 		graph.diagonal = true;
 		graph.dontCrossCorners = true;
 		var result = this.astar.search(graph, start, end);
-		
+
 		return result;
 	}
 

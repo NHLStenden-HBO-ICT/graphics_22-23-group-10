@@ -3,8 +3,10 @@ import * as THREE from "../node_modules/three/build/three.module.js";
 import { OrbitControls } from "../node_modules/three/examples/jsm/controls/OrbitControls.js";
 import { PointerLockControls } from "../node_modules/three/examples/jsm/controls/PointerLockControls.js";
 import { Level } from "./Level.js";
+import { DynamicBody } from "./CollisionSystem/DynamicBody.js";
+import { Camera } from "./Camera.js";
 
-export class Player {
+export class Player extends DynamicBody {
 	Actions = Object.freeze({
 		IDLE: Symbol(0),
 		WALK: Symbol(1),
@@ -13,12 +15,12 @@ export class Player {
 
 	playerLoaded = new Event("playerLoaded");
 
-	#MODELPATH = "../models/pacman.gltf";
+	#MODELPATH = "../models/ghost.glb";
 
 	#walkVelocity = 6;
-	#runVelocity = 50;
+	#runVelocity = 20;
 
-	#ready = false;
+	ready = false;
 	#currentAction = this.Actions.IDLE;
 	#walkDirection = new THREE.Vector3();
 	#rotateAngle = new THREE.Vector3(0, 1, 0);
@@ -32,42 +34,44 @@ export class Player {
 	SHIFT = "shift";
 	DIRECTIONS = [this.W, this.A, this.S, this.D];
 
-	#playerModel;
+	model;
 	camera;
 	#orbitControls;
 	// #lockControls;
 
-	get getPlayerModel() {
-		return this.#playerModel;
+	get getModel() {
+		return this.model;
 	}
 
-	get getPlayerPos() {
-		if (this.#ready) return this.getPlayerModel.position;
-		else return new THREE.Vector3();
+	get getCameraBase() {
+		return this.camera.rotY;
 	}
 
-	get isReady() {
-		return this.#ready;
-	}
+	// get getPosition() {
+	// 	if (this.ready) return this.model.position;
+	// 	else return new THREE.Vector3();
+	// }
+
+	// get isReady() {
+	// 	return this.ready;
+	// }
 
 	constructor(rendererDomElement) {
+		super();
 		this._loadPlayer(rendererDomElement);
 		this._initListeners();
 	}
 
-	setPosition(x, y, z) {
-		this.#playerModel.position.set(x, y, z);
-	}
-
 	update(delta) {
-		this._movePlayer(delta);
-	}
-
-	_movePlayer(delta) {
-		if (!this.#ready) {
+		if (!this.ready) {
 			return;
 		}
 
+		this._movePlayer(delta);
+		this.camera.update(delta, this.getPosition);
+	}
+
+	_movePlayer(delta) {
 		const directionPressed = this.DIRECTIONS.some(
 			(key) => this.#keysPressed[key] == true
 		);
@@ -83,27 +87,26 @@ export class Player {
 		}
 
 		if (this.#currentAction != this.Actions.IDLE) {
-			// Calculate camera direction
-			let cameraDirection = Math.atan2(
-				this.camera.position.x - this.#playerModel.position.x,
-				this.camera.position.z - this.#playerModel.position.z
-			);
+			// Calculate camera direction vector
+			this.camera.getWorldDirection(this.#walkDirection);
 
-			// console.log(cameraDirection);
-
-			// Diagonal movement offset
+			// Calculate what direction player wants to go
 			let directionOffset = this.directionOffset(this.#keysPressed);
+
+			// Calculate camera direction angle
+			let cameraDirection = Math.atan2(
+				this.#walkDirection.x,
+				this.#walkDirection.z
+			);
 
 			// Rotate player
 			this.#rotateQuaternion.setFromAxisAngle(
 				this.#rotateAngle,
-				cameraDirection + directionOffset
+				cameraDirection + directionOffset + Math.PI
 			);
-			// console.log(this.#playerModel.quaternion);
-			this.#playerModel.quaternion.rotateTowards(this.#rotateQuaternion, 0.2);
+			this.model.quaternion.rotateTowards(this.#rotateQuaternion, 0.2);
 
-			// Calculate direction
-			this.camera.getWorldDirection(this.#walkDirection);
+			// Calculate walk direction based on input and camera angle
 			this.#walkDirection.y = 0;
 			this.#walkDirection.normalize();
 			this.#walkDirection.applyAxisAngle(this.#rotateAngle, directionOffset);
@@ -120,41 +123,33 @@ export class Player {
 			}
 
 			// Move player
-			const moveX = this.#walkDirection.x * velocity * delta;
-			const moveZ = this.#walkDirection.z * velocity * delta;
-			this.#playerModel.position.x += moveX;
-			this.#playerModel.position.z += moveZ;
-
-			// Move camera
-			this._updateCamera(moveX, moveZ);
+			const movementVector = new THREE.Vector3(
+				this.#walkDirection.x * velocity * delta,
+				0,
+				this.#walkDirection.z * velocity * delta
+			);
+			this.moveAndCollide(movementVector, this.camera);
 		}
 	}
 
-	_updateCamera(moveX, moveZ) {
-		this.camera.position.x += moveX;
-		this.camera.position.z += moveZ;
-		this.#orbitControls.target = this.#playerModel.position;
-	}
-
 	_initCamera(rendererDomElement) {
-		const fov = 80;
-		const aspect = 2;
-		const near = 0.1;
-		const far = 1500.0;
-		this.camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+		this.camera = new Camera(this.getPosition);
+		// this.model.add(this.camera.rotY);
 
-		this.camera.position.y = 15;
+		// this.camera.position.y = 15;
 
 		// console.log(Level.getPlayerSpawn);
 
-		this.#orbitControls = new OrbitControls(this.camera, rendererDomElement);
-		this.#orbitControls.enableDamping = true;
-		this.#orbitControls.dampingFactor = 0.9;
-		this.#orbitControls.enablePan = false;
-		this.#orbitControls.enableZoom = false;
+		// this.#orbitControls = new OrbitControls(this.camera, rendererDomElement);
+		// this.#orbitControls.enableDamping = true;
+		// this.#orbitControls.dampingFactor = 0.9;
+		// this.#orbitControls.enablePan = false;
+		// this.#orbitControls.enableZoom = false;
 
-		let pos = Level.getPlayerSpawn;
-		this._updateCamera(pos.x, pos.z);
+		// let pos = Level.getPlayerSpawn;
+		// pos.z -= 12;
+		// this.camera.position.x = pos.x;
+		// this.camera.position.z = pos.z;
 
 		// this.#lockControls = new PointerLockControls(this.camera, document.body);
 	}
@@ -165,9 +160,7 @@ export class Player {
 			const mesh = model.scene;
 			mesh.position.x = Level.getPlayerSpawn.x;
 			mesh.position.z = Level.getPlayerSpawn.z;
-			self.#playerModel = mesh;
-
-			mesh.scale.set(1, 1, 1); // TEMPORARY
+			self.model = mesh;
 
 			mesh.traverse(function (obj) {
 				if (obj.isMesh) {
@@ -176,8 +169,9 @@ export class Player {
 				}
 			});
 
-			self.#ready = true;
+			self.ready = true;
 			self._initCamera(rendererDomElement);
+			self.calculateExtents(mesh.children[0].children[0].geometry); // Ugly hardcoding, but oh well
 			dispatchEvent(self.playerLoaded);
 		});
 	}

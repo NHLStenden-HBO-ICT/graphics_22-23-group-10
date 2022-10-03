@@ -4,6 +4,8 @@ import { loadShader } from "./ShaderLoader.js";
 
 export class Skybox {
 	skyboxLoaded = new Event("skyboxLoaded");
+	nightTimeStart = new Event("nightTimeStart");
+	nightTimeEnd = new Event("nightTimeEnd");
 
 	#ready = false;
 
@@ -13,6 +15,7 @@ export class Skybox {
 
 	#sunAxis = new THREE.Vector3(1, 0, 0);
 	#sunVector = new THREE.Vector3(0, -10, -500);
+	#isNight = false;
 
 	constructor() {
 		loadShader("skybox", onShaderLoaded);
@@ -48,16 +51,24 @@ export class Skybox {
 		let angle = THREE.MathUtils.radToDeg(
 			Math.atan2(this.#sunVector.z, this.#sunVector.y)
 		);
-		angle = clamp(angle, -90, 90);
+		let clampedAngle = clamp(angle, -90, 90);
 
 		let value = 1;
 
 		if (angle > 75) {
-			value = map(angle, 75, 90, 1, 0);
+			value = map(clampedAngle, 75, 90, 1, 0);
 		} else if (angle < -75) {
-			value = map(angle, -75, -90, 1, 0);
+			value = map(clampedAngle, -75, -90, 1, 0);
 		}
 		sun.intensity = value;
+
+		if (angle > 90 && angle > 0 && !this.#isNight) {
+			this.#isNight = true;
+			dispatchEvent(this.nightTimeStart);
+		} else if (angle > -90 && angle < 0 && this.#isNight) {
+			this.#isNight = false;
+			dispatchEvent(this.nightTimeEnd);
+		}
 	}
 }
 
