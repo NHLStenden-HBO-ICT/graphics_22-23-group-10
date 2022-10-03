@@ -11,7 +11,7 @@ export class Pacman extends Ai {
 
 	#MODELPATH = "../models/pacmanEvil.glb";
 	#PacmanModel;
-
+	
 	#walkVelocity = 8;
 	#walkDirection = new THREE.Vector3();
 	#rotateAngle = new THREE.Vector3(0, 1, 0);
@@ -33,7 +33,9 @@ export class Pacman extends Ai {
 		let self = this;
 		new GLTFLoader().load(this.#MODELPATH, function (model) {
 			const mesh = model.scene;
+
 			mesh.position.x = Level.getPacmanSpawn.x;
+			mesh.position.y = 3;
 			mesh.position.z = Level.getPacmanSpawn.z;
 			self.model = mesh;
 
@@ -53,7 +55,7 @@ export class Pacman extends Ai {
 			const action = self.#mixer.clipAction(clip);
 			action.play();			
 
-			self.#ready = true;
+			self.ready = true;
 			dispatchEvent(self.pacmanLoaded);
 		});
 	}
