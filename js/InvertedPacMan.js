@@ -6,7 +6,7 @@ import { Pacman } from "./Pacman.js";
 
 THREE.Cache.enabled = true;
 
-const LEVEL_TO_LOAD = "test2";
+const LEVEL_TO_LOAD = "test4";
 
 class InvertedPacman {
 	playerPacmanCollision = new Event("playerPacmanCollision");

@@ -10,14 +10,14 @@ export class Pacman extends Ai {
 	pacmanLoaded = new Event("pacmanLoaded");
 
 	#MODELPATH = "../models/pacmanEvil.glb";
-	#PacmanModel;
-	
+	// #PacmanModel;
+
 	#walkVelocity = 8;
 	#walkDirection = new THREE.Vector3();
 	#rotateAngle = new THREE.Vector3(0, 1, 0);
 	#rotateQuaternion = new THREE.Quaternion();
 
-	#mixer;
+	mixer;
 	#clock = new THREE.Clock();
 
 	get getPacmanModel() {
@@ -39,7 +39,7 @@ export class Pacman extends Ai {
 			mesh.position.z = Level.getPacmanSpawn.z;
 			self.model = mesh;
 
-			mesh.scale.set(3, 3, 3); // TEMPORARY
+			mesh.scale.set(3, 3, 3);
 
 			mesh.traverse(function (obj) {
 				if (obj.isMesh) {
@@ -49,11 +49,11 @@ export class Pacman extends Ai {
 			});
 
 			// animation related
-			self.#mixer = new THREE.AnimationMixer(mesh);
+			self.mixer = new THREE.AnimationMixer(mesh);
 			const clips = model.animations;
 			const clip = THREE.AnimationClip.findByName(clips, "Walk.002");
-			const action = self.#mixer.clipAction(clip);
-			action.play();			
+			const action = self.mixer.clipAction(clip);
+			action.play();
 
 			self.ready = true;
 			dispatchEvent(self.pacmanLoaded);
@@ -61,17 +61,17 @@ export class Pacman extends Ai {
 	}
 
 	update(delta, playerPos) {
-		this._movePacman(delta, playerPos);
-
-		// update animations
-		this.#mixer.update(delta);
-	}
-	
-	_movePacman(delta, playerPos) {
 		if (!this.ready) {
 			return;
 		}
 
+		this._movePacman(delta, playerPos);
+
+		// update animations
+		this.mixer.update(delta);
+	}
+
+	_movePacman(delta, playerPos) {
 		// Calculate direction
 		let p11 = playerPos;
 		let p22 = this.model.position;
@@ -108,10 +108,7 @@ export class Pacman extends Ai {
 		let directionAngle = Math.atan2(dir.x, dir.z); // Get angle to next point
 
 		// Rotate pacman
-		this.#rotateQuaternion.setFromAxisAngle(
-			this.#rotateAngle,
-			directionAngle
-		);
+		this.#rotateQuaternion.setFromAxisAngle(this.#rotateAngle, directionAngle);
 
 		this.model.quaternion.rotateTowards(this.#rotateQuaternion, 0.2);
 

@@ -1,4 +1,3 @@
-import { clamp } from "three/src/math/MathUtils.js";
 import * as THREE from "../node_modules/three/build/three.module.js";
 import { loadShader } from "./ShaderLoader.js";
 
@@ -74,3 +73,7 @@ export class Skybox {
 
 const map = (value, x1, y1, x2, y2) =>
 	((value - x1) * (y2 - x2)) / (y1 - x1) + x2;
+
+const clamp = (number, min, max) => {
+	return Math.max(min, Math.min(number, max));
+};

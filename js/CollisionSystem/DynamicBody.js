@@ -1,6 +1,5 @@
 import { Collision } from "./Collision.js";
 import { Level } from "../Level.js";
-import { clamp } from "three/src/math/MathUtils.js";
 
 const cTHRESHOLD = 0.2;
 
@@ -75,3 +74,7 @@ export class DynamicBody extends Collision {
 		this.model.position.z += moveZ;
 	}
 }
+
+const clamp = (number, min, max) => {
+	return Math.max(min, Math.min(number, max));
+};

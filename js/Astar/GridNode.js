@@ -1,3 +1,5 @@
+import { Level } from "../Level";
+
 export class GridNode {
 	constructor(x, y, weight) {
 		this.x = x;
@@ -15,6 +17,6 @@ export class GridNode {
 		return this.weight;
 	}
 	isWall() {
-		return this.weight === 0;
+		return this.weight === Level.WALL;
 	}
 }

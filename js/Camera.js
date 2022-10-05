@@ -1,6 +1,5 @@
 import * as THREE from "../node_modules/three/build/three.module.js";
 import { Level } from "./Level.js";
-import { clamp } from "three/src/math/MathUtils.js";
 
 const FOV = 80;
 const ASPECT = 2;
@@ -123,7 +122,9 @@ export class Camera extends THREE.PerspectiveCamera {
 
 		this.raycast.set(this.rotY.position, dir);
 
-		const intersects = this.raycast.intersectObjects(Level.cModelObjects);
+		const intersects = this.raycast.intersectObjects(
+			Level.cameraCollisionObjects
+		);
 		if (intersects.length > 0) {
 			const isct = intersects[0];
 			if (isct.distance < 12) {
@@ -133,3 +134,7 @@ export class Camera extends THREE.PerspectiveCamera {
 		}
 	}
 }
+
+const clamp = (number, min, max) => {
+	return Math.max(min, Math.min(number, max));
+};
