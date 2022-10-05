@@ -49,32 +49,47 @@ canvas {
     background-color: black;
 }
 
+.main_menu_bg {
+    width: 100%;
+    height: 100%;
+    background: url('../assets/img/arcade-bg.png') no-repeat;
+    background-size: cover;
+    position: inherit;
+    top: inherit;
+    left: inherit;
+    right: inherit;
+    bottom: inherit;
+    z-index: 999;
+    pointer-events: none;
+}
+
 .main_menu .ghost .img_ghost,
 .main_menu .pacman .img_pacman {
     position: absolute;
 }
 
 .main_menu .pacman .img_pacman {
-    height: 80rem;
-    left: -32rem;
-    top: 7.5rem;
+    height: 40rem;
+    left: 20rem;
+    top: 15rem;
 }
 
 
 .main_menu .ghost .img_ghost {
-    right: -30rem;
-    top: 8rem;
+    height: 40rem;
+    right: 18rem;
+    top: 14rem;
 }
 
 .main_menu .ghost .img_pupil {
+    height: 6rem;
     position: absolute;
-    right: 4rem;
+    right: 35rem;
     top: 28rem;
-    transform: rotate(0deg);
 }
 
 .main_menu_container {
-    margin-top: 12rem;
+    margin-top: 3rem;
     display: inherit;
     flex-direction: column;
 }
@@ -94,6 +109,7 @@ canvas {
 .main_menu_container .menu_controls {
     display: inherit;
     flex-direction: inherit;
+    margin-top: 5rem;
 }
 
 .main_menu_container .menu_controls > .play_button, .help_button {
@@ -107,6 +123,7 @@ canvas {
 
 .main_menu_container .menu_controls .play_button {
     font-size: 5rem;
+    animation: blink 1s linear infinite;
 }
 
 .main_menu_container .menu_controls .help_button {
@@ -122,4 +139,20 @@ canvas {
           -ms-user-select: none; /* Internet Explorer/Edge */
               user-select: none; /* Non-prefixed version, currently
                                     supported by Chrome, Edge, Opera and Firefox */
+  }
+
+
+  /* ---------- ANIMATION ---------- */
+
+  /* Menu */
+  @keyframes blink{
+    0%{
+      opacity: 0;
+    }
+    50%{
+      opacity: 0.7;
+    }
+    100%{
+      opacity: 0;
+    }
   }
