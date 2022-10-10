@@ -7,7 +7,7 @@ const FLOOR = 0;
 const WALL = 1;
 const DEAD_SPACE = 2;
 
-const SCALE_FACTOR = 5;
+const SCALE_FACTOR = 2;
 
 export class Level {
 	static #levelData;

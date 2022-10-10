@@ -6,7 +6,7 @@ import { Pacman } from "./Pacman.js";
 
 THREE.Cache.enabled = true;
 
-const LEVEL_TO_LOAD = "test4";
+const LEVEL_TO_LOAD = "test";
 
 class InvertedPacman {
 	playerPacmanCollision = new Event("playerPacmanCollision");
@@ -84,7 +84,7 @@ class InvertedPacman {
 
 			this._initPacman();
 
-			// this._addDebugShapes();
+			this._addDebugShapes();
 		});
 	}
 
@@ -150,8 +150,8 @@ class InvertedPacman {
 		this.player.boundingBox.setFromObject(this.player.model);
 		this.pacman.boundingBox.setFromObject(this.pacman.model);
 
-		// this.playerBoxHelper.box = this.player.boundingBox;
-		// this.pacmanBoxHelper.box = this.pacman.boundingBox;
+		this.playerBoxHelper.box = this.player.boundingBox;
+		this.pacmanBoxHelper.box = this.pacman.boundingBox;
 
 		if (this.player.boundingBox.intersectsBox(this.pacman.boundingBox)) {
 			dispatchEvent(this.playerPacmanCollision);

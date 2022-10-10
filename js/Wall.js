@@ -11,7 +11,7 @@ export class Wall extends StaticBody {
 		this.model = new THREE.Mesh(
 			new THREE.BoxGeometry(
 				SCALE_FACTOR * width,
-				SCALE_FACTOR * 2,
+				SCALE_FACTOR * 5,
 				SCALE_FACTOR * height
 			),
 			new THREE.MeshPhongMaterial()
@@ -21,7 +21,7 @@ export class Wall extends StaticBody {
 		this.model.receiveShadow = true;
 		this.model.castShadow = true;
 		this.model.position.x = posX * SCALE_FACTOR - 0.5 * SCALE_FACTOR;
-		this.model.position.y = SCALE_FACTOR;
+		this.model.position.y = SCALE_FACTOR * 2.5;
 		this.model.position.z = posZ * SCALE_FACTOR - 0.5 * SCALE_FACTOR;
 
 		this.calcExtents(this.model.geometry);
