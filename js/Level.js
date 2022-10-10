@@ -205,7 +205,7 @@ export class Level {
 		const WIDTH = map.length;
 		const HEIGHT = map[0].length;
 
-		console.log(WIDTH, HEIGHT);
+		// console.log(WIDTH, HEIGHT);
 
 		const findLargestRect = (x, y) => {
 			const rect = {
@@ -215,6 +215,8 @@ export class Level {
 				y2: HEIGHT - 1,
 				area: 0,
 			};
+
+			// console.log(rect.x2, rect.y2);
 
 			if (map[x][y] == FLOOR) {
 				// Tile is a floor
@@ -248,14 +250,22 @@ export class Level {
 				// Find smallest Y value
 				let yValues = [];
 				for (let x = rect.x1; x <= rect.x2; x++) {
-					for (let y = rect.y1; y <= rect.y2; y++) {
-						if (map[x][y] != WALL || y == rect.y2) {
+					for (let y = rect.y1; y < HEIGHT; y++) {
+						if (y == HEIGHT - 1) {
+							yValues.push(HEIGHT - 1);
+							break;
+						}
+						if (map[x][y] != WALL) {
 							yValues.push(y - 1);
 							break;
 						}
 					}
 				}
+				// console.log(yValues);
 				const lowestY = Math.min(...yValues);
+				// if (lowestY == Infinity) {
+				// 	console.log("INFINITY, x: " + x);
+				// }
 				rect.y2 = lowestY;
 
 				// Calculate area
@@ -285,7 +295,7 @@ export class Level {
 
 		while (this.containsWalls(map)) {
 			const largestRect = findLargestRect(0, 0);
-			console.log(largestRect);
+			// console.log(largestRect);
 
 			// Remove rectangle from map so it doesn't get found again
 			for (let y = largestRect.y1; y <= largestRect.y2; y++) {

@@ -10,8 +10,8 @@ export class Graph {
 		this.rotationToNextNode = 0;
 		// this.diagonal = !!this.diagonalOption;
 		// this.dontCrossCorners = !!this.dontCrossCornersOption;
-		this.diagonal = false;
-		this.dontCrossCorners = false;
+		this.diagonal = true;
+		this.dontCrossCorners = true;
 		this.grid = [];
 		for (var x = 0; x < gridIn.length; x++) {
 			this.grid[x] = [];
