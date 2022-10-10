@@ -10,20 +10,21 @@ export class Ai extends DynamicBody {
 	//add general code for the AI (pathfinding etc)
 
 	astar = new Astar();
+	graph = new Graph(Level.getLevelData);
 
 	getPath(pacmanPos, playerPos) {
 		// console.log(pacmanPos);
 
-		let graph = new Graph(Level.getLevelData);
-		graph.diagonal = true;
+		// let graph = new Graph(Level.getLevelData);
+		// graph.diagonal = true;
 
-		var start = graph.grid[pacmanPos.x][pacmanPos.z];
-		var end = graph.grid[playerPos.x][playerPos.z];
+		var start = this.graph.grid[pacmanPos.x][pacmanPos.z];
+		var end = this.graph.grid[playerPos.x][playerPos.z];
 		// console.log(graph.grid[0].length);
 
-		graph.diagonal = true;
-		graph.dontCrossCorners = true;
-		var result = this.astar.search(graph, start, end);
+		// graph.diagonal = true;
+		// graph.dontCrossCorners = true;
+		var result = this.astar.search(this.graph, start, end);
 
 		return result;
 	}

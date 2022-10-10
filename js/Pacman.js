@@ -39,7 +39,7 @@ export class Pacman extends Ai {
 			mesh.position.z = Level.getPacmanSpawn.z;
 			self.model = mesh;
 
-			mesh.scale.set(3, 3, 3);
+			// mesh.scale.set(3, 3, 3);
 
 			mesh.traverse(function (obj) {
 				if (obj.isMesh) {

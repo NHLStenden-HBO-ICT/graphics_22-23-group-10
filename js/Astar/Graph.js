@@ -3,11 +3,15 @@ import { GridNode } from "./Gridnode.js";
 import { Astar } from "./Astar.js";
 
 export class Graph {
+	level = [];
 	constructor(gridIn) {
+		this.level = gridIn;
 		this.nodes = [];
 		this.rotationToNextNode = 0;
-		this.diagonal = !!this.diagonalOption;
-		this.dontCrossCorners = !!this.dontCrossCornersOption;
+		// this.diagonal = !!this.diagonalOption;
+		// this.dontCrossCorners = !!this.dontCrossCornersOption;
+		this.diagonal = false;
+		this.dontCrossCorners = false;
 		this.grid = [];
 		for (var x = 0; x < gridIn.length; x++) {
 			this.grid[x] = [];
@@ -37,7 +41,7 @@ export class Graph {
 	}
 	//returns true when node is a floor
 	isWalkableAt(x, y) {
-		return Level.getLevelData[x][y] == Level.FLOOR;
+		return this.level[x][y] == Level.FLOOR;
 	}
 	neighbors(node) {
 		var x = node.x,
