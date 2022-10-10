@@ -5,11 +5,11 @@ import { loadShader } from "./ShaderLoader.js";
 export class Skybox {
 	skyboxLoaded = new Event("skyboxLoaded");
 	nightTimeStart = new Event("nightTimeStart");
-	nightTimeEnd = new Event("nightTimeEnd");
+	dayTimeStart = new Event("dayTimeStart");
 
 	#ready = false;
 
-	#SUNSPEED = 0.005;
+	#SUNSPEED = 0.5;
 
 	skyGeometry;
 
@@ -67,7 +67,7 @@ export class Skybox {
 			dispatchEvent(this.nightTimeStart);
 		} else if (angle > -90 && angle < 0 && this.#isNight) {
 			this.#isNight = false;
-			dispatchEvent(this.nightTimeEnd);
+			dispatchEvent(this.dayTimeStart);
 		}
 	}
 }

@@ -3,6 +3,7 @@ import * as THREE from "../node_modules/three/build/three.module.js";
 import { Ai } from "./AI.js";
 import { Level } from "./Level.js";
 import { Graph } from "./Astar/Graph.js";
+import { PacmanStatemachine } from "./PacmanStatemachine.js";
 
 export class Pacman extends Ai {
 	//add code for pacman (movement related, model, animation)
@@ -19,6 +20,8 @@ export class Pacman extends Ai {
 
 	#mixer;
 	#clock = new THREE.Clock();
+
+	pacmanState = new PacmanStatemachine();
 
 	get getPacmanModel() {
 		return this.model;
@@ -71,6 +74,7 @@ export class Pacman extends Ai {
 		if (!this.ready) {
 			return;
 		}
+		let pacmanstate = this.pacmanState.getState();
 
 		// Calculate direction
 		let p11 = playerPos;
@@ -92,7 +96,15 @@ export class Pacman extends Ai {
 
 		const ghostPos = new THREE.Vector3(playerPos.x / SF, 0, playerPos.z / SF);
 
-		let path = this.getPath(pacmanPos.round(), ghostPos.round());
+		let path = [];
+
+		if (pacmanstate == PacmanStatemachine.Cycles.DAY){
+			// get random path towards some random node
+		}
+		else {
+			path = this.getPath(pacmanPos.round(), ghostPos.round());
+		}
+		
 		if (path.length == 0) {
 			return;
 		}
