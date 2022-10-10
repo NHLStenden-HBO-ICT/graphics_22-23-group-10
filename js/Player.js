@@ -159,11 +159,13 @@ export class Player extends DynamicBody {
 			mesh.position.x = Level.getPlayerSpawn.x;
 			mesh.position.z = Level.getPlayerSpawn.z;
 			self.model = mesh;
+			mesh.layers.enable(2);
 
 			mesh.traverse(function (obj) {
 				if (obj.isMesh) {
 					obj.castShadow = true;
 					obj.receiveShadow = true;
+					obj.layers.enable(2);
 				}
 			});
 

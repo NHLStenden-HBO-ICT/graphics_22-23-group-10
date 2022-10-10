@@ -63,18 +63,17 @@ export class Pacman extends Ai {
 		});
 	}
 
-	update(delta, playerPos) {
-		this._movePacman(delta, playerPos);
+	update(delta, playerPos, playerModel) {
+		this._movePacman(delta, playerPos, playerModel);
 
 		// update animations
 		this.#mixer.update(delta);
 	}
 	
-	_movePacman(delta, playerPos) {
+	_movePacman(delta, playerPos, playerModel) {
 		if (!this.ready) {
 			return;
 		}
-		let pacmanstate = this.pacmanState.getState();
 
 		// Calculate direction
 		let p11 = playerPos;
@@ -98,13 +97,8 @@ export class Pacman extends Ai {
 
 		let path = [];
 
-		if (pacmanstate == PacmanStatemachine.Cycles.DAY){
-			// get random path towards some random node
-		}
-		else {
-			path = this.getPath(pacmanPos.round(), ghostPos.round());
-		}
-		
+		path = this.getPath(pacmanPos.round(), ghostPos.round(), this.pacmanState.getState(), playerModel);
+
 		if (path.length == 0) {
 			return;
 		}

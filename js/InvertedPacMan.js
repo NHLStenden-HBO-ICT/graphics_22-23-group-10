@@ -172,8 +172,7 @@ class InvertedPacman {
 			// delta = THREE.getDelta();
 
 			this.player.update(delta);
-
-			this.pacman.update(delta, this.player.getPosition);
+			this.pacman.update(delta, this.player.getPosition, this.player.getModel);
 
 			this.skybox.update(delta, this.sun);
 
