@@ -41,6 +41,9 @@ export class Graph {
 	}
 	//returns true when node is a floor
 	isWalkableAt(x, y) {
+		// console.log(x, y);
+		if (x >= this.level.length || x < 0) return false;
+		if (y >= this.level[0].length || y < 0) return false;
 		return this.level[x][y] == Level.FLOOR;
 	}
 	neighbors(node) {
