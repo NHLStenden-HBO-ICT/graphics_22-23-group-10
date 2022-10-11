@@ -55,14 +55,14 @@ class InvertedPacman {
 		this.sun.position.set(0, 1, 0);
 		this.sun.target.position.set(0, 0, 0);
 		this.sun.castShadow = true;
-		this.sun.shadow.mapSize.width = 4096 * 10;
-		this.sun.shadow.mapSize.height = 4096 * 10;
+		this.sun.shadow.mapSize.width = 40960;
+		this.sun.shadow.mapSize.height = 40960;
 		this.sun.shadow.camera.near = 0.1;
 		this.sun.shadow.camera.far = 1000;
-		this.sun.shadow.camera.left = -500;
-		this.sun.shadow.camera.right = 500;
-		this.sun.shadow.camera.top = 500;
-		this.sun.shadow.camera.bottom = -500;
+		this.sun.shadow.camera.left = -200;
+		this.sun.shadow.camera.right = 200;
+		this.sun.shadow.camera.top = 200;
+		this.sun.shadow.camera.bottom = -200;
 		this.sun.shadow.bias = -0.0001;
 		this.scene.add(this.sun);
 
@@ -101,7 +101,7 @@ class InvertedPacman {
 		this.scene.add(this.playerBoxHelper);
 		this.scene.add(this.pacmanBoxHelper);
 
-		// this.scene.add(new THREE.CameraHelper(this.sun.shadow.camera));
+		this.scene.add(new THREE.CameraHelper(this.sun.shadow.camera));
 	}
 
 	_initPlayer(rendererDomElement) {
