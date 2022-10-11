@@ -66,7 +66,8 @@ class InvertedPacman {
 		this.sun.shadow.bias = -0.0001;
 		this.scene.add(this.sun);
 
-		let light = new THREE.HemisphereLight(0x404040, 0x12782d, 0.5);
+		let light = new THREE.HemisphereLight(0xa5dfe8, 0x12782d, 0.5);
+		// let light = new THREE.AmbientLight(0xbfd7d9, 0.3);
 		this.scene.add(light);
 
 		this.skybox = new Skybox();
@@ -84,7 +85,7 @@ class InvertedPacman {
 
 			this._initPacman();
 
-			this._addDebugShapes();
+			// this._addDebugShapes();
 		});
 	}
 
@@ -150,8 +151,8 @@ class InvertedPacman {
 		this.player.boundingBox.setFromObject(this.player.model);
 		this.pacman.boundingBox.setFromObject(this.pacman.model);
 
-		this.playerBoxHelper.box = this.player.boundingBox;
-		this.pacmanBoxHelper.box = this.pacman.boundingBox;
+		// this.playerBoxHelper.box = this.player.boundingBox;
+		// this.pacmanBoxHelper.box = this.pacman.boundingBox;
 
 		if (this.player.boundingBox.intersectsBox(this.pacman.boundingBox)) {
 			dispatchEvent(this.playerPacmanCollision);
@@ -169,9 +170,8 @@ class InvertedPacman {
 			this.renderer.render(this.scene, this.player.camera);
 			// this.renderer.render(this.scene, this.camera);
 			let delta = this.clock.getDelta();
-			// delta = THREE.getDelta();
 
-			this.player.update(delta);
+			this.player.update(delta, this.clock.getElapsedTime());
 
 			this.pacman.update(delta, this.player.getPosition);
 

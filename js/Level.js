@@ -127,18 +127,16 @@ export class Level {
 			const floorWidth = img.width * SCALE_FACTOR;
 			const floorHeight = 0.1;
 			const floorDepth = img.height * SCALE_FACTOR;
-
-			// Create mesh
 			const floor = new THREE.Mesh(
 				new THREE.BoxGeometry(floorWidth, floorHeight, floorDepth, 1, 1),
 				new THREE.MeshPhongMaterial({
 					color: 0x336600,
 				})
 			);
-
+			floor.name = "Floor";
 			floor.layers.enable(1);
 
-			// Position mesh correctly
+			// Position floor correctly
 			floor.position.x = floorDepth / 2 - SCALE_FACTOR / 2;
 			floor.position.y = -floorHeight;
 			floor.position.z = floorWidth / 2 - SCALE_FACTOR / 2;
@@ -147,9 +145,8 @@ export class Level {
 			this.#level.add(floor);
 			this.cameraCollisionObjects.push(floor);
 
+			// Scan map matrix and generate better walls
 			this.createWalls();
-
-			// console.log(this.#levelData);
 
 			this.setCollisionList();
 
@@ -197,15 +194,9 @@ export class Level {
 	/** Will find rectangles in a matrix/2d array */
 	static createWalls() {
 		let map = this.#mapData;
-		// let map = [];
-
-		// for (var i = 0; i < this.#levelData.length; i++)
-		// 	map[i] = this.#levelData[i].slice();
 
 		const WIDTH = map.length;
 		const HEIGHT = map[0].length;
-
-		// console.log(WIDTH, HEIGHT);
 
 		const findLargestRect = (x, y) => {
 			const rect = {
@@ -215,8 +206,6 @@ export class Level {
 				y2: HEIGHT - 1,
 				area: 0,
 			};
-
-			// console.log(rect.x2, rect.y2);
 
 			if (map[x][y] == FLOOR) {
 				// Tile is a floor
@@ -261,11 +250,8 @@ export class Level {
 						}
 					}
 				}
-				// console.log(yValues);
+
 				const lowestY = Math.min(...yValues);
-				// if (lowestY == Infinity) {
-				// 	console.log("INFINITY, x: " + x);
-				// }
 				rect.y2 = lowestY;
 
 				// Calculate area
@@ -315,8 +301,6 @@ export class Level {
 			this.#level.add(wall.model);
 			this.collisionObjects.push(wall);
 		}
-
-		// console.log("\n", walls);
 	}
 
 	static calculateWallArea(map, width, height) {
@@ -339,54 +323,3 @@ export class Level {
 }
 
 const equals = (a, b) => a.length === b.length && a.every((v, i) => v === b[i]); // Compares 2 objects
-
-//
-
-//
-
-// // Find top left corner
-// let foundCorner = false;
-// for (let y = 0; y < HEIGHT; y++) {
-// 	for (let x = 0; x < WIDTH; x++) {
-// 		if (map[x][y] == WALL) {
-// 			// Wall found
-// 			rect.x1 = x;
-// 			rect.y1 = y;
-// 			foundCorner = true;
-// 			break;
-// 		}
-// 	}
-// 	if (foundCorner) break;
-// }
-
-// // Find bottom right corner
-// // First we find largest possible X value
-// for (let x = rect.x1; x <= rect.x2; ++x) {
-// 	if (x == rect.x2) {
-// 		// If edge of map is reached
-// 		break;
-// 	}
-
-// 	if (map[x][rect.y1] != WALL) {
-// 		// If a floor is encountered on the horizonal axis
-// 		rect.x2 = x - 1;
-// 		break;
-// 	}
-// }
-
-// // Find smallest Y value
-// let yValues = [];
-// for (let x = rect.x1; x <= rect.x2; x++) {
-// 	for (let y = rect.y1; y <= rect.y2; y++) {
-// 		if (map[x][y] != WALL || y == rect.y2) {
-// 			yValues.push(y - 1);
-// 			break;
-// 		}
-// 	}
-// }
-
-// const lowestY = Math.min(...yValues);
-// const index = yValues.lastIndexOf(lowestY);
-// rect.x2 = rect.x1 + index;
-// rect.y2 = lowestY;
-// rectangles.push(rect);

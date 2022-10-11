@@ -2,7 +2,6 @@ import { GLTFLoader } from "../node_modules/three/examples/jsm/loaders/GLTFLoade
 import * as THREE from "../node_modules/three/build/three.module.js";
 import { Ai } from "./AI.js";
 import { Level } from "./Level.js";
-import { Graph } from "./Astar/Graph.js";
 
 export class Pacman extends Ai {
 	//add code for pacman (movement related, model, animation)
@@ -10,7 +9,6 @@ export class Pacman extends Ai {
 	pacmanLoaded = new Event("pacmanLoaded");
 
 	#MODELPATH = "../models/pacmanEvil.glb";
-	// #PacmanModel;
 
 	#walkVelocity = 8;
 	#walkDirection = new THREE.Vector3();
@@ -18,7 +16,6 @@ export class Pacman extends Ai {
 	#rotateQuaternion = new THREE.Quaternion();
 
 	mixer;
-	#clock = new THREE.Clock();
 
 	get getPacmanModel() {
 		return this.model;
@@ -78,7 +75,6 @@ export class Pacman extends Ai {
 		this.#walkDirection = new THREE.Vector3(p11.x - p22.x, 0, p11.z - p22.z);
 		this.#walkDirection.normalize();
 		this.#rotateAngle.normalize();
-		// console.log(this.#walkDirection);
 
 		const velocity = this.#walkVelocity;
 

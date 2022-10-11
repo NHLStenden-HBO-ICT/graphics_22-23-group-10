@@ -130,6 +130,9 @@ export class Camera extends THREE.PerspectiveCamera {
 			if (isct.distance < 12) {
 				// console.log(isct);
 				this.position.z = isct.distance - 1;
+				// if (isct.object.name == "Floor") {
+				// 	this.position.y += 5;
+				// }
 			}
 		}
 	}
