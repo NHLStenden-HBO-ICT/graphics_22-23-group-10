@@ -15,6 +15,11 @@ export class Skybox {
 	#sunAxis = new THREE.Vector3(1, 0, 0);
 	#sunVector = new THREE.Vector3(0, 100, -500);
 	#isNight = false;
+	#lightIntensity;
+
+	get getLightIntensity() {
+		return this.#lightIntensity;
+	}
 
 	constructor() {
 		loadShader("skybox", onShaderLoaded);
@@ -59,6 +64,8 @@ export class Skybox {
 		} else if (angle < -75) {
 			value = map(clampedAngle, -75, -90, 1, 0);
 		}
+
+		this.#lightIntensity = value;
 		sun.intensity = value;
 
 		if (angle > 90 && angle > 0 && !this.#isNight) {

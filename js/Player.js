@@ -35,7 +35,9 @@ export class Player extends DynamicBody {
 
 	model;
 	camera;
+
 	lamp;
+	eye;
 
 	get getModel() {
 		return this.model;
@@ -45,13 +47,13 @@ export class Player extends DynamicBody {
 		return this.camera.rotY;
 	}
 
-	constructor(rendererDomElement) {
+	constructor() {
 		super();
-		this._loadPlayer(rendererDomElement);
+		this._loadPlayer();
 		this._initListeners();
 	}
 
-	update(delta, timeElapsed) {
+	update(delta, timeElapsed, sunIntensity) {
 		if (!this.ready) {
 			return;
 		}
@@ -60,6 +62,15 @@ export class Player extends DynamicBody {
 		this.camera.update(delta, this.getPosition);
 
 		this.updateShader(timeElapsed);
+
+		this.updateLamp(sunIntensity);
+	}
+
+	updateLamp(sunIntensity) {
+		this.lamp.intensity = 1 - sunIntensity;
+
+		const bloomIntensity = 1 - sunIntensity;
+		this.eye.material.emissiveIntensity = bloomIntensity * 3;
 	}
 
 	updateShader(timeElapsed) {
@@ -127,11 +138,11 @@ export class Player extends DynamicBody {
 		}
 	}
 
-	_initCamera(rendererDomElement) {
+	_initCamera() {
 		this.camera = new Camera(this.getPosition);
 	}
 
-	_loadPlayer(rendererDomElement) {
+	_loadPlayer() {
 		let self = this;
 		new GLTFLoader().load(this.#MODELPATH, function (model) {
 			const mesh = model.scene;
@@ -160,9 +171,9 @@ export class Player extends DynamicBody {
 						light.layers.enable(1);
 						light.castShadow = true;
 						light.angle = Math.PI / 6;
-						light.distance = 25;
+						light.distance = 50;
 						light.position.set(0, 0, 0);
-						light.intensity = 1;
+						light.intensity = 1.2;
 						light.decay = 1;
 						light.penumbra = 0.4;
 						light.shadow.bias = -0.0001;
@@ -174,13 +185,14 @@ export class Player extends DynamicBody {
 						lightTarget = obj;
 					}
 					if (obj.name == "Eye") {
-						obj.material.emissiveIntensity = 5;
+						obj.material.emissiveIntensity = 0;
+						self.eye = obj;
 					}
 				});
 				self.lamp.target = lightTarget;
 
 				self.ready = true;
-				self._initCamera(rendererDomElement);
+				self._initCamera();
 				dispatchEvent(self.playerLoaded);
 			}
 		});

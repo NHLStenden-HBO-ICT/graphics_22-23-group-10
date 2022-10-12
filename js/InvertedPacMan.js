@@ -2,7 +2,6 @@ import * as THREE from "../node_modules/three/build/three.module.js";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass";
-import { BokehPass } from "three/examples/jsm/postprocessing/BokehPass";
 import { Player } from "./Player.js";
 import { Skybox } from "./Skybox.js";
 import { Level } from "./Level.js";
@@ -21,10 +20,6 @@ class InvertedPacman {
 		this._init();
 
 		this.update();
-	}
-
-	addToScene(object) {
-		this.scene.add(object);
 	}
 
 	_init() {
@@ -56,7 +51,7 @@ class InvertedPacman {
 	_initScene() {
 		this.scene = new THREE.Scene();
 
-		// this.scene.fog = new THREE.Fog(0xc5d4d9, 0, 50);
+		this.scene.fog = new THREE.Fog(0x000000, 0, 60);
 
 		this.sun = new THREE.DirectionalLight(0xffffff);
 		this.sun.position.set(0, 1, 0);
@@ -88,7 +83,7 @@ class InvertedPacman {
 		addEventListener("levelLoaded", () => {
 			this.scene.add(Level.getLevel);
 
-			this._initPlayer(this.renderer.domElement);
+			this._initPlayer();
 
 			this._initPacman();
 		});
@@ -127,8 +122,8 @@ class InvertedPacman {
 		Level.addHelpers();
 	}
 
-	_initPlayer(rendererDomElement) {
-		this.player = new Player(rendererDomElement);
+	_initPlayer() {
+		this.player = new Player();
 
 		addEventListener("playerLoaded", () => {
 			this.scene.add(this.player.getModel);
@@ -150,18 +145,6 @@ class InvertedPacman {
 		addEventListener("pacmanLoaded", () => {
 			this.scene.add(this.pacman.getPacmanModel);
 		});
-	}
-
-	_initDebugCam() {
-		const fov = 80;
-		const aspect = 2;
-		const near = 0.1;
-		const far = 1000.0;
-		this.camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-		this.camera.position.set(0, 10, 10);
-		this.camera.lookAt(new THREE.Vector3());
-
-		this.controls = new OrbitControls(this.camera, this.renderer.domElement);
 	}
 
 	_OnWindowResize() {
@@ -186,6 +169,12 @@ class InvertedPacman {
 		}
 	}
 
+	updateFog() {
+		const lightLevel = this.skybox.getLightIntensity;
+
+		this.scene.fog.far = map(lightLevel, 0, 1, 60, 500);
+	}
+
 	clock = new THREE.Clock();
 
 	update() {
@@ -198,11 +187,17 @@ class InvertedPacman {
 			// this.renderer.render(this.scene, this.player.camera);
 			this.composer.render(delta);
 
-			this.player.update(delta, this.clock.getElapsedTime());
+			this.player.update(
+				delta,
+				this.clock.getElapsedTime(),
+				this.skybox.getLightIntensity
+			);
 
 			this.pacman.update(delta, this.player.getPosition);
 
 			this.skybox.update(delta, this.sun);
+
+			this.updateFog();
 
 			this.checkPlayerPacmanCollision();
 
@@ -212,3 +207,6 @@ class InvertedPacman {
 }
 
 new InvertedPacman();
+
+const map = (value, x1, y1, x2, y2) =>
+	((value - x1) * (y2 - x2)) / (y1 - x1) + x2;
