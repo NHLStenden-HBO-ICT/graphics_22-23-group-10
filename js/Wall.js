@@ -8,13 +8,15 @@ export class Wall extends StaticBody {
 
 		const SCALE_FACTOR = Level.getScaleFactor;
 
+		const mat = new THREE.MeshStandardMaterial({ color: 0xd6d6d6 });
+
 		this.model = new THREE.Mesh(
 			new THREE.BoxGeometry(
 				SCALE_FACTOR * width,
 				SCALE_FACTOR * 5,
 				SCALE_FACTOR * height
 			),
-			new THREE.MeshPhongMaterial()
+			mat
 		);
 
 		this.model.layers.enable(1);

@@ -71,10 +71,7 @@ export class Level {
 			this.#levelData = this.initLevelData(img.width);
 			this.#mapData = this.initLevelData(img.width);
 
-			// console.log(img.height, img.width);
-
 			context.drawImage(img, 0, 0);
-			// console.log(img.width, img.height, canvas.width, canvas.height);
 			for (let y = 0; y < canvas.height; y++) {
 				for (let x = 0; x < canvas.width; x++) {
 					let data = context.getImageData(x, y, 1, 1).data;
@@ -110,8 +107,6 @@ export class Level {
 						console.log("Color not found at ", x, y);
 						tile = FLOOR;
 					}
-					// this.#levelData[x][y] = tile;
-					// this.#mapData[x][y] = tile;
 					if (tile == DEAD_SPACE) {
 						this.#levelData[x][y] = WALL;
 						this.#mapData[x][y] = FLOOR;
@@ -121,7 +116,6 @@ export class Level {
 					}
 				}
 			}
-			// console.log(this.#levelData, this.#mapData);
 
 			// Add a ground
 			const floorWidth = img.width * SCALE_FACTOR;
@@ -154,9 +148,6 @@ export class Level {
 			dispatchEvent(this.levelLoaded);
 
 			canvas.remove();
-			// console.log(this.collisionObjects);
-
-			this.addHelpers();
 		};
 
 		img.src = level;

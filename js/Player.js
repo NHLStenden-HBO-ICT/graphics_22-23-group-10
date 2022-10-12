@@ -64,7 +64,6 @@ export class Player extends DynamicBody {
 
 	updateShader(timeElapsed) {
 		this.model.children[0].material.uniforms.u_time.value = timeElapsed;
-		// console.log(this.model.children[0].material);
 	}
 
 	_movePlayer(delta) {
@@ -163,14 +162,10 @@ export class Player extends DynamicBody {
 						light.angle = Math.PI / 6;
 						light.distance = 25;
 						light.position.set(0, 0, 0);
-						light.intensity = 2;
+						light.intensity = 1;
 						light.decay = 1;
 						light.penumbra = 0.4;
-						// light.shadow.mapSize.width = 1024;
-						// light.shadow.mapSize.height = 1024;
-						// light.shadow.camera.near = 500;
-						// light.shadow.camera.far = 4000;
-						// light.shadow.camera.fov = 30;
+						light.shadow.bias = -0.0001;
 
 						self.lamp = light;
 						obj.add(self.lamp);
@@ -178,8 +173,10 @@ export class Player extends DynamicBody {
 					if (obj.name == "LightTarget") {
 						lightTarget = obj;
 					}
+					if (obj.name == "Eye") {
+						obj.material.emissiveIntensity = 5;
+					}
 				});
-				// console.log(mesh);
 				self.lamp.target = lightTarget;
 
 				self.ready = true;
