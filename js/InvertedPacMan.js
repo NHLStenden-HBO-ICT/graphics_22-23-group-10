@@ -1,4 +1,7 @@
 import * as THREE from "../node_modules/three/build/three.module.js";
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
+import { BloomPass } from "three/examples/jsm/postprocessing/BloomPass.js";
 import { Player } from "./Player.js";
 import { Skybox } from "./Skybox.js";
 import { Level } from "./Level.js";
@@ -14,7 +17,7 @@ class InvertedPacman {
 	constructor() {
 		this._init();
 
-		this._RAF();
+		this.update();
 	}
 
 	addToScene(object) {
@@ -39,6 +42,8 @@ class InvertedPacman {
 		this.renderer.shadowMap.enabled = true;
 		this.renderer.shadowMap.type = THREE.PCFShadowMap;
 
+		this.composer = new EffectComposer(this.renderer);
+
 		window.addEventListener(
 			"resize",
 			() => {
@@ -50,6 +55,8 @@ class InvertedPacman {
 
 	_initScene() {
 		this.scene = new THREE.Scene();
+
+		// this.scene.fog = new THREE.Fog(0xc5d4d9, 0, 50);
 
 		this.sun = new THREE.DirectionalLight(0xffffff);
 		this.sun.position.set(0, 1, 0);
@@ -85,7 +92,7 @@ class InvertedPacman {
 
 			this._initPacman();
 
-			// this._addDebugShapes();
+			this._addDebugShapes();
 		});
 	}
 
@@ -114,6 +121,18 @@ class InvertedPacman {
 			this._OnWindowResize();
 
 			this.ready = true;
+			this.scene.add(new THREE.SpotLightHelper(this.player.lamp));
+
+			const renderPass = new RenderPass(this.scene, this.player.camera);
+			this.composer.addPass(renderPass);
+
+			const bloomPass = new BloomPass(
+				1, // strength
+				25, // kernel size
+				4, // sigma ?
+				256 // blur render target resolution
+			);
+			this.composer.addPass(bloomPass);
 		});
 	}
 
@@ -151,8 +170,8 @@ class InvertedPacman {
 		this.player.boundingBox.setFromObject(this.player.model);
 		this.pacman.boundingBox.setFromObject(this.pacman.model);
 
-		// this.playerBoxHelper.box = this.player.boundingBox;
-		// this.pacmanBoxHelper.box = this.pacman.boundingBox;
+		this.playerBoxHelper.box = this.player.boundingBox;
+		this.pacmanBoxHelper.box = this.pacman.boundingBox;
 
 		if (this.player.boundingBox.intersectsBox(this.pacman.boundingBox)) {
 			dispatchEvent(this.playerPacmanCollision);
@@ -161,15 +180,26 @@ class InvertedPacman {
 
 	clock = new THREE.Clock();
 
-	_RAF() {
+	// update() {
+	// 	if (!this.ready) {
+	// 		this.update();
+	// 		return;
+	// 	}
+	// 	requestAnimationFrame(this.update);
+	// 	this.renderer.render(this.scene, this.player.camera);
+	// 	const delta = this.clock.getDelta();
+	// 	// this.composer.render(delta);
+	// }
+
+	update() {
 		requestAnimationFrame(() => {
 			if (!this.ready) {
-				this._RAF();
+				this.update();
 				return;
 			}
-			this.renderer.render(this.scene, this.player.camera);
-			// this.renderer.render(this.scene, this.camera);
 			let delta = this.clock.getDelta();
+			this.renderer.render(this.scene, this.player.camera);
+			// this.composer.render(delta);
 
 			this.player.update(delta, this.clock.getElapsedTime());
 
@@ -179,7 +209,7 @@ class InvertedPacman {
 
 			this.checkPlayerPacmanCollision();
 
-			this._RAF();
+			this.update();
 		});
 	}
 }

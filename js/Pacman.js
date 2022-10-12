@@ -62,7 +62,7 @@ export class Pacman extends Ai {
 			return;
 		}
 
-		this._movePacman(delta, playerPos);
+		// this._movePacman(delta, playerPos);
 
 		// update animations
 		this.mixer.update(delta);

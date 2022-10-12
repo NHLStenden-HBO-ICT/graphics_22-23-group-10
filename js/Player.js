@@ -35,6 +35,7 @@ export class Player extends DynamicBody {
 
 	model;
 	camera;
+	lamp;
 
 	get getModel() {
 		return this.model;
@@ -145,19 +146,44 @@ export class Player extends DynamicBody {
 			function shaderLoaded(material) {
 				material.transparent = true;
 				material.lights = true;
+				let lightTarget;
 				mesh.traverse(function (obj) {
 					if (obj.isMesh) {
 						if (obj.name == "Ghost") {
 							obj.castShadow = true;
 							obj.receiveShadow = true;
 							obj.material = material;
+							self.calculateExtents(obj.geometry);
 						}
 					}
+					if (obj.name == "LampPoint") {
+						let light = new THREE.SpotLight(0xfcd08d);
+						light.layers.enable(1);
+						light.castShadow = true;
+						light.angle = Math.PI / 6;
+						light.distance = 25;
+						light.position.set(0, 0, 0);
+						light.intensity = 2;
+						light.decay = 1;
+						light.penumbra = 0.4;
+						// light.shadow.mapSize.width = 1024;
+						// light.shadow.mapSize.height = 1024;
+						// light.shadow.camera.near = 500;
+						// light.shadow.camera.far = 4000;
+						// light.shadow.camera.fov = 30;
+
+						self.lamp = light;
+						obj.add(self.lamp);
+					}
+					if (obj.name == "LightTarget") {
+						lightTarget = obj;
+					}
 				});
+				// console.log(mesh);
+				self.lamp.target = lightTarget;
 
 				self.ready = true;
 				self._initCamera(rendererDomElement);
-				self.calculateExtents(mesh.children[0].children[0].geometry); // Ugly hardcoding, but oh well
 				dispatchEvent(self.playerLoaded);
 			}
 		});
