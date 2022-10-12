@@ -5,10 +5,30 @@ export class Menu {
     }
 
     _initMainMenu() {
+        this._initHelpMenu();
         this.eyeAnimation();
     }
 
-    _initHelpMenu() {}
+    _initHelpMenu() {
+        const helpBtn = document.getElementById('help_button');
+        const modal = document.getElementById('helpModal');
+        const closeBtn = document.getElementById('closeBtn');
+
+        helpBtn.addEventListener('click', () => {
+            modal.style.display = 'block';
+        })
+
+        closeBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+        })
+
+        window.addEventListener('click', (event) => {
+            if(event.target == modal) {
+                modal.style.display = 'none';
+            }
+        })
+
+    }
 
     eyeAnimation() {
         const eye = document.getElementById('pupil');
