@@ -193,7 +193,7 @@ class InvertedPacman {
 				this.skybox.getLightIntensity
 			);
 
-			this.pacman.update(delta, this.player.getPosition, this.player.getModel);
+			this.pacman.update(delta, this.player.getPosition, this.player.model);
 
 			this.skybox.update(delta, this.sun);
 

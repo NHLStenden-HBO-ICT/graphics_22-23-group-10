@@ -65,21 +65,21 @@ export class Pacman extends Ai {
 		this._movePacman(delta, playerPos, playerModel);
 
 		// update animations
-		this.#mixer.update(delta);
-	}
-
-	_movePacman(delta, playerPos, playerModel) {
-		if (!this.ready) {
-			return;
-		}
-
-		this._movePacman(delta, playerPos);
-
-		// update animations
 		this.mixer.update(delta);
 	}
 
-	_movePacman(delta, playerPos) {
+	// _movePacman(delta, playerPos, playerModel) {
+	// 	if (!this.ready) {
+	// 		return;
+	// 	}
+
+	// 	this._movePacman(delta, playerPos);
+
+	// 	// update animations
+	// 	this.mixer.update(delta);
+	// }
+
+	_movePacman(delta, playerPos, playerModel) {
 		// Calculate direction
 		let p11 = playerPos;
 		let p22 = this.model.position;
