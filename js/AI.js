@@ -9,6 +9,8 @@ const THRESHOLD = 0.2;
 
 export class Ai extends DynamicBody {
 	//add general code for the AI (pathfinding etc)
+	raycastOrigin = new THREE.Vector3();
+	raycastEnd = new THREE.Vector3();
 
 	astar = new Astar();
 	graph = new Graph(Level.getLevelData);
@@ -25,7 +27,7 @@ export class Ai extends DynamicBody {
 			case PacmanStatemachine.Cycles.DAY:
 				this.graphStart = this.graph.grid[pacmanPos.x][pacmanPos.z];
 				this.graphEnd = this.graph.grid[playerPos.x][playerPos.z];
-				//this.DayEndPath(pacmanPos, playerPos, playerModel);
+				this.DayEndPath(pacmanPos, playerPos, playerModel);
 				break;
 
 			case PacmanStatemachine.Cycles.NIGHT:
@@ -39,25 +41,37 @@ export class Ai extends DynamicBody {
 		return result;
 	}
 
-	// DayEndPath(pacmanPos, playerPos, playerModel){
-	// 	this.raycaster.layers.set(2);
-	// 	let dir = new THREE.Vector3(playerPos.x - pacmanPos.x, 0, playerPos.z - pacmanPos.z).normalize();
-	// 	this.raycaster.set(pacmanPos, dir);
+	DayEndPath(_pacmanPos, playerPos, playerModel) {
+		const pacmanPos = this.model.position;
+		playerPos.multiplyScalar(Level.getScaleFactor);
+		// this.raycaster.layers.set(2);
+		let dir = new THREE.Vector3();
+		dir.subVectors(playerPos, pacmanPos).normalize();
+		// console.log(dir);
+		this.raycaster.set(pacmanPos, dir);
 
-	// 	// Position away from player
-	// 	let pos = new THREE.Vector3(Math.round(pacmanPos.x * -dir.x * 4), 0, Math.round(pacmanPos.z * -dir.x * 4));
+		this.raycastOrigin = pacmanPos;
+		this.raycaster.ray.at(100, this.raycastEnd);
+		this.raycastEnd.y = 2;
+		this.raycastOrigin.y = 2;
 
-	// 	const intersect = this.raycaster.intersectObject(playerModel)
-	// 	console.log(playerModel);
-	// 	if (intersect.length > 0) {
-	// 		const isct = intersect[0];
-	// 		console.log(isct);
-	// 		if (isct.distance < 100) {
+		// Position away from player
+		let pos = new THREE.Vector3(
+			Math.round(pacmanPos.x * -dir.x * 4),
+			0,
+			Math.round(pacmanPos.z * -dir.x * 4)
+		);
 
-	// 			this.graphEnd = this.graph.grid[pos.x][pos.z];
-	// 		}
-	// 	}
-	// }
+		const intersect = this.raycaster.intersectObject(playerModel);
+		// console.log(playerModel);
+		if (intersect.length > 0) {
+			const isct = intersect[0];
+			console.log(isct);
+			// if (isct.distance < 100) {
+			// 	this.graphEnd = this.graph.grid[pos.x][pos.z];
+			// }
+		}
+	}
 
 	// not used atm
 	isPositionReached(pos, targetpos) {

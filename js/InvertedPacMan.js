@@ -184,8 +184,6 @@ class InvertedPacman {
 				return;
 			}
 			let delta = this.clock.getDelta();
-			// this.renderer.render(this.scene, this.player.camera);
-			this.composer.render(delta);
 
 			this.player.update(
 				delta,
@@ -201,6 +199,25 @@ class InvertedPacman {
 
 			this.checkPlayerPacmanCollision();
 
+			this.scene.remove(this.line);
+
+			const points = [];
+			points.push(this.pacman.raycastOrigin);
+			points.push(this.pacman.raycastEnd);
+
+			const material = new THREE.LineBasicMaterial({
+				color: 0xee00ff,
+				linewidth: 10,
+			});
+			const geom = new THREE.BufferGeometry().setFromPoints(points);
+			this.line = new THREE.Line(geom, material);
+			// this.line.position.set(this.pacman.model.position);
+			this.scene.add(this.line);
+
+			// console.log(this.line);
+
+			// this.renderer.render(this.scene, this.player.camera);
+			this.composer.render(delta);
 			this.update();
 		});
 	}

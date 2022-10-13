@@ -11,8 +11,8 @@ const INVIS_WALL = 3;
 const SCALE_FACTOR = 2;
 
 export class Level {
-	static #levelData;
-	static #mapData;
+	static #levelDataAi;
+	static #levelGenData;
 	static #level = new THREE.Object3D();
 	static #isLevelLoaded = false;
 	static #playerSpawn = new THREE.Vector3();
@@ -23,7 +23,7 @@ export class Level {
 	static levelLoaded = new Event("levelLoaded");
 
 	static get getLevelData() {
-		if (this.#isLevelLoaded) return this.#levelData;
+		if (this.#isLevelLoaded) return this.#levelDataAi;
 		else return [];
 	}
 
@@ -69,8 +69,8 @@ export class Level {
 			canvas.width = img.width;
 			canvas.height = img.height;
 
-			this.#levelData = this.initLevelData(img.width);
-			this.#mapData = this.initLevelData(img.width);
+			this.#levelDataAi = this.initLevelData(img.width);
+			this.#levelGenData = this.initLevelData(img.width);
 
 			context.drawImage(img, 0, 0);
 			for (let y = 0; y < canvas.height; y++) {
@@ -114,14 +114,15 @@ export class Level {
 
 					switch (tile) {
 						case DEAD_SPACE:
-							this.#levelData[x][y] = WALL;
-							this.#mapData[x][y] = FLOOR;
+							this.#levelDataAi[x][y] = WALL;
+							this.#levelGenData[x][y] = FLOOR;
 							break;
 						case INVIS_WALL:
-							break;
+							this.#levelDataAi[x][y] = WALL;
+							this.#levelGenData[x][y] = INVIS_WALL;
 						default:
-							this.#levelData[x][y] = tile;
-							this.#mapData[x][y] = tile;
+							this.#levelDataAi[x][y] = tile;
+							this.#levelGenData[x][y] = tile;
 							break;
 					}
 				}
@@ -194,7 +195,7 @@ export class Level {
 
 	/** Will find rectangles in a matrix/2d array */
 	static createWalls() {
-		let map = this.#mapData;
+		let map = this.#levelGenData;
 
 		const WIDTH = map.length;
 		const HEIGHT = map[0].length;

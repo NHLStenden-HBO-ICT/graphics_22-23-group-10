@@ -110,7 +110,7 @@ export class Player extends DynamicBody {
 				this.#rotateAngle,
 				cameraDirection + directionOffset + Math.PI
 			);
-			this.model.quaternion.rotateTowards(this.#rotateQuaternion, 0.2);
+			this.model.quaternion.rotateTowards(this.#rotateQuaternion, 6 * delta);
 
 			// Calculate walk direction based on input and camera angle
 			this.#walkDirection.y = 0;
@@ -150,7 +150,7 @@ export class Player extends DynamicBody {
 			mesh.position.x = Level.getPlayerSpawn.x;
 			mesh.position.z = Level.getPlayerSpawn.z;
 			self.model = mesh;
-			mesh.layers.enable(2);
+			// mesh.layers.enable(2);
 
 			loadShader("ghost", shaderLoaded);
 
