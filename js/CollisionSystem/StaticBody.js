@@ -9,8 +9,6 @@ export class StaticBody extends Collision {
 
 	constructor() {
 		super();
-
-		Level.collisionObjects.push(this);
 	}
 
 	calcExtents(geom) {
