@@ -1,12 +1,12 @@
 import * as THREE from "../node_modules/three/build/three.module.js";
-import { Wall } from "./Wall.js";
+import { Wall } from "./Objects/Wall.js";
 
 const LEVELFOLDER = "../levels/";
 
 const FLOOR = 0;
 const WALL = 1;
 const DEAD_SPACE = 2;
-const INVIS_WALL = 3;
+const WATER = 3;
 
 const SCALE_FACTOR = 2;
 
@@ -86,9 +86,9 @@ export class Level {
 					} else if (equals(data, [125, 125, 125, 255])) {
 						// GRAY | Dead wall -> Won't spawn a wall but won't be walkable for the AI
 						tile = DEAD_SPACE;
-					} else if (equals(data, [50, 50, 50, 255])) {
-						// DARK GRAY | Invisible wall -> Not walkabale for player and AI, but won't be visible
-						tile = INVIS_WALL;
+					} else if (equals(data, [0, 0, 255, 255])) {
+						// BLUE | Water -> Not walkabale for player and AI
+						tile = WATER;
 					} else if (equals(data, [255, 255, 255, 255])) {
 						// WHITE | Floor
 						tile = FLOOR;
@@ -118,9 +118,9 @@ export class Level {
 							this.#levelDataAi[x][y] = WALL;
 							this.#levelGenData[x][y] = FLOOR;
 							break;
-						case INVIS_WALL:
+						case WATER:
 							this.#levelDataAi[x][y] = WALL;
-							this.#levelGenData[x][y] = INVIS_WALL;
+							this.#levelGenData[x][y] = WATER;
 						default:
 							this.#levelDataAi[x][y] = tile;
 							this.#levelGenData[x][y] = tile;
@@ -151,8 +151,15 @@ export class Level {
 			this.#level.add(floor);
 			this.cameraCollisionObjects.push(floor);
 
-			// Scan map matrix and generate better walls
-			this.createWalls();
+			const walls = this.getRectangles(WALL);
+			for (let i = 0; i < walls.length; i++) {
+				const rect = walls[i];
+				const w = rect.x2 - rect.x1 + 1;
+				const h = rect.y2 - rect.y1 + 1;
+				const wall = new Wall(rect.x1 + w / 2, rect.y1 + h / 2, w, h);
+				this.#level.add(wall.model);
+				this.collisionObjects.push(wall);
+			}
 
 			this.setCollisionList();
 
@@ -195,8 +202,10 @@ export class Level {
 	}
 
 	/** Will find rectangles in a matrix/2d array */
-	static createWalls() {
+	static getRectangles(tileID) {
 		let map = this.#levelGenData;
+
+		let rectangles = [];
 
 		const WIDTH = map.length;
 		const HEIGHT = map[0].length;
@@ -211,7 +220,7 @@ export class Level {
 				invisible: false,
 			};
 
-			if (map[x][y] == FLOOR) {
+			if (map[x][y] != tileID) {
 				// Tile is a floor
 				x += 1;
 				if (x == WIDTH) {
@@ -227,13 +236,13 @@ export class Level {
 				return findLargestRect(x, y);
 			}
 
-			if (map[x][y] == WALL) {
+			if (map[x][y] == tileID) {
 				// Tile is a wall, so we get the biggest rectangle possible from this location
 
 				// Find bottom right corner
 				// First we find largest possible X value
 				for (let x = rect.x1; x < WIDTH; x++) {
-					if (map[x][rect.y1] != WALL) {
+					if (map[x][rect.y1] != tileID) {
 						// If a floor is encountered on the horizonal axis
 						rect.x2 = x - 1;
 						break;
@@ -248,7 +257,7 @@ export class Level {
 							yValues.push(HEIGHT - 1);
 							break;
 						}
-						if (map[x][y] != WALL) {
+						if (map[x][y] != tileID) {
 							yValues.push(y - 1);
 							break;
 						}
@@ -283,8 +292,10 @@ export class Level {
 			}
 		};
 
-		while (this.containsWalls(map)) {
+		while (this.containsTile(map, tileID)) {
 			const largestRect = findLargestRect(0, 0);
+
+			rectangles.push(largestRect);
 
 			// Remove rectangle from map so it doesn't get found again
 			for (let y = largestRect.y1; y <= largestRect.y2; y++) {
@@ -292,24 +303,14 @@ export class Level {
 					map[x][y] = FLOOR;
 				}
 			}
-
-			const w = largestRect.x2 - largestRect.x1 + 1;
-			const h = largestRect.y2 - largestRect.y1 + 1;
-			const wall = new Wall(
-				largestRect.x1 + w / 2,
-				largestRect.y1 + h / 2,
-				w,
-				h
-			);
-			this.#level.add(wall.model);
-			this.collisionObjects.push(wall);
 		}
+		return rectangles;
 	}
 
-	static containsWalls(map) {
+	static containsTile(map, tileID) {
 		// console.log("Checking for walls");
 		for (let x = 0; x < map.length; x++) {
-			if (map[x].includes(WALL)) return true;
+			if (map[x].includes(tileID)) return true;
 		}
 		return false;
 	}
