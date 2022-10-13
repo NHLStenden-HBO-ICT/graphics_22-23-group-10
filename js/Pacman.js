@@ -108,6 +108,7 @@ export class Pacman extends Ai {
 			playerModel
 		);
 
+		// when there is no specified path, move to random point
 		if (path.length == 0) {
 			return;
 		}

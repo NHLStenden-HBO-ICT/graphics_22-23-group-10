@@ -19,6 +19,7 @@ export class Level {
 	static #pacmanSpawn = new THREE.Vector3();
 	static collisionObjects = [];
 	static cameraCollisionObjects = [];
+	static coins = [];
 
 	static levelLoaded = new Event("levelLoaded");
 

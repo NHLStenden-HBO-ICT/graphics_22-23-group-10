@@ -26,8 +26,7 @@ export class Ai extends DynamicBody {
 		switch (state) {
 			case PacmanStatemachine.Cycles.DAY:
 				this.graphStart = this.graph.grid[pacmanPos.x][pacmanPos.z];
-				this.graphEnd = this.graph.grid[playerPos.x][playerPos.z];
-				this.DayEndPath(pacmanPos, playerPos, playerModel);
+				this.graphEnd = this.DayEndPath(pacmanPos, playerPos, playerModel);
 				break;
 
 			case PacmanStatemachine.Cycles.NIGHT:
@@ -53,13 +52,17 @@ export class Ai extends DynamicBody {
 		this.raycastOrigin = pacmanPos;
 		this.raycaster.ray.at(100, this.raycastEnd);
 		this.raycastEnd.y = 2;
-		this.raycastOrigin.y = 2;
 
 		// Position away from player
 		let pos = new THREE.Vector3(
-			Math.round(pacmanPos.x * -dir.x * 4),
+			Math.round(pacmanPos.x * -dir.x),
 			0,
-			Math.round(pacmanPos.z * -dir.x * 4)
+			Math.round(pacmanPos.z * -dir.z)
+		);
+
+		pos.clamp(
+			new THREE.Vector3(0, 0, 0),
+			new THREE.Vector3(this.graph.grid.length -1 , 0, this.graph.grid[0].length -1)
 		);
 
 		const intersect = this.raycaster.intersectObject(playerModel);
@@ -67,10 +70,16 @@ export class Ai extends DynamicBody {
 		if (intersect.length > 0) {
 			const isct = intersect[0];
 			console.log(isct);
-			// if (isct.distance < 100) {
-			// 	this.graphEnd = this.graph.grid[pos.x][pos.z];
-			// }
+			if (isct.distance < 500) {
+				return this.graph.grid[pos.x][pos.z];
+			}
 		}
+		else{
+			this.MoveToNextCoin();
+		}
+	}
+	MoveToNextCoin(){
+		let allExistingCoins = Level.coins;
 	}
 
 	// not used atm
