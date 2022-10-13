@@ -150,6 +150,7 @@ export class Player extends DynamicBody {
 			mesh.position.x = Level.getPlayerSpawn.x;
 			mesh.position.z = Level.getPlayerSpawn.z;
 			self.model = mesh;
+			mesh.layers.enable(2);
 
 			loadShader("ghost", shaderLoaded);
 

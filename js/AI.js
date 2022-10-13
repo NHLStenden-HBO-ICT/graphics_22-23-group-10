@@ -3,6 +3,7 @@ import { Graph } from "./Astar/Graph.js";
 import { Level } from "./Level.js";
 import * as THREE from "../node_modules/three/build/three.module.js";
 import { DynamicBody } from "./CollisionSystem/DynamicBody.js";
+import { PacmanStatemachine } from "./PacmanStatemachine.js";
 
 const THRESHOLD = 0.2;
 
@@ -11,23 +12,52 @@ export class Ai extends DynamicBody {
 
 	astar = new Astar();
 	graph = new Graph(Level.getLevelData);
+	graphStart;
+	graphEnd;
 
-	getPath(pacmanPos, playerPos) {
-		// console.log(pacmanPos);
+	raycaster = new THREE.Raycaster();
 
-		// let graph = new Graph(Level.getLevelData);
-		// graph.diagonal = true;
+	getPath(pacmanPos, playerPos, state, playerModel) {
+		this.graph.diagonal = true;
+		this.graph.dontCrossCorners = true;
 
-		var start = this.graph.grid[pacmanPos.x][pacmanPos.z];
-		var end = this.graph.grid[playerPos.x][playerPos.z];
-		// console.log(graph.grid[0].length);
+		switch (state) {
+			case PacmanStatemachine.Cycles.DAY:
+				this.graphStart = this.graph.grid[pacmanPos.x][pacmanPos.z];
+				this.graphEnd = this.graph.grid[playerPos.x][playerPos.z];
+				//this.DayEndPath(pacmanPos, playerPos, playerModel);
+				break;
 
-		// graph.diagonal = true;
-		// graph.dontCrossCorners = true;
-		var result = this.astar.search(this.graph, start, end);
+			case PacmanStatemachine.Cycles.NIGHT:
+				this.graphStart = this.graph.grid[pacmanPos.x][pacmanPos.z];
+				this.graphEnd = this.graph.grid[playerPos.x][playerPos.z];
+				break;
+		}
+
+		var result = this.astar.search(this.graph, this.graphStart, this.graphEnd);
 
 		return result;
 	}
+
+	// DayEndPath(pacmanPos, playerPos, playerModel){
+	// 	this.raycaster.layers.set(2);
+	// 	let dir = new THREE.Vector3(playerPos.x - pacmanPos.x, 0, playerPos.z - pacmanPos.z).normalize();
+	// 	this.raycaster.set(pacmanPos, dir);
+
+	// 	// Position away from player
+	// 	let pos = new THREE.Vector3(Math.round(pacmanPos.x * -dir.x * 4), 0, Math.round(pacmanPos.z * -dir.x * 4));
+
+	// 	const intersect = this.raycaster.intersectObject(playerModel)
+	// 	console.log(playerModel);
+	// 	if (intersect.length > 0) {
+	// 		const isct = intersect[0];
+	// 		console.log(isct);
+	// 		if (isct.distance < 100) {
+
+	// 			this.graphEnd = this.graph.grid[pos.x][pos.z];
+	// 		}
+	// 	}
+	// }
 
 	// not used atm
 	isPositionReached(pos, targetpos) {
