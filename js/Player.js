@@ -104,7 +104,7 @@ export class Player extends DynamicBody {
 				this.#rotateAngle,
 				cameraDirection + directionOffset + Math.PI
 			);
-			this.model.quaternion.rotateTowards(this.#rotateQuaternion, 0.2);
+			this.model.quaternion.rotateTowards(this.#rotateQuaternion, 6 * delta);
 
 			// Calculate walk direction based on input and camera angle
 			this.#walkDirection.y = 0;
@@ -161,18 +161,52 @@ export class Player extends DynamicBody {
 			mesh.position.x = Level.getPlayerSpawn.x;
 			mesh.position.z = Level.getPlayerSpawn.z;
 			self.model = mesh;
+			// mesh.layers.enable(2);
 
-			mesh.traverse(function (obj) {
-				if (obj.isMesh) {
-					obj.castShadow = true;
-					obj.receiveShadow = true;
-				}
-			});
+			loadShader("ghost", shaderLoaded);
 
-			self.ready = true;
-			self._initCamera(rendererDomElement);
-			self.calculateExtents(mesh.children[0].children[0].geometry); // Ugly hardcoding, but oh well
-			dispatchEvent(self.playerLoaded);
+			function shaderLoaded(material) {
+				material.transparent = true;
+				material.lights = true;
+				let lightTarget;
+				mesh.traverse(function (obj) {
+					if (obj.isMesh) {
+						if (obj.name == "Ghost") {
+							obj.castShadow = true;
+							obj.receiveShadow = true;
+							obj.material = material;
+							self.calculateExtents(obj.geometry);
+						}
+					}
+					if (obj.name == "LampPoint") {
+						let light = new THREE.SpotLight(0xfcd08d);
+						light.layers.enable(1);
+						light.castShadow = true;
+						light.angle = Math.PI / 6;
+						light.distance = 50;
+						light.position.set(0, 0, 0);
+						light.intensity = 1.2;
+						light.decay = 1;
+						light.penumbra = 0.4;
+						light.shadow.bias = -0.0001;
+
+						self.lamp = light;
+						obj.add(self.lamp);
+					}
+					if (obj.name == "LightTarget") {
+						lightTarget = obj;
+					}
+					if (obj.name == "Eye") {
+						obj.material.emissiveIntensity = 0;
+						self.eye = obj;
+					}
+				});
+				self.lamp.target = lightTarget;
+
+				self.ready = true;
+				self._initCamera();
+				dispatchEvent(self.playerLoaded);
+			}
 		});
 	}
 

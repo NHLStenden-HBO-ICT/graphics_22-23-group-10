@@ -15,7 +15,7 @@ class InvertedPacman {
 	constructor() {
 		this._init();
 
-		this._RAF();
+		this.update();
 	}
 
 	addToScene(object) {
@@ -161,16 +161,15 @@ class InvertedPacman {
 
 	clock = new THREE.Clock();
 
-	_RAF() {
+	update() {
 		requestAnimationFrame(() => {
 			if (!this.ready) {
-				this._RAF();
+				this.update();
 				return;
 			}
 			this.renderer.render(this.scene, this.player.camera);
 			// this.renderer.render(this.scene, this.camera);
 			let delta = this.clock.getDelta();
-			// delta = THREE.getDelta();
 
 			this.player.update(delta);
 
@@ -180,7 +179,26 @@ class InvertedPacman {
 
 			this.checkPlayerPacmanCollision();
 
-			this._RAF();
+			this.scene.remove(this.line);
+
+			const points = [];
+			points.push(this.pacman.raycastOrigin);
+			points.push(this.pacman.raycastEnd);
+
+			const material = new THREE.LineBasicMaterial({
+				color: 0xee00ff,
+				linewidth: 10,
+			});
+			const geom = new THREE.BufferGeometry().setFromPoints(points);
+			this.line = new THREE.Line(geom, material);
+			// this.line.position.set(this.pacman.model.position);
+			this.scene.add(this.line);
+
+			// console.log(this.line);
+
+			// this.renderer.render(this.scene, this.player.camera);
+			this.composer.render(delta);
+			this.update();
 		});
 	}
 }
