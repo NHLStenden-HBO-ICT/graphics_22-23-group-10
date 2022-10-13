@@ -6,6 +6,7 @@ const LEVELFOLDER = "../levels/";
 const FLOOR = 0;
 const WALL = 1;
 const DEAD_SPACE = 2;
+const INVIS_WALL = 3;
 
 const SCALE_FACTOR = 2;
 
@@ -84,6 +85,9 @@ export class Level {
 					} else if (equals(data, [125, 125, 125, 255])) {
 						// GRAY | Dead wall -> Won't spawn a wall but won't be walkable for the AI
 						tile = DEAD_SPACE;
+					} else if (equals(data, [50, 50, 50, 255])) {
+						// DARK GRAY | Invisible wall -> Not walkabale for player and AI, but won't be visible
+						tile = INVIS_WALL;
 					} else if (equals(data, [255, 255, 255, 255])) {
 						// WHITE | Floor
 						tile = FLOOR;
@@ -107,12 +111,18 @@ export class Level {
 						console.log("Color not found at ", x, y);
 						tile = FLOOR;
 					}
-					if (tile == DEAD_SPACE) {
-						this.#levelData[x][y] = WALL;
-						this.#mapData[x][y] = FLOOR;
-					} else {
-						this.#levelData[x][y] = tile;
-						this.#mapData[x][y] = tile;
+
+					switch (tile) {
+						case DEAD_SPACE:
+							this.#levelData[x][y] = WALL;
+							this.#mapData[x][y] = FLOOR;
+							break;
+						case INVIS_WALL:
+							break;
+						default:
+							this.#levelData[x][y] = tile;
+							this.#mapData[x][y] = tile;
+							break;
 					}
 				}
 			}
@@ -196,6 +206,7 @@ export class Level {
 				x2: WIDTH - 1,
 				y2: HEIGHT - 1,
 				area: 0,
+				invisible: false,
 			};
 
 			if (map[x][y] == FLOOR) {
@@ -272,7 +283,6 @@ export class Level {
 
 		while (this.containsWalls(map)) {
 			const largestRect = findLargestRect(0, 0);
-			// console.log(largestRect);
 
 			// Remove rectangle from map so it doesn't get found again
 			for (let y = largestRect.y1; y <= largestRect.y2; y++) {
@@ -292,16 +302,6 @@ export class Level {
 			this.#level.add(wall.model);
 			this.collisionObjects.push(wall);
 		}
-	}
-
-	static calculateWallArea(map, width, height) {
-		let total = 0;
-		for (let x = 0; x < width; x++) {
-			for (let y = 0; y < height; y++) {
-				if (map[x][y] == WALL) total += 1;
-			}
-		}
-		return total;
 	}
 
 	static containsWalls(map) {
