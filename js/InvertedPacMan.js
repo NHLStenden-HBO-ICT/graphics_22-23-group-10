@@ -11,7 +11,7 @@ THREE.Cache.enabled = true;
 
 const DEBUG_MODE = false;
 
-const LEVEL_TO_LOAD = "test2_old";
+const LEVEL_TO_LOAD = "test";
 
 class InvertedPacman {
 	playerPacmanCollision = new Event("playerPacmanCollision");

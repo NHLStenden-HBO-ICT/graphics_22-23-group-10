@@ -1,5 +1,6 @@
 import * as THREE from "../node_modules/three/build/three.module.js";
 import { Wall } from "./Objects/Wall.js";
+import { Water } from "./Objects/Water.js";
 
 const LEVELFOLDER = "../levels/";
 
@@ -136,29 +137,7 @@ export class Level {
 				}
 			}
 
-			// Add a ground
-			const floorWidth = img.width * SCALE_FACTOR;
-			const floorHeight = 0.1;
-			const floorDepth = img.height * SCALE_FACTOR;
-			const floor = new THREE.Mesh(
-				new THREE.BoxGeometry(floorWidth, floorHeight, floorDepth, 1, 1),
-				new THREE.MeshPhongMaterial({
-					color: 0x336600,
-				})
-			);
-			floor.name = "Floor";
-			floor.layers.enable(1);
-
-			// Position floor correctly
-			floor.position.x = floorDepth / 2 - SCALE_FACTOR / 2;
-			floor.position.y = -floorHeight;
-			floor.position.z = floorWidth / 2 - SCALE_FACTOR / 2;
-
-			floor.receiveShadow = true;
-			this.#level.add(floor);
-			this.cameraCollisionObjects.push(floor);
-
-			this.generateLevel();
+			this.generateLevel(img.width, img.height);
 
 			this.setCollisionList();
 
@@ -171,7 +150,23 @@ export class Level {
 		img.src = level;
 	}
 
-	static generateLevel() {
+	static generateLevel(width, height) {
+		// Add the water
+		const water = new Water(width, height);
+		this.#level.add(water.model);
+		
+		// Get invisible walls
+		// const invisibleWalls = this.getRectangles(INVIS_WALL);
+		// for (let i = 0; i < invisibleWalls.length; i++) {
+		// 	const rect = invisibleWalls[i];
+		// 	const w = rect.x2 - rect.x1 + 1;
+		// 	const h = rect.y2 - rect.y1 + 1;
+		// 	const wall = new Wall(rect.x1 + w / 2, rect.y1 + h / 2, w, h, true);
+		// 	this.#level.add(wall.model);
+		// 	this.collisionObjects.push(wall);
+		// }
+
+		// Get walls
 		const walls = this.getRectangles(WALL);
 		for (let i = 0; i < walls.length; i++) {
 			const rect = walls[i];
@@ -182,15 +177,6 @@ export class Level {
 			this.collisionObjects.push(wall);
 		}
 
-		// const invisibleWalls = this.getRectangles(INVIS_WALL);
-		// for (let i = 0; i < walls.length; i++) {
-		// 	const rect = walls[i];
-		// 	const w = rect.x2 - rect.x1 + 1;
-		// 	const h = rect.y2 - rect.y1 + 1;
-		// 	const wall = new Wall(rect.x1 + w / 2, rect.y1 + h / 2, w, h, true);
-		// 	this.#level.add(wall.model);
-		// 	this.collisionObjects.push(wall);
-		// }
 	}
 
 	static addToLevel(obj) {
@@ -224,7 +210,9 @@ export class Level {
 
 	/** Will find rectangles in a matrix/2d array */
 	static getRectangles(tileID) {
-		let map = this.#levelGenData;
+		let map = [];
+		for (var i = 0; i < this.#levelGenData.length; i++)
+			map[i] = this.#levelGenData[i].slice();
 
 		let rectangles = [];
 
@@ -232,15 +220,6 @@ export class Level {
 		const HEIGHT = map[0].length;
 
 		const findLargestRect = (x, y) => {
-			const rect = {
-				x1: x,
-				y1: y,
-				x2: WIDTH - 1,
-				y2: HEIGHT - 1,
-				area: 0,
-				invisible: false,
-			};
-
 			if (map[x][y] != tileID) {
 				// Tile is a floor
 				x += 1;
@@ -256,6 +235,15 @@ export class Level {
 				}
 				return findLargestRect(x, y);
 			}
+
+			const rect = {
+				x1: x,
+				y1: y,
+				x2: WIDTH - 1,
+				y2: HEIGHT - 1,
+				area: 0,
+				invisible: false,
+			};
 
 			if (map[x][y] == tileID) {
 				// Tile is a wall, so we get the biggest rectangle possible from this location
@@ -325,6 +313,7 @@ export class Level {
 				}
 			}
 		}
+		console.log(this.#levelGenData, map)
 		return rectangles;
 	}
 

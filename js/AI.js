@@ -66,7 +66,7 @@ export class Ai extends DynamicBody {
 		// console.log(playerModel);
 		if (intersect.length > 0) {
 			const isct = intersect[0];
-			console.log(isct);
+			// console.log(isct);
 			// if (isct.distance < 100) {
 			// 	this.graphEnd = this.graph.grid[pos.x][pos.z];
 			// }
