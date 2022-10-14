@@ -21,7 +21,8 @@ export class Water extends StaticBody {
 			),
 			mat
 		);
-
+		
+		this.model.layers.enable(1);
 		this.model.receiveShadow = true;
 		this.model.position.x = waterDepth / 2 - SCALE_FACTOR / 2;
 		this.model.position.y = -waterHeight * 1.2;

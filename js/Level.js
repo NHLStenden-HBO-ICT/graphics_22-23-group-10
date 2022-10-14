@@ -95,8 +95,8 @@ export class Level {
 						// WHITE | Floor
 						tile = FLOOR;
 					} else if (equals(data, [50, 50, 50, 255])) {
-						// WHITE | Floor
-						tile = FLOOR;
+						// DARK GRAY | Invisible wall
+						tile = INVIS_WALL;
 					} else if (equals(data, [255, 0, 0, 255])) {
 						// RED | Player spawnpoint
 						tile = FLOOR;
@@ -127,8 +127,8 @@ export class Level {
 							this.#levelDataAi[x][y] = WALL;
 							this.#levelGenData[x][y] = WATER;
 						case INVIS_WALL:
-							this.#levelDataAi[x][y] = FLOOR;
-							this.#levelGenData[x][y] = FLOOR;
+							this.#levelDataAi[x][y] = WALL;
+							this.#levelGenData[x][y] = INVIS_WALL;
 						default:
 							this.#levelDataAi[x][y] = tile;
 							this.#levelGenData[x][y] = tile;
@@ -138,8 +138,6 @@ export class Level {
 			}
 
 			this.generateLevel(img.width, img.height);
-
-			this.setCollisionList();
 
 			this.#isLevelLoaded = true;
 			dispatchEvent(this.levelLoaded);
@@ -154,17 +152,19 @@ export class Level {
 		// Add the water
 		const water = new Water(width, height);
 		this.#level.add(water.model);
+		this.cameraCollisionObjects.push(water.model)
 		
 		// Get invisible walls
-		// const invisibleWalls = this.getRectangles(INVIS_WALL);
-		// for (let i = 0; i < invisibleWalls.length; i++) {
-		// 	const rect = invisibleWalls[i];
-		// 	const w = rect.x2 - rect.x1 + 1;
-		// 	const h = rect.y2 - rect.y1 + 1;
-		// 	const wall = new Wall(rect.x1 + w / 2, rect.y1 + h / 2, w, h, true);
-		// 	this.#level.add(wall.model);
-		// 	this.collisionObjects.push(wall);
-		// }
+		const invisibleWalls = this.getRectangles(INVIS_WALL);
+		for (let i = 0; i < invisibleWalls.length; i++) {
+			const rect = invisibleWalls[i];
+			const w = rect.x2 - rect.x1 + 1;
+			const h = rect.y2 - rect.y1 + 1;
+
+			const wall = new Wall(rect.x1 + w / 2, rect.y1 + h / 2, w, h, true);
+			this.#level.add(wall.model);
+			this.collisionObjects.push(wall);
+		}
 
 		// Get walls
 		const walls = this.getRectangles(WALL);
@@ -172,21 +172,33 @@ export class Level {
 			const rect = walls[i];
 			const w = rect.x2 - rect.x1 + 1;
 			const h = rect.y2 - rect.y1 + 1;
+			
 			const wall = new Wall(rect.x1 + w / 2, rect.y1 + h / 2, w, h);
 			this.#level.add(wall.model);
 			this.collisionObjects.push(wall);
+			this.cameraCollisionObjects.push(wall.model)
 		}
+
+
+		// NOTE : Floor needs a seperate method. Floor should ignore walls, as it can just generate under them
+
+		// Get floor
+		// const floors = this.getRectangles(FLOOR);
+		// for (let i = 0; i < floors.length; i++) {
+		// 	const rect = floors[i];
+		// 	const w = rect.x2 - rect.x1 + 1;
+		// 	const h = rect.y2 - rect.y1 + 1;
+			
+		// 	const floor = new Floor(rect.x1 + w / 2, rect.y1 + h / 2, w, h);
+		// 	this.#level.add(floor.model);
+		// 	this.collisionObjects.push(floor);
+		// 	this.cameraCollisionObjects.push(floor.model)
+		// }
 
 	}
 
 	static addToLevel(obj) {
 		this.#level.add(obj);
-	}
-
-	static setCollisionList() {
-		for (let i = 0; i < this.collisionObjects.length; i++) {
-			this.cameraCollisionObjects.push(this.collisionObjects[i].model);
-		}
 	}
 
 	static initLevelData(n) {
@@ -219,90 +231,99 @@ export class Level {
 		const WIDTH = map.length;
 		const HEIGHT = map[0].length;
 
-		const findLargestRect = (x, y) => {
-			if (map[x][y] != tileID) {
-				// Tile is a floor
-				x += 1;
-				if (x == WIDTH) {
-					// Reached the right edge of the map
-					x = 0;
-					y += 1;
+		const findLargestRect = () => {
+			let x = 0;
+			let y = 0;
+			
+			let mapCopy = [];
+			for (var i = 0; i < map.length; i++)
+				mapCopy[i] = map[i].slice();
 
-					if (y == HEIGHT) {
-						// Reached the bottom right, thus the end of the loop
-						return null;
-					}
-				}
-				return findLargestRect(x, y);
-			}
+			let biggestRect = {area: 0};
 
-			const rect = {
-				x1: x,
-				y1: y,
-				x2: WIDTH - 1,
-				y2: HEIGHT - 1,
-				area: 0,
-				invisible: false,
-			};
+			while (this.containsTile(mapCopy, tileID)){
+				if (mapCopy[x][y] != tileID) {
+					x += 1;
+					if (x == WIDTH) {
+						// Reached the right edge of the map
+						x = 0;
+						y += 1;
 
-			if (map[x][y] == tileID) {
-				// Tile is a wall, so we get the biggest rectangle possible from this location
-
-				// Find bottom right corner
-				// First we find largest possible X value
-				for (let x = rect.x1; x < WIDTH; x++) {
-					if (map[x][rect.y1] != tileID) {
-						// If a floor is encountered on the horizonal axis
-						rect.x2 = x - 1;
-						break;
-					}
-				}
-
-				// Find smallest Y value
-				let yValues = [];
-				for (let x = rect.x1; x <= rect.x2; x++) {
-					for (let y = rect.y1; y < HEIGHT; y++) {
-						if (y == HEIGHT - 1) {
-							yValues.push(HEIGHT - 1);
-							break;
-						}
-						if (map[x][y] != tileID) {
-							yValues.push(y - 1);
+						if (y == HEIGHT) {
+							// Reached the bottom right, thus the end of the loop
 							break;
 						}
 					}
+					continue;
 				}
 
-				const lowestY = Math.min(...yValues);
-				rect.y2 = lowestY;
+				if (mapCopy[x][y] == tileID) {
+					// Tile is what we're looking for, so we get the biggest rectangle possible from this location
 
-				// Calculate area
-				rect.area = (rect.x2 - rect.x1 + 1) * (rect.y2 - rect.y1 + 1);
+					const rect = {
+						x1: x,
+						y1: y,
+						x2: WIDTH - 1,
+						y2: HEIGHT - 1,
+						area: 0,
+						invisible: false,
+					};
 
-				// Move to next rectangle
-				x += 1;
-				if (x == WIDTH) {
-					// Reached the right edge of the map
-					x = 0;
-					y += 1;
+					// Find bottom right corner
+					// First we find largest possible X value
+					for (let x = rect.x1; x < WIDTH; x++) {
+						if (mapCopy[x][rect.y1] != tileID) {
+							// If a floor is encountered on the horizonal axis
+							rect.x2 = x - 1;
+							break;
+						}
+					}
 
-					if (y == HEIGHT) {
-						// Reached the bottom right, thus the end of the loop
-						return null;
+					// Find smallest Y value
+					let yValues = [];
+					for (let x = rect.x1; x <= rect.x2; x++) {
+						for (let y = rect.y1; y < HEIGHT; y++) {
+							if (y == HEIGHT - 1) {
+								yValues.push(HEIGHT - 1);
+								break;
+							}
+							if (mapCopy[x][y] != tileID) {
+								yValues.push(y - 1);
+								break;
+							}
+						}
+					}
+
+					const lowestY = Math.min(...yValues);
+					rect.y2 = lowestY;
+
+					// Calculate area
+					rect.area = (rect.x2 - rect.x1 + 1) * (rect.y2 - rect.y1 + 1);
+
+					// Move to next rectangle
+					x += 1;
+					if (x == WIDTH) {
+						// Reached the right edge of the map
+						x = 0;
+						y += 1;
+
+						if (y == HEIGHT) {
+							// Reached the bottom right, thus the end of the loop
+							break;;
+						}
+					}
+
+					if (rect.area > biggestRect.area){
+						biggestRect = rect;
 					}
 				}
-
-				const nextRect = findLargestRect(x, y);
-				if (nextRect == null) return rect;
-				if (nextRect.area > rect.area) {
-					return nextRect;
-				}
-				return rect;
 			}
+
+			return biggestRect;
 		};
 
 		while (this.containsTile(map, tileID)) {
-			const largestRect = findLargestRect(0, 0);
+			const largestRect = findLargestRect();
 
 			rectangles.push(largestRect);
 
@@ -313,7 +334,6 @@ export class Level {
 				}
 			}
 		}
-		console.log(this.#levelGenData, map)
 		return rectangles;
 	}
 
