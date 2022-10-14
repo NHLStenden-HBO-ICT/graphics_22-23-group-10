@@ -3,9 +3,10 @@ import { StaticBody } from "../CollisionSystem/StaticBody.js";
 import { Level } from "../Level.js";
 
 export class Wall extends StaticBody {
-	constructor(posX, posZ, width, height) {
+	constructor(posX, posZ, width, height, invisble) {
 		super();
 
+		const invis = invisble || false;
 		const SCALE_FACTOR = Level.getScaleFactor;
 
 		const mat = new THREE.MeshStandardMaterial({ color: 0xd6d6d6 });

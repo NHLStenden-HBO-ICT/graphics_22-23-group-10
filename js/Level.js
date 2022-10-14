@@ -7,6 +7,7 @@ const FLOOR = 0;
 const WALL = 1;
 const DEAD_SPACE = 2;
 const WATER = 3;
+const INVIS_WALL = 4;
 
 const SCALE_FACTOR = 2;
 
@@ -92,6 +93,9 @@ export class Level {
 					} else if (equals(data, [255, 255, 255, 255])) {
 						// WHITE | Floor
 						tile = FLOOR;
+					} else if (equals(data, [50, 50, 50, 255])) {
+						// WHITE | Floor
+						tile = FLOOR;
 					} else if (equals(data, [255, 0, 0, 255])) {
 						// RED | Player spawnpoint
 						tile = FLOOR;
@@ -121,6 +125,9 @@ export class Level {
 						case WATER:
 							this.#levelDataAi[x][y] = WALL;
 							this.#levelGenData[x][y] = WATER;
+						case INVIS_WALL:
+							this.#levelDataAi[x][y] = FLOOR;
+							this.#levelGenData[x][y] = FLOOR;
 						default:
 							this.#levelDataAi[x][y] = tile;
 							this.#levelGenData[x][y] = tile;
@@ -151,15 +158,7 @@ export class Level {
 			this.#level.add(floor);
 			this.cameraCollisionObjects.push(floor);
 
-			const walls = this.getRectangles(WALL);
-			for (let i = 0; i < walls.length; i++) {
-				const rect = walls[i];
-				const w = rect.x2 - rect.x1 + 1;
-				const h = rect.y2 - rect.y1 + 1;
-				const wall = new Wall(rect.x1 + w / 2, rect.y1 + h / 2, w, h);
-				this.#level.add(wall.model);
-				this.collisionObjects.push(wall);
-			}
+			this.generateLevel();
 
 			this.setCollisionList();
 
@@ -170,6 +169,28 @@ export class Level {
 		};
 
 		img.src = level;
+	}
+
+	static generateLevel() {
+		const walls = this.getRectangles(WALL);
+		for (let i = 0; i < walls.length; i++) {
+			const rect = walls[i];
+			const w = rect.x2 - rect.x1 + 1;
+			const h = rect.y2 - rect.y1 + 1;
+			const wall = new Wall(rect.x1 + w / 2, rect.y1 + h / 2, w, h);
+			this.#level.add(wall.model);
+			this.collisionObjects.push(wall);
+		}
+
+		// const invisibleWalls = this.getRectangles(INVIS_WALL);
+		// for (let i = 0; i < walls.length; i++) {
+		// 	const rect = walls[i];
+		// 	const w = rect.x2 - rect.x1 + 1;
+		// 	const h = rect.y2 - rect.y1 + 1;
+		// 	const wall = new Wall(rect.x1 + w / 2, rect.y1 + h / 2, w, h, true);
+		// 	this.#level.add(wall.model);
+		// 	this.collisionObjects.push(wall);
+		// }
 	}
 
 	static addToLevel(obj) {
