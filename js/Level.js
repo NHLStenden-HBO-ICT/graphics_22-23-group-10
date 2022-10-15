@@ -1,14 +1,17 @@
 import * as THREE from "../node_modules/three/build/three.module.js";
 import { Wall } from "./Objects/Wall.js";
 import { Water } from "./Objects/Water.js";
+import { Floor } from "./Objects/Floor.js"
 
 const LEVELFOLDER = "../levels/";
 
+const NONE = -1;
 const FLOOR = 0;
 const WALL = 1;
 const DEAD_SPACE = 2;
 const WATER = 3;
 const INVIS_WALL = 4;
+const COIN = 5;
 
 const SCALE_FACTOR = 2;
 
@@ -139,6 +142,8 @@ export class Level {
 
 			this.generateLevel(img.width, img.height);
 
+			this.addHelpers();
+
 			this.#isLevelLoaded = true;
 			dispatchEvent(this.levelLoaded);
 
@@ -179,52 +184,27 @@ export class Level {
 			this.cameraCollisionObjects.push(wall.model)
 		}
 
-
-		// NOTE : Floor needs a seperate method. Floor should ignore walls, as it can just generate under them
-
 		// Get floor
-		// const floors = this.getRectangles(FLOOR);
-		// for (let i = 0; i < floors.length; i++) {
-		// 	const rect = floors[i];
-		// 	const w = rect.x2 - rect.x1 + 1;
-		// 	const h = rect.y2 - rect.y1 + 1;
+		const floors = this.getRectangles(FLOOR);
+		console.log(floors);
+		for (let i = 0; i < floors.length; i++) {
+			const rect = floors[i];
+			const w = rect.x2 - rect.x1 + 1;
+			const h = rect.y2 - rect.y1 + 1;
 			
-		// 	const floor = new Floor(rect.x1 + w / 2, rect.y1 + h / 2, w, h);
-		// 	this.#level.add(floor.model);
-		// 	this.collisionObjects.push(floor);
-		// 	this.cameraCollisionObjects.push(floor.model)
-		// }
-
-	}
-
-	static addToLevel(obj) {
-		this.#level.add(obj);
-	}
-
-	static initLevelData(n) {
-		let array = [];
-		for (let i = 0; i < n; i++) {
-			array[i] = [];
+			const floor = new Floor(rect.x1 + w / 2, rect.y1 + h / 2, w, h);
+			this.#level.add(floor.model);
+			this.collisionObjects.push(floor);
+			this.cameraCollisionObjects.push(floor.model)
 		}
-		return array;
-	}
 
-	static addHelpers() {
-		for (let i = 0; i < this.collisionObjects.length; i++) {
-			let helper = new THREE.Box3Helper(
-				this.collisionObjects[i].boundingBox,
-				0xff0000
-			);
-
-			this.#level.add(helper);
-		}
 	}
 
 	/** Will find rectangles in a matrix/2d array */
 	static getRectangles(tileID) {
-		let map = [];
-		for (var i = 0; i < this.#levelGenData.length; i++)
-			map[i] = this.#levelGenData[i].slice();
+		let map = this.#levelGenData;
+		// for (var i = 0; i < this.#levelGenData.length; i++)
+		// 	map[i] = this.#levelGenData[i].slice();
 
 		let rectangles = [];
 
@@ -235,14 +215,14 @@ export class Level {
 			let x = 0;
 			let y = 0;
 			
-			let mapCopy = [];
-			for (var i = 0; i < map.length; i++)
-				mapCopy[i] = map[i].slice();
+			// let mapCopy = [];
+			// for (var i = 0; i < map.length; i++)
+			// 	mapCopy[i] = map[i].slice();
 
 			let biggestRect = {area: 0};
 
-			while (this.containsTile(mapCopy, tileID)){
-				if (mapCopy[x][y] != tileID) {
+			while (this.containsTile(map, tileID)){
+				if (map[x][y] != tileID) {
 					x += 1;
 					if (x == WIDTH) {
 						// Reached the right edge of the map
@@ -257,7 +237,7 @@ export class Level {
 					continue;
 				}
 
-				if (mapCopy[x][y] == tileID) {
+				if (map[x][y] == tileID) {
 					// Tile is what we're looking for, so we get the biggest rectangle possible from this location
 
 					const rect = {
@@ -272,7 +252,7 @@ export class Level {
 					// Find bottom right corner
 					// First we find largest possible X value
 					for (let x = rect.x1; x < WIDTH; x++) {
-						if (mapCopy[x][rect.y1] != tileID) {
+						if (map[x][rect.y1] != tileID) {
 							// If a floor is encountered on the horizonal axis
 							rect.x2 = x - 1;
 							break;
@@ -287,7 +267,7 @@ export class Level {
 								yValues.push(HEIGHT - 1);
 								break;
 							}
-							if (mapCopy[x][y] != tileID) {
+							if (map[x][y] != tileID) {
 								yValues.push(y - 1);
 								break;
 							}
@@ -327,10 +307,30 @@ export class Level {
 
 			rectangles.push(largestRect);
 
+			let newTile;
+			
+			switch (tileID){
+				case FLOOR:
+					newTile = NONE;
+					break;
+				case INVIS_WALL:
+					newTile = WATER;
+					break;
+				case WALL:
+					newTile = FLOOR;
+					break;
+				case COIN:
+					newTile = FLOOR;
+					break;
+				default:
+					newTile = FLOOR;
+					break;
+			}
+
 			// Remove rectangle from map so it doesn't get found again
 			for (let y = largestRect.y1; y <= largestRect.y2; y++) {
 				for (let x = largestRect.x1; x <= largestRect.x2; x++) {
-					map[x][y] = FLOOR;
+					map[x][y] = newTile;
 				}
 			}
 		}
@@ -343,6 +343,29 @@ export class Level {
 			if (map[x].includes(tileID)) return true;
 		}
 		return false;
+	}
+
+	static addToLevel(obj) {
+		this.#level.add(obj);
+	}
+
+	static initLevelData(n) {
+		let array = [];
+		for (let i = 0; i < n; i++) {
+			array[i] = [];
+		}
+		return array;
+	}
+
+	static addHelpers() {
+		for (let i = 0; i < this.collisionObjects.length; i++) {
+			let helper = new THREE.Box3Helper(
+				this.collisionObjects[i].boundingBox,
+				0xff0000
+			);
+
+			this.#level.add(helper);
+		}
 	}
 }
 
