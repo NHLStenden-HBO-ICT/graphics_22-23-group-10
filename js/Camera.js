@@ -6,7 +6,7 @@ const ASPECT = 2;
 const NEAR = 0.1;
 const FAR = 1500.0;
 
-const SENS = 0.8;
+const SENS = 0.4;
 const HEIGHT = 2;
 
 const CANVAS = document.getElementById("webgl");

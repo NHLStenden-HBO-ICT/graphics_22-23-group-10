@@ -25,6 +25,7 @@ export class Level {
 	static collisionObjects = [];
 	static cameraCollisionObjects = [];
 	static coins = [];
+	static water;
 
 	static levelLoaded = new Event("levelLoaded");
 
@@ -155,9 +156,7 @@ export class Level {
 
 	static generateLevel(width, height) {
 		// Add the water
-		const water = new Water(width, height);
-		this.#level.add(water.model);
-		this.cameraCollisionObjects.push(water.model)
+		this.water = new Water(width, height);
 		
 		// Get invisible walls
 		const invisibleWalls = this.getRectangles(INVIS_WALL);
@@ -186,7 +185,6 @@ export class Level {
 
 		// Get floor
 		const floors = this.getRectangles(FLOOR);
-		console.log(floors);
 		for (let i = 0; i < floors.length; i++) {
 			const rect = floors[i];
 			const w = rect.x2 - rect.x1 + 1;
