@@ -16,6 +16,14 @@
     font-display: swap;
 }
 
+@font-face {
+    font-family: 'Pathway Gothic One Regular';
+    src: url('../assets/fonts/PathwayGothicOne-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+    }
+
 html {
     height: 100vh;
     font-size: 10px;
@@ -112,7 +120,7 @@ canvas {
     margin-top: 5rem;
 }
 
-.main_menu_container .menu_controls > .play_button, .help_button {
+.main_menu_container .menu_controls > .play_button, .help_button, .credits_button {
     font-family: 'PacFont', system-ui, -apple-system, sans-serif;
     color: white;
     border: 0;
@@ -126,7 +134,7 @@ canvas {
     animation: blink 1s linear infinite;
 }
 
-.main_menu_container .menu_controls .help_button {
+.main_menu_container .menu_controls .help_button, .credits_button {
     font-size: 3rem;
     margin-top: 2rem;
 }
@@ -162,6 +170,52 @@ canvas {
     cursor: pointer;
 }
 
+.credits {
+    /* Flexbox to center the entire element on the screen */
+    display: flex;
+    justify-content: center;
+    /* This is a magic number based on the context in which this snippet is used and effects the perspective */
+    height: 100%;
+    /* This sets allows us to transform the text on a 3D plane, and is somewhat a magic number */
+    perspective: 60rem;
+    /* The rest is totally up to personal styling preferences */
+    color: #feda4a;
+    font-family: 'Pathway Gothic One', sans-serif;
+    font-size: 10rem;
+    font-weight: 600;
+    letter-spacing: 6px;
+    line-height: 150%;
+    text-align: justify;
+    pointer-events: none;
+  }
+
+  .crawl {
+    /* Position the element so we can adjust the top property in the animation */
+    position: relative;
+    /* Defines the skew origin at the very center when we apply transforms on the animation */
+    transform-origin: 50% 100%;
+    /* Adds the crawl animation, which plays for one minute */
+  }
+
+  .crawl-animation {
+    animation: crawl 30s linear;
+  }
+
+  .fade {
+    position: absolute;
+    width: 100%;
+    min-height: 20vh;
+    background-image: linear-gradient(0deg, transparent, #000 75%);
+    z-index: 1;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 50rem;
+    content: '';
+    display: block;
+    pointer-events: none;
+  }
+
 .noselect {
     -webkit-touch-callout: none; /* iOS Safari */
       -webkit-user-select: none; /* Safari */
@@ -185,5 +239,21 @@ canvas {
     }
     100%{
       opacity: 0;
+    }
+  }
+
+  /* For credits menu */
+@keyframes crawl {
+    0% {
+      /* The element starts below the screen */
+      top: 0;
+      /* Rotate the text 20 degrees but keep it close to the viewer */
+      transform: rotateX(20deg) translateZ(0);
+    }
+    100% { 
+      /* This is a magic number, but using a big one to make sure the text is fully off the screen at the end */
+      top: -8000px;
+      /* Slightly increasing the rotation at the end and moving the text far away from the viewer */
+      transform: rotateX(25deg) translateZ(-2500px);
     }
   }

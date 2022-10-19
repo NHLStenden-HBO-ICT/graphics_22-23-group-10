@@ -17,22 +17,25 @@
         <div class="menu_controls">
           <button class="play_button" id="play_button">PLAY</button>
           <button class="help_button" id="help_button">HELP</button>
+          <button class="credits_button" id="credits_button">CREDITS</button>
         </div>
-      </div>
-      <div class="pacman">
-        <img class="img_pacman" src="./assets/img/Pacman.png" alt="" />
-      </div>
-      <div class="ghost">
-        <img class="img_ghost" src="./assets/img/Ghost.png" alt="" />
-        <img
-          id="pupil"
-          class="img_pupil"
-          src="./assets/img/Pupil2.png"
-          alt=""
-        />
+
+        <div class="pacman">
+          <img class="img_pacman" src="./assets/img/Pacman.png" alt="" />
+        </div>
+        <div class="ghost">
+          <img class="img_ghost" src="./assets/img/Ghost.png" alt="" />
+          <img
+            id="pupil"
+            class="img_pupil"
+            src="./assets/img/Pupil2.png"
+            alt=""
+          />
+        </div>
       </div>
     </div>
 
+    <!-- Modal for help menu -->
     <div id="helpModal" class="modal">
       <div class="modal_container">
         <div class="help">
@@ -45,6 +48,31 @@
           />
         </div>
       </div>
+    </div>
+
+    <!-- Credits -->
+    <div id="fade_container"></div>
+    <div class="credits">
+      <div class="crawl">
+        <div class="title">
+          <p>Groep 10</p>
+          <h1>Reverse Pacman</h1>
+        </div>
+        <p>Wouter Barf</p>
+        <p>Laurens Moedt</p>
+        <p>Khalid Dahir</p>
+        <p>Teshale Noorman</p>
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+          eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
+          minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+          aliquip ex ea commodo consequat. Duis aute irure dolor in
+          reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+          pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+          culpa qui officia deserunt mollit anim id est laborum.
+        </p>
+      </div>
+      <audio src="./assets/audio/credits.mp3" id="creditsMusic"></audio>
     </div>
     <script type="module" src="./js/InvertedPacMan.js"></script>
   </body>
