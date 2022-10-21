@@ -6,49 +6,118 @@ export class PacmanStatemachine {
 		DAY: "day",
 		NIGHT: "night",
 	});
+	static MovePattern = Object.freeze({
+		WANDER: "wander",
+		RUN: "run",
+		CHASE: "chase",
+	});
 
 	constructor() {
-		addEventListener("nightTimeStart", () => {
-			// console.log(this.#state);
-			this.dispatch("switch");
-			// console.log(this.#state);
+		// nighttime events
+		addEventListener("nightTimeWander", () => {
+			this.dispatch("switchMovePattern");
 		});
 
-		addEventListener("dayTimeStart", () => {
-			// console.log(this.#state);
-			this.dispatch("switch");
-			// console.log(this.#state);
+		addEventListener("nightTimeRun", () => {
+			this.dispatch("switchMovePattern");
+		});
+
+		addEventListener("nightTime", () => {
+			this.dispatch("switchCycle");
+		});
+
+		// daytime events
+		addEventListener("dayTimeWander", () => {
+			this.dispatch("switchMovePattern");
+		});
+
+		addEventListener("dayTimeRun", () => {
+			this.dispatch("switchMovePattern");
+		});
+
+		addEventListener("dayTime", () => {
+			this.dispatch("switchCycle");
 		});
 	}
 
 	#state = PacmanStatemachine.Cycles.DAY;
+	#moveState = PacmanStatemachine.MovePattern.WANDER;
 
 	transitions = {
 		night: {
-			switch() {
-				this.#state = PacmanStatemachine.Cycles.DAY;
+			wander: {
+				switchMovePattern() {
+					this.#moveState = PacmanStatemachine.MovePattern.CHASE;
+				},
+				switchCycle() {
+					this.#state = PacmanStatemachine.Cycles.DAY;
+				},
+			},
+			run: {
+				switchMovePattern() {
+					this.#moveState = PacmanStatemachine.MovePattern.WANDER;
+				},
+				switchCycle() {
+					this.#state = PacmanStatemachine.Cycles.DAY;
+				},
+			},
+			chase: {
+				switchMovePattern() {
+					this.#moveState = PacmanStatemachine.MovePattern.WANDER;
+				},
+				switchCycle() {
+					this.#state = PacmanStatemachine.Cycles.DAY;
+				},
 			},
 		},
 		day: {
-			switch() {
-				this.#state = PacmanStatemachine.Cycles.NIGHT;
+			wander: {
+				switchMovePattern() {
+					this.#moveState = PacmanStatemachine.MovePattern.RUN;
+				},
+				switchCycle() {
+					this.#state = PacmanStatemachine.Cycles.NIGHT;
+				},
+			},
+			run: {
+				switchMovePattern() {
+					this.#moveState = PacmanStatemachine.MovePattern.WANDER;
+				},
+				switchCycle() {
+					this.#state = PacmanStatemachine.Cycles.NIGHT;
+				},
+			},
+			chase: {
+				switchMovePattern() {
+					this.#moveState = PacmanStatemachine.MovePattern.WANDER;
+				},
+				switchCycle() {
+					this.#state = PacmanStatemachine.Cycles.NIGHT;
+				},
 			},
 		},
 	};
 	dispatch(actionName) {
-		const action = this.transitions[this.#state][actionName];
+		const action = this.transitions[this.#state][this.#moveState][actionName];
 
 		if (action) {
 			action.call(this);
 		} else {
 			console.log("invalid action");
-		}
+		}		
 	}
 
-	getState() {
+	getCycleState() {
 		return this.#state;
 	}
-	setState(state) {
+	setCycleState(state) {
 		this.#state = state;
+	}
+
+	getMoveState() {
+		return this.#moveState;
+	}
+	setMoveState(moveState) {
+		this.#moveState = moveState;
 	}
 }

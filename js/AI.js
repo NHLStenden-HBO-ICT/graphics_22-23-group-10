@@ -80,22 +80,23 @@ export class Ai extends DynamicBody {
 	}
 	MoveToNextCoin(){
 		let allExistingCoins = Level.coins;
+		
 	}
 
 	// not used atm
-	isPositionReached(pos, targetpos) {
-		let deltaPos = new THREE.Vector3(
-			pos.x - targetpos.x,
-			0,
-			pos.z - targetpos.z
-		);
+	// isPositionReached(pos, targetpos) {
+	// 	let deltaPos = new THREE.Vector3(
+	// 		pos.x - targetpos.x,
+	// 		0,
+	// 		pos.z - targetpos.z
+	// 	);
 
-		if (deltaPos.x > THRESHOLD || deltaPos.x < -THRESHOLD) {
-			return false;
-		}
-		if (deltaPos.z > THRESHOLD || deltaPos.z < -THRESHOLD) {
-			return false;
-		}
-		return true;
-	}
+	// 	if (deltaPos.x > THRESHOLD || deltaPos.x < -THRESHOLD) {
+	// 		return false;
+	// 	}
+	// 	if (deltaPos.z > THRESHOLD || deltaPos.z < -THRESHOLD) {
+	// 		return false;
+	// 	}
+	// 	return true;
+	// }
 }

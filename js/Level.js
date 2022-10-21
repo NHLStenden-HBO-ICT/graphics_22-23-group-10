@@ -7,6 +7,7 @@ const FLOOR = 0;
 const WALL = 1;
 const DEAD_SPACE = 2;
 const WATER = 3;
+const COIN = 4;
 
 const SCALE_FACTOR = 2;
 
