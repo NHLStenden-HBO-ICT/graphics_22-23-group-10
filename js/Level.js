@@ -169,7 +169,7 @@ export class Level {
 	static generateLevel(width, height) {
 		// Add the water
 		this.water = new Water(width, height);
-		
+
 		// Get invisible walls
 		const invisibleWalls = this.getRectangles(INVIS_WALL);
 		for (let i = 0; i < invisibleWalls.length; i++) {
@@ -188,11 +188,11 @@ export class Level {
 			const rect = walls[i];
 			const w = rect.x2 - rect.x1 + 1;
 			const h = rect.y2 - rect.y1 + 1;
-			
+
 			const wall = new Wall(rect.x1 + w / 2, rect.y1 + h / 2, w, h);
 			this.#level.add(wall.model);
 			this.collisionObjects.push(wall);
-			this.cameraCollisionObjects.push(wall.model)
+			this.cameraCollisionObjects.push(wall.model);
 		}
 
 		// Get floor
@@ -201,11 +201,11 @@ export class Level {
 			const rect = floors[i];
 			const w = rect.x2 - rect.x1 + 1;
 			const h = rect.y2 - rect.y1 + 1;
-			
+
 			const floor = new Floor(rect.x1 + w / 2, rect.y1 + h / 2, w, h);
 			this.#level.add(floor.model);
 			this.collisionObjects.push(floor);
-			this.cameraCollisionObjects.push(floor.model)
+			this.cameraCollisionObjects.push(floor.model);
 		}
 	}
 
@@ -223,14 +223,14 @@ export class Level {
 		const findLargestRect = () => {
 			let x = 0;
 			let y = 0;
-			
+
 			// let mapCopy = [];
 			// for (var i = 0; i < map.length; i++)
 			// 	mapCopy[i] = map[i].slice();
 
-			let biggestRect = {area: 0};
+			let biggestRect = { area: 0 };
 
-			while (this.containsTile(map, tileID)){
+			while (this.containsTile(map, tileID)) {
 				if (map[x][y] != tileID) {
 					x += 1;
 					if (x == WIDTH) {
@@ -298,11 +298,11 @@ export class Level {
 
 						if (y == HEIGHT) {
 							// Reached the bottom right, thus the end of the loop
-							break;;
+							break;
 						}
 					}
 
-					if (rect.area > biggestRect.area){
+					if (rect.area > biggestRect.area) {
 						biggestRect = rect;
 					}
 				}
@@ -317,8 +317,8 @@ export class Level {
 			rectangles.push(largestRect);
 
 			let newTile;
-			
-			switch (tileID){
+
+			switch (tileID) {
 				case FLOOR:
 					newTile = NONE;
 					break;
@@ -351,7 +351,7 @@ export class Level {
 		return false;
 	}
 
-	static addToLevel(obj) {
+	static add(obj) {
 		this.#level.add(obj);
 	}
 

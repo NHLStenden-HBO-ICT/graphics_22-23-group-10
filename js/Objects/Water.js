@@ -13,14 +13,14 @@ export class Water extends StaticBody {
 		function shaderLoaded(mat) {
 			mat.lights = true;
 			// mat.transparent = true;
-			
+
 			const SCALE_FACTOR = Level.getScaleFactor;
 			const waterWidth = width * SCALE_FACTOR;
 			const waterHeight = 0;
 			const waterDepth = height * SCALE_FACTOR;
-	
+
 			self.model = new THREE.Mesh(
-			new THREE.BoxGeometry(
+				new THREE.BoxGeometry(
 					waterWidth,
 					waterHeight,
 					waterDepth,
@@ -30,23 +30,23 @@ export class Water extends StaticBody {
 				),
 				mat
 			);
-			
+
 			self.model.layers.enable(1);
 			self.model.receiveShadow = true;
 			self.model.position.x = waterDepth / 2 - SCALE_FACTOR / 2;
 			self.model.position.y = -1.2;
 			self.model.position.z = waterWidth / 2 - SCALE_FACTOR / 2;
-	
+
 			self.model.name = "Water";
-	
+
 			self.calcExtents(self.model.geometry);
 
-			Level.addToLevel(self.model);
+			Level.add(self.model);
 			Level.cameraCollisionObjects.push(self.model);
 		}
 	}
 
-	update(elapsedTime){
+	update(elapsedTime) {
 		this.model.material.uniforms.u_time.value = elapsedTime;
 	}
 }
