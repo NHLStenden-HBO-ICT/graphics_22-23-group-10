@@ -16,7 +16,7 @@ export class Player extends DynamicBody {
 
 	#MODELPATH = "../models/ghost.glb";
 
-	#walkVelocity = 6;
+	#walkVelocity = 30;
 	#runVelocity = 12;
 	#runCost = 0.5;
 	#stamina = 100;

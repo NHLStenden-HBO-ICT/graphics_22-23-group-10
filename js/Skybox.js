@@ -1,5 +1,6 @@
 import * as THREE from "../node_modules/three/build/three.module.js";
 import { loadShader } from "./ShaderLoader.js";
+import { Level } from "./Level.js";
 
 export class Skybox {
 	skyboxLoaded = new Event("skyboxLoaded");
@@ -13,7 +14,7 @@ export class Skybox {
 	skyGeometry;
 
 	#sunAxis = new THREE.Vector3(1, 0, 0);
-	#sunVector = new THREE.Vector3(0, -100, -500);
+	#sunVector = new THREE.Vector3(0, 100, -500);
 	#isNight = false;
 	#lightIntensity;
 
@@ -23,6 +24,9 @@ export class Skybox {
 
 	constructor() {
 		loadShader("skybox", onShaderLoaded);
+
+		const mapSize = Level.getMapSize;
+		this.#sunVector.x = (mapSize.x / 2) * Level.getScaleFactor;
 
 		const self = this;
 		function onShaderLoaded(material) {

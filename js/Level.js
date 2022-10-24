@@ -22,6 +22,8 @@ export class Level {
 	static #isLevelLoaded = false;
 	static #playerSpawn = new THREE.Vector3();
 	static #pacmanSpawn = new THREE.Vector3();
+	static #mapSize = new THREE.Vector2();
+
 	static collisionObjects = [];
 	static cameraCollisionObjects = [];
 	static coins = [];
@@ -53,6 +55,10 @@ export class Level {
 		else return undefined;
 	}
 
+	static get getMapSize() {
+		return this.#mapSize;
+	}
+
 	static get getScaleFactor() {
 		return SCALE_FACTOR;
 	}
@@ -75,6 +81,9 @@ export class Level {
 		img.onload = () => {
 			canvas.width = img.width;
 			canvas.height = img.height;
+
+			this.#mapSize.x = img.width;
+			this.#mapSize.y = img.height;
 
 			this.#levelDataAi = this.initLevelData(img.width);
 			this.#levelGenData = this.initLevelData(img.width);

@@ -51,28 +51,38 @@ class InvertedPacman {
 	_initScene() {
 		this.scene = new THREE.Scene();
 
-		this.scene.fog = new THREE.Fog(0x0c0908, 0, 50);
+		const addSun = () => {
+			const mapSize = Level.getMapSize;
 
-		this.sun = new THREE.DirectionalLight(0xffffff);
-		this.sun.position.set(0, 1, 0);
-		this.sun.target.position.set(0, 0, 0);
-		this.sun.castShadow = true;
-		this.sun.shadow.mapSize.width = 40960;
-		this.sun.shadow.mapSize.height = 40960;
-		this.sun.shadow.camera.near = 0.1;
-		this.sun.shadow.camera.far = 1000;
-		this.sun.shadow.camera.left = -200;
-		this.sun.shadow.camera.right = 200;
-		this.sun.shadow.camera.top = 200;
-		this.sun.shadow.camera.bottom = -200;
-		this.sun.shadow.bias = -0.0001;
-		this.scene.add(this.sun);
+			console.log(mapSize);
+
+			this.sun = new THREE.DirectionalLight(0xffffff);
+			this.sun.position.set(100, 0, -500);
+			this.sun.target.position.set(
+				(mapSize.x * Level.getScaleFactor) / 2,
+				0,
+				(mapSize.y * Level.getScaleFactor) / 2
+			);
+			this.sun.castShadow = true;
+			this.sun.shadow.mapSize.width = 40960;
+			this.sun.shadow.mapSize.height = 40960;
+			this.sun.shadow.camera.near = 0.1;
+			this.sun.shadow.camera.far = 1000;
+			this.sun.shadow.camera.left = -mapSize.x * Level.getScaleFactor;
+			this.sun.shadow.camera.right = mapSize.x * Level.getScaleFactor;
+			this.sun.shadow.camera.top = mapSize.y * Level.getScaleFactor;
+			this.sun.shadow.camera.bottom = -mapSize.y * Level.getScaleFactor;
+			this.sun.shadow.bias = -0.0001;
+
+			this.scene.add(this.sun.target);
+			this.scene.add(this.sun);
+		};
+
+		this.scene.fog = new THREE.Fog(0x0c0908, 0, 50);
 
 		let light = new THREE.HemisphereLight(0xa5dfe8, 0x12782d, 0.5);
 		// let light = new THREE.AmbientLight(0xbfd7d9, 0.3);
 		this.scene.add(light);
-
-		this.skybox = new Skybox();
 
 		addEventListener("skyboxLoaded", () => {
 			this.scene.add(this.skybox.skyGeometry);
@@ -81,7 +91,10 @@ class InvertedPacman {
 		Level.load(LEVEL_TO_LOAD);
 
 		addEventListener("levelLoaded", () => {
+			addSun();
+
 			this.scene.add(Level.getLevel);
+			this.skybox = new Skybox();
 
 			this._initPlayer();
 
@@ -116,8 +129,8 @@ class InvertedPacman {
 		this.scene.add(this.pacmanBoxHelper);
 
 		this.scene.add(new THREE.CameraHelper(this.sun.shadow.camera));
-
 		this.scene.add(new THREE.SpotLightHelper(this.player.lamp));
+		this.scene.add(new THREE.AxesHelper());
 
 		Level.addHelpers();
 	}
@@ -160,9 +173,6 @@ class InvertedPacman {
 
 		this.player.boundingBox.setFromObject(this.player.model);
 		this.pacman.boundingBox.setFromObject(this.pacman.model);
-
-		// this.playerBoxHelper.box = this.player.boundingBox;
-		// this.pacmanBoxHelper.box = this.pacman.boundingBox;
 
 		if (this.player.boundingBox.intersectsBox(this.pacman.boundingBox)) {
 			dispatchEvent(this.playerPacmanCollision);
