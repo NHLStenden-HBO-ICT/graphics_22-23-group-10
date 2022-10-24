@@ -25,8 +25,8 @@ export class Pacman extends Ai {
 		return this.model;
 	}
 
-	constructor() {
-		super();
+	constructor(playerModel) {
+		super(playerModel);
 		this._loadPacman();
 	}
 
@@ -62,6 +62,7 @@ export class Pacman extends Ai {
 	}
 
 	update(delta, playerPos, playerModel) {
+
 		this._movePacman(delta, playerPos, playerModel);
 
 		// update animations

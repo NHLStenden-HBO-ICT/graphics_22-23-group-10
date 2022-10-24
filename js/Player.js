@@ -134,7 +134,7 @@ export class Player extends DynamicBody {
 				0,
 				this.#walkDirection.z * velocity * delta
 			);
-			this.moveAndCollide(movementVector, this.camera);
+			this.moveAndCollide(movementVector);
 		}
 	}
 
@@ -146,7 +146,7 @@ export class Player extends DynamicBody {
 		let self = this;
 		new GLTFLoader().load(this.#MODELPATH, function (model) {
 			const mesh = model.scene;
-
+			mesh.name = "player";
 			mesh.position.x = Level.getPlayerSpawn.x;
 			mesh.position.z = Level.getPlayerSpawn.z;
 			self.model = mesh;

@@ -14,34 +14,17 @@ export class PacmanStatemachine {
 
 	constructor() {
 		// nighttime events
-		addEventListener("nightTimeWander", () => {
+		addEventListener("switchMovePattern", () => {
 			this.dispatch("switchMovePattern");
 		});
 
-		addEventListener("nightTimeRun", () => {
-			this.dispatch("switchMovePattern");
-		});
-
-		addEventListener("nightTimeStart", () => {
-			this.dispatch("switchCycle");
-		});
-
-		// daytime events
-		addEventListener("dayTimeWander", () => {
-			this.dispatch("switchMovePattern");
-		});
-
-		addEventListener("dayTimeRun", () => {
-			this.dispatch("switchMovePattern");
-		});
-
-		addEventListener("dayTimeStart", () => {
+		addEventListener("switchCycle", () => {
 			this.dispatch("switchCycle");
 		});
 	}
 
 	#state = PacmanStatemachine.Cycles.DAY;
-	#moveState = PacmanStatemachine.MovePattern.WANDER;
+	#moveState = PacmanStatemachine.MovePattern.RUN;
 
 	transitions = {
 		night: {

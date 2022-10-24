@@ -17,25 +17,41 @@ export class Ai extends DynamicBody {
 	graphStart;
 	graphEnd;
 
+	intersectObjects = Level.cameraCollisionObjects.slice();
+
+	closestCoin = null;
+
 	raycaster = new THREE.Raycaster();
 
-	nightTimeWander = new Event("nightTimeWander");
+	switchMovePattern = new Event("switchMovePattern");
+
+	constructor(playerMesh){
+		super();
+		this.intersectObjects.push(playerMesh);
+	}
 
 	getPath(pacmanPos, playerPos, cycleState, moveState, playerModel) {
 		this.graph.diagonal = true;
 		this.graph.dontCrossCorners = true;
+
+		this.InVisionRange(pacmanPos, playerPos, playerModel, moveState);
+
+		if(!this.closestCoin){
+			this.closestCoin = this.GetClosestCoin();
+		}
 
 		switch (cycleState) {
 			case PacmanStatemachine.Cycles.DAY:
 				switch (moveState) {
 					case PacmanStatemachine.MovePattern.WANDER:
 						this.graphStart = this.graph.grid[pacmanPos.x][pacmanPos.z];
-						// this.graphEnd = POINT TO CHOSEST COIN --CoinGraphEnd()
+						const coinpos = new THREE.Vector3(this.closestCoin.getPosition.x / Level.getScaleFactor, 0, this.closestCoin.getPosition.z / Level.getScaleFactor);
+						this.graphEnd = this.graph.grid[coinpos.x][coinpos.z];
 						break;
 		
 					case PacmanStatemachine.MovePattern.RUN:
 						this.graphStart = this.graph.grid[pacmanPos.x][pacmanPos.z];
-						this.graphEnd = this.RunGraphEnd(pacmanPos, playerPos, playerModel);
+						this.graphEnd = this.RunGraphEnd(playerPos);
 						break;
 		
 					case PacmanStatemachine.MovePattern.CHASE:
@@ -49,12 +65,13 @@ export class Ai extends DynamicBody {
 				switch (moveState) {
 					case PacmanStatemachine.MovePattern.WANDER:
 						this.graphStart = this.graph.grid[pacmanPos.x][pacmanPos.z];
-						// this.graphEnd = POINT TO CHOSEST COIN --CoinGraphEnd()
+						const coinpos = new THREE.Vector3(this.closestCoin.getPosition.x / Level.getScaleFactor, 0, this.closestCoin.getPosition.z / Level.getScaleFactor);
+						this.graphEnd = this.graph.grid[coinpos.x][coinpos.z];
 						break;
 		
 					case PacmanStatemachine.MovePattern.RUN:
 						this.graphStart = this.graph.grid[pacmanPos.x][pacmanPos.z];
-						this.graphEnd = this.RunGraphEnd(pacmanPos, playerPos, playerModel);
+						this.graphEnd = this.RunGraphEnd(playerPos);
 						break;
 		
 					case PacmanStatemachine.MovePattern.CHASE:
@@ -64,24 +81,17 @@ export class Ai extends DynamicBody {
 				}
 				break;
 		}
-
+		
 		var result = this.astar.search(this.graph, this.graphStart, this.graphEnd);
 
 		return result;
 	}
 
-	RunGraphEnd(_pacmanPos, playerPos, playerModel) {
+	RunGraphEnd(targetPos){
 		const pacmanPos = this.model.position;
-		playerPos.multiplyScalar(Level.getScaleFactor);
-		// this.raycaster.layers.set(2);
+		targetPos.multiplyScalar(Level.getScaleFactor);
 		let dir = new THREE.Vector3();
-		dir.subVectors(playerPos, pacmanPos).normalize();
-		// console.log(dir);
-		this.raycaster.set(pacmanPos, dir);
-
-		this.raycastOrigin = pacmanPos;
-		this.raycaster.ray.at(100, this.raycastEnd);
-		this.raycastEnd.y = 2;
+		dir.subVectors(targetPos, pacmanPos).normalize();
 
 		// Position away from player
 		let pos = new THREE.Vector3(
@@ -94,24 +104,59 @@ export class Ai extends DynamicBody {
 			new THREE.Vector3(0, 0, 0),
 			new THREE.Vector3(this.graph.grid.length -1 , 0, this.graph.grid[0].length -1)
 		);
+		return this.graph.grid[pos.x][pos.z];
+	}
 
-		const intersect = this.raycaster.intersectObject(playerModel);
-		// console.log(playerModel);
+
+	InVisionRange(_pacmanPos, targetPos, playerModel, moveState) {
+		const pacmanPos = this.model.position;
+		targetPos.multiplyScalar(Level.getScaleFactor);
+		// this.raycaster.layers.set(2);
+		let dir = new THREE.Vector3();
+		dir.subVectors(targetPos, pacmanPos).normalize();
+		// console.log(dir);
+		this.raycaster.set(pacmanPos, dir);
+
+		this.raycastOrigin = pacmanPos;
+		this.raycaster.ray.at(100, this.raycastEnd);
+		this.raycastEnd.y = 2;
+
+		const intersect = this.raycaster.intersectObjects(this.intersectObjects);
+		
 		if (intersect.length > 0) {
 			const isct = intersect[0];
 			console.log(isct);
-			if (isct.distance < 500) {
-				return this.graph.grid[pos.x][pos.z];
+			if (isct.distance < 100) {
+				if(isct.object.name == "player"){
+					console.log("inrange");
+					if(moveState != PacmanStatemachine.MovePattern.RUN){
+						dispatchEvent(this.switchMovePattern);
+					}
+				}
+				
 			}
-			else{ // switch to wander if pacman is too far away
-				return dispatchEvent(this.nightTimeWander);
-			}
+		}
+		if(moveState == PacmanStatemachine.MovePattern.RUN){
+			dispatchEvent(this.switchMovePattern);
 		}
 	}
 
-	CoinGraphEnd(){
+	GetClosestCoin(){
 		let allExistingCoins = Level.coins;
-		// ToDo: graphEnd = closest coin
+		let CoinPathResults = [];
+
+		this.graphStart = this.graph.grid[this.getPosition.x][this.getPosition.z];
+
+		for(let i = 0; i < allExistingCoins.length; i++){
+			const coin = allExistingCoins[i];
+			const coinpos = new THREE.Vector3(coin.getPosition.x / Level.getScaleFactor, 0, coin.getPosition.z / Level.getScaleFactor)
+			this.graphEnd = this.graph.grid[coinpos.x][coinpos.z];
+			var result = this.astar.search(this.graph, this.graphStart, this.graphEnd);
+			CoinPathResults.push(result.length);
+		}
+		const lowestPath = Math.min(...CoinPathResults);
+
+		return allExistingCoins[CoinPathResults.indexOf(lowestPath)]
 	}
 
 	// not used atm

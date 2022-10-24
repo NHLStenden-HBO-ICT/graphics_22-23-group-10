@@ -3,8 +3,7 @@ import { loadShader } from "./ShaderLoader.js";
 
 export class Skybox {
 	skyboxLoaded = new Event("skyboxLoaded");
-	nightTimeStart = new Event("nightTimeStart");
-	dayTimeStart = new Event("dayTimeStart");
+	switchCycle = new Event("switchCycle");
 
 	#ready = false;
 
@@ -13,7 +12,7 @@ export class Skybox {
 	skyGeometry;
 
 	#sunAxis = new THREE.Vector3(1, 0, 0);
-	#sunVector = new THREE.Vector3(0, -100, -500);
+	#sunVector = new THREE.Vector3(0, 100, -500);
 	#isNight = false;
 	#lightIntensity;
 
@@ -70,10 +69,10 @@ export class Skybox {
 
 		if (angle > 90 && angle > 0 && !this.#isNight) {
 			this.#isNight = true;
-			dispatchEvent(this.nightTimeStart);
+			dispatchEvent(this.switchCycle);
 		} else if (angle > -90 && angle < 0 && this.#isNight) {
 			this.#isNight = false;
-			dispatchEvent(this.dayTimeStart);
+			dispatchEvent(this.switchCycle);
 		}
 	}
 }

@@ -84,8 +84,6 @@ class InvertedPacman {
 			this.scene.add(Level.getLevel);
 
 			this._initPlayer();
-
-			this._initPacman();
 		});
 	}
 
@@ -131,19 +129,20 @@ class InvertedPacman {
 
 			this._OnWindowResize();
 
-			this.ready = true;
-
 			this._initPostProcessing();
+
+			this._initPacman();
 
 			if (DEBUG_MODE) this._addDebugShapes();
 		});
 	}
 
 	_initPacman() {
-		this.pacman = new Pacman();
+		this.pacman = new Pacman(this.player.getModel.children[0]);
 
 		addEventListener("pacmanLoaded", () => {
 			this.scene.add(this.pacman.getPacmanModel);
+			this.ready = true;
 		});
 	}
 
