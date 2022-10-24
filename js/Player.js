@@ -17,7 +17,9 @@ export class Player extends DynamicBody {
 	#MODELPATH = "../models/ghost.glb";
 
 	#walkVelocity = 6;
-	#runVelocity = 20;
+	#runVelocity = 12;
+	#runCost = 0.5;
+	#stamina = 100;
 
 	ready = false;
 	#currentAction = this.Actions.IDLE;
@@ -33,7 +35,6 @@ export class Player extends DynamicBody {
 	SHIFT = "shift";
 	DIRECTIONS = [this.W, this.A, this.S, this.D];
 
-	model;
 	camera;
 
 	lamp;
@@ -45,6 +46,10 @@ export class Player extends DynamicBody {
 
 	get getCameraBase() {
 		return this.camera.rotY;
+	}
+
+	get getStaminaLevel() {
+		return this.#stamina;
 	}
 
 	constructor() {
@@ -89,7 +94,14 @@ export class Player extends DynamicBody {
 			this.#currentAction = this.Actions.WALK;
 		}
 		if (this.#keysPressed.shift && directionPressed) {
-			this.#currentAction = this.Actions.RUN;
+			if (this.#stamina <= 0) this.#stamina = 0;
+			else {
+				this.#stamina -= this.#runCost;
+				this.#currentAction = this.Actions.RUN;
+			}
+		} else {
+			this.#stamina += this.#runCost;
+			if (this.#stamina >= 100) this.#stamina = 100;
 		}
 
 		if (this.#currentAction != this.Actions.IDLE) {
