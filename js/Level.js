@@ -2,6 +2,7 @@ import * as THREE from "../node_modules/three/build/three.module.js";
 import { Wall } from "./Objects/Wall.js";
 import { Water } from "./Objects/Water.js";
 import { Floor } from "./Objects/Floor.js"
+import { Coin } from "./Objects/Coin.js";
 
 const LEVELFOLDER = "../levels/";
 
@@ -65,6 +66,10 @@ export class Level {
 		return WALL;
 	}
 
+	static get COIN() {
+		return COIN;
+	}
+
 	static load(levelName) {
 		const level = LEVELFOLDER + levelName + ".png";
 
@@ -101,6 +106,10 @@ export class Level {
 					} else if (equals(data, [50, 50, 50, 255])) {
 						// DARK GRAY | Invisible wall
 						tile = INVIS_WALL;
+					} else if (equals(data, [255, 255, 0, 255])) {
+						// YELLOW | Coin
+						tile = FLOOR;
+						this.coins.push(new Coin(x,y));
 					} else if (equals(data, [255, 0, 0, 255])) {
 						// RED | Player spawnpoint
 						tile = FLOOR;
@@ -133,6 +142,9 @@ export class Level {
 						case INVIS_WALL:
 							this.#levelDataAi[x][y] = WALL;
 							this.#levelGenData[x][y] = INVIS_WALL;
+						case COIN:
+							this.#levelDataAi[x][y] = WALL;
+							this.#levelGenData[x][y] = COIN;
 						default:
 							this.#levelDataAi[x][y] = tile;
 							this.#levelGenData[x][y] = tile;
@@ -195,7 +207,6 @@ export class Level {
 			this.collisionObjects.push(floor);
 			this.cameraCollisionObjects.push(floor.model)
 		}
-
 	}
 
 	/** Will find rectangles in a matrix/2d array */
@@ -315,9 +326,6 @@ export class Level {
 					newTile = WATER;
 					break;
 				case WALL:
-					newTile = FLOOR;
-					break;
-				case COIN:
 					newTile = FLOOR;
 					break;
 				default:
