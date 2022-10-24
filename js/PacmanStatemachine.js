@@ -22,7 +22,7 @@ export class PacmanStatemachine {
 			this.dispatch("switchMovePattern");
 		});
 
-		addEventListener("nightTime", () => {
+		addEventListener("nightTimeStart", () => {
 			this.dispatch("switchCycle");
 		});
 
@@ -35,7 +35,7 @@ export class PacmanStatemachine {
 			this.dispatch("switchMovePattern");
 		});
 
-		addEventListener("dayTime", () => {
+		addEventListener("dayTimeStart", () => {
 			this.dispatch("switchCycle");
 		});
 	}

@@ -19,19 +19,49 @@ export class Ai extends DynamicBody {
 
 	raycaster = new THREE.Raycaster();
 
-	getPath(pacmanPos, playerPos, state, playerModel) {
+	nightTimeWander = new Event("nightTimeWander");
+
+	getPath(pacmanPos, playerPos, cycleState, moveState, playerModel) {
 		this.graph.diagonal = true;
 		this.graph.dontCrossCorners = true;
 
-		switch (state) {
+		switch (cycleState) {
 			case PacmanStatemachine.Cycles.DAY:
-				this.graphStart = this.graph.grid[pacmanPos.x][pacmanPos.z];
-				this.graphEnd = this.DayEndPath(pacmanPos, playerPos, playerModel);
+				switch (moveState) {
+					case PacmanStatemachine.MovePattern.WANDER:
+						this.graphStart = this.graph.grid[pacmanPos.x][pacmanPos.z];
+						// this.graphEnd = POINT TO CHOSEST COIN --CoinGraphEnd()
+						break;
+		
+					case PacmanStatemachine.MovePattern.RUN:
+						this.graphStart = this.graph.grid[pacmanPos.x][pacmanPos.z];
+						this.graphEnd = this.RunGraphEnd(pacmanPos, playerPos, playerModel);
+						break;
+		
+					case PacmanStatemachine.MovePattern.CHASE:
+						this.graphStart = this.graph.grid[pacmanPos.x][pacmanPos.z];
+						this.graphEnd = this.graph.grid[playerPos.x][playerPos.z];
+						break;
+				}
 				break;
 
 			case PacmanStatemachine.Cycles.NIGHT:
-				this.graphStart = this.graph.grid[pacmanPos.x][pacmanPos.z];
-				this.graphEnd = this.graph.grid[playerPos.x][playerPos.z];
+				switch (moveState) {
+					case PacmanStatemachine.MovePattern.WANDER:
+						this.graphStart = this.graph.grid[pacmanPos.x][pacmanPos.z];
+						// this.graphEnd = POINT TO CHOSEST COIN --CoinGraphEnd()
+						break;
+		
+					case PacmanStatemachine.MovePattern.RUN:
+						this.graphStart = this.graph.grid[pacmanPos.x][pacmanPos.z];
+						this.graphEnd = this.RunGraphEnd(pacmanPos, playerPos, playerModel);
+						break;
+		
+					case PacmanStatemachine.MovePattern.CHASE:
+						this.graphStart = this.graph.grid[pacmanPos.x][pacmanPos.z];
+						this.graphEnd = this.graph.grid[playerPos.x][playerPos.z];
+						break;
+				}
 				break;
 		}
 
@@ -40,7 +70,7 @@ export class Ai extends DynamicBody {
 		return result;
 	}
 
-	DayEndPath(_pacmanPos, playerPos, playerModel) {
+	RunGraphEnd(_pacmanPos, playerPos, playerModel) {
 		const pacmanPos = this.model.position;
 		playerPos.multiplyScalar(Level.getScaleFactor);
 		// this.raycaster.layers.set(2);
@@ -73,14 +103,15 @@ export class Ai extends DynamicBody {
 			if (isct.distance < 500) {
 				return this.graph.grid[pos.x][pos.z];
 			}
-		}
-		else{
-			this.MoveToNextCoin();
+			else{ // switch to wander if pacman is too far away
+				return dispatchEvent(this.nightTimeWander);
+			}
 		}
 	}
-	MoveToNextCoin(){
+
+	CoinGraphEnd(){
 		let allExistingCoins = Level.coins;
-		
+		// ToDo: graphEnd = closest coin
 	}
 
 	// not used atm

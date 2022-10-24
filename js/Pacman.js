@@ -104,7 +104,8 @@ export class Pacman extends Ai {
 		path = this.getPath(
 			pacmanPos.round(),
 			ghostPos.round(),
-			this.pacmanState.getState(),
+			this.pacmanState.getCycleState(),
+			this.pacmanState.getMoveState(),
 			playerModel
 		);
 
