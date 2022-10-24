@@ -30,14 +30,15 @@ export class Ai extends DynamicBody {
 				switch (moveState) {
 					case PacmanStatemachine.MovePattern.WANDER:
 						this.graphStart = this.graph.grid[pacmanPos.x][pacmanPos.z];
+						this.graphEnd = this.graph.grid[playerPos.x][playerPos.z];
 						// this.graphEnd = POINT TO CHOSEST COIN --CoinGraphEnd()
 						break;
-		
+
 					case PacmanStatemachine.MovePattern.RUN:
 						this.graphStart = this.graph.grid[pacmanPos.x][pacmanPos.z];
 						this.graphEnd = this.RunGraphEnd(pacmanPos, playerPos, playerModel);
 						break;
-		
+
 					case PacmanStatemachine.MovePattern.CHASE:
 						this.graphStart = this.graph.grid[pacmanPos.x][pacmanPos.z];
 						this.graphEnd = this.graph.grid[playerPos.x][playerPos.z];
@@ -51,12 +52,12 @@ export class Ai extends DynamicBody {
 						this.graphStart = this.graph.grid[pacmanPos.x][pacmanPos.z];
 						// this.graphEnd = POINT TO CHOSEST COIN --CoinGraphEnd()
 						break;
-		
+
 					case PacmanStatemachine.MovePattern.RUN:
 						this.graphStart = this.graph.grid[pacmanPos.x][pacmanPos.z];
 						this.graphEnd = this.RunGraphEnd(pacmanPos, playerPos, playerModel);
 						break;
-		
+
 					case PacmanStatemachine.MovePattern.CHASE:
 						this.graphStart = this.graph.grid[pacmanPos.x][pacmanPos.z];
 						this.graphEnd = this.graph.grid[playerPos.x][playerPos.z];
@@ -92,7 +93,11 @@ export class Ai extends DynamicBody {
 
 		pos.clamp(
 			new THREE.Vector3(0, 0, 0),
-			new THREE.Vector3(this.graph.grid.length -1 , 0, this.graph.grid[0].length -1)
+			new THREE.Vector3(
+				this.graph.grid.length - 1,
+				0,
+				this.graph.grid[0].length - 1
+			)
 		);
 
 		const intersect = this.raycaster.intersectObject(playerModel);
@@ -102,14 +107,14 @@ export class Ai extends DynamicBody {
 			console.log(isct);
 			if (isct.distance < 500) {
 				return this.graph.grid[pos.x][pos.z];
-			}
-			else{ // switch to wander if pacman is too far away
+			} else {
+				// switch to wander if pacman is too far away
 				return dispatchEvent(this.nightTimeWander);
 			}
 		}
 	}
 
-	CoinGraphEnd(){
+	CoinGraphEnd() {
 		let allExistingCoins = Level.coins;
 		// ToDo: graphEnd = closest coin
 	}
