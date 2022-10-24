@@ -2,31 +2,32 @@ import * as THREE from "../../node_modules/three/build/three.module.js";
 import { StaticBody } from "../CollisionSystem/StaticBody.js";
 import { Level } from "../Level.js";
 
-export class Wall extends StaticBody {
-	constructor(posX, posZ, width, height, invisble) {
+export class Floor extends StaticBody {
+	constructor(posX, posZ, width, height) {
 		super();
 
 		const SCALE_FACTOR = Level.getScaleFactor;
 
-		const mat = new THREE.MeshStandardMaterial({ color: 0xd6d6d6 });
+		const mat = new THREE.MeshStandardMaterial({ color: 0x015900 });
+
+        const floorWidth = width * SCALE_FACTOR;
+        const floorHeight = SCALE_FACTOR;
+        const floorDepth = height * SCALE_FACTOR;
 
 		this.model = new THREE.Mesh(
 			new THREE.BoxGeometry(
-				SCALE_FACTOR * width,
-				SCALE_FACTOR * 5,
-				SCALE_FACTOR * height
+				floorWidth,
+				floorHeight,
+				floorDepth
 			),
 			mat
 		);
 
 		this.model.layers.enable(1);
 		this.model.receiveShadow = true;
-		this.model.castShadow = true;
 		this.model.position.x = posX * SCALE_FACTOR - 0.5 * SCALE_FACTOR;
-		this.model.position.y = SCALE_FACTOR * 2.5;
+		this.model.position.y = SCALE_FACTOR * -0.5;
 		this.model.position.z = posZ * SCALE_FACTOR - 0.5 * SCALE_FACTOR;
-
-		this.model.visible = ((invisble) ? false : true);
 
 		this.calcExtents(this.model.geometry);
 	}

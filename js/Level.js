@@ -1,13 +1,17 @@
 import * as THREE from "../node_modules/three/build/three.module.js";
 import { Wall } from "./Objects/Wall.js";
+import { Water } from "./Objects/Water.js";
+import { Floor } from "./Objects/Floor.js"
 
 const LEVELFOLDER = "../levels/";
 
+const NONE = -1;
 const FLOOR = 0;
 const WALL = 1;
 const DEAD_SPACE = 2;
 const WATER = 3;
-const COIN = 4;
+const INVIS_WALL = 4;
+const COIN = 5;
 
 const SCALE_FACTOR = 2;
 
@@ -21,6 +25,7 @@ export class Level {
 	static collisionObjects = [];
 	static cameraCollisionObjects = [];
 	static coins = [];
+	static water;
 
 	static levelLoaded = new Event("levelLoaded");
 
@@ -93,6 +98,9 @@ export class Level {
 					} else if (equals(data, [255, 255, 255, 255])) {
 						// WHITE | Floor
 						tile = FLOOR;
+					} else if (equals(data, [50, 50, 50, 255])) {
+						// DARK GRAY | Invisible wall
+						tile = INVIS_WALL;
 					} else if (equals(data, [255, 0, 0, 255])) {
 						// RED | Player spawnpoint
 						tile = FLOOR;
@@ -122,6 +130,9 @@ export class Level {
 						case WATER:
 							this.#levelDataAi[x][y] = WALL;
 							this.#levelGenData[x][y] = WATER;
+						case INVIS_WALL:
+							this.#levelDataAi[x][y] = WALL;
+							this.#levelGenData[x][y] = INVIS_WALL;
 						default:
 							this.#levelDataAi[x][y] = tile;
 							this.#levelGenData[x][y] = tile;
@@ -130,39 +141,9 @@ export class Level {
 				}
 			}
 
-			// Add a ground
-			const floorWidth = img.width * SCALE_FACTOR;
-			const floorHeight = 0.1;
-			const floorDepth = img.height * SCALE_FACTOR;
-			const floor = new THREE.Mesh(
-				new THREE.BoxGeometry(floorWidth, floorHeight, floorDepth, 1, 1),
-				new THREE.MeshPhongMaterial({
-					color: 0x336600,
-				})
-			);
-			floor.name = "Floor";
-			floor.layers.enable(1);
+			this.generateLevel(img.width, img.height);
 
-			// Position floor correctly
-			floor.position.x = floorDepth / 2 - SCALE_FACTOR / 2;
-			floor.position.y = -floorHeight;
-			floor.position.z = floorWidth / 2 - SCALE_FACTOR / 2;
-
-			floor.receiveShadow = true;
-			this.#level.add(floor);
-			this.cameraCollisionObjects.push(floor);
-
-			const walls = this.getRectangles(WALL);
-			for (let i = 0; i < walls.length; i++) {
-				const rect = walls[i];
-				const w = rect.x2 - rect.x1 + 1;
-				const h = rect.y2 - rect.y1 + 1;
-				const wall = new Wall(rect.x1 + w / 2, rect.y1 + h / 2, w, h);
-				this.#level.add(wall.model);
-				this.collisionObjects.push(wall);
-			}
-
-			this.setCollisionList();
+			this.addHelpers();
 
 			this.#isLevelLoaded = true;
 			dispatchEvent(this.levelLoaded);
@@ -173,14 +154,197 @@ export class Level {
 		img.src = level;
 	}
 
-	static addToLevel(obj) {
-		this.#level.add(obj);
+	static generateLevel(width, height) {
+		// Add the water
+		this.water = new Water(width, height);
+		
+		// Get invisible walls
+		const invisibleWalls = this.getRectangles(INVIS_WALL);
+		for (let i = 0; i < invisibleWalls.length; i++) {
+			const rect = invisibleWalls[i];
+			const w = rect.x2 - rect.x1 + 1;
+			const h = rect.y2 - rect.y1 + 1;
+
+			const wall = new Wall(rect.x1 + w / 2, rect.y1 + h / 2, w, h, true);
+			this.#level.add(wall.model);
+			this.collisionObjects.push(wall);
+		}
+
+		// Get walls
+		const walls = this.getRectangles(WALL);
+		for (let i = 0; i < walls.length; i++) {
+			const rect = walls[i];
+			const w = rect.x2 - rect.x1 + 1;
+			const h = rect.y2 - rect.y1 + 1;
+			
+			const wall = new Wall(rect.x1 + w / 2, rect.y1 + h / 2, w, h);
+			this.#level.add(wall.model);
+			this.collisionObjects.push(wall);
+			this.cameraCollisionObjects.push(wall.model)
+		}
+
+		// Get floor
+		const floors = this.getRectangles(FLOOR);
+		for (let i = 0; i < floors.length; i++) {
+			const rect = floors[i];
+			const w = rect.x2 - rect.x1 + 1;
+			const h = rect.y2 - rect.y1 + 1;
+			
+			const floor = new Floor(rect.x1 + w / 2, rect.y1 + h / 2, w, h);
+			this.#level.add(floor.model);
+			this.collisionObjects.push(floor);
+			this.cameraCollisionObjects.push(floor.model)
+		}
+
 	}
 
-	static setCollisionList() {
-		for (let i = 0; i < this.collisionObjects.length; i++) {
-			this.cameraCollisionObjects.push(this.collisionObjects[i].model);
+	/** Will find rectangles in a matrix/2d array */
+	static getRectangles(tileID) {
+		let map = this.#levelGenData;
+		// for (var i = 0; i < this.#levelGenData.length; i++)
+		// 	map[i] = this.#levelGenData[i].slice();
+
+		let rectangles = [];
+
+		const WIDTH = map.length;
+		const HEIGHT = map[0].length;
+
+		const findLargestRect = () => {
+			let x = 0;
+			let y = 0;
+			
+			// let mapCopy = [];
+			// for (var i = 0; i < map.length; i++)
+			// 	mapCopy[i] = map[i].slice();
+
+			let biggestRect = {area: 0};
+
+			while (this.containsTile(map, tileID)){
+				if (map[x][y] != tileID) {
+					x += 1;
+					if (x == WIDTH) {
+						// Reached the right edge of the map
+						x = 0;
+						y += 1;
+
+						if (y == HEIGHT) {
+							// Reached the bottom right, thus the end of the loop
+							break;
+						}
+					}
+					continue;
+				}
+
+				if (map[x][y] == tileID) {
+					// Tile is what we're looking for, so we get the biggest rectangle possible from this location
+
+					const rect = {
+						x1: x,
+						y1: y,
+						x2: WIDTH - 1,
+						y2: HEIGHT - 1,
+						area: 0,
+						invisible: false,
+					};
+
+					// Find bottom right corner
+					// First we find largest possible X value
+					for (let x = rect.x1; x < WIDTH; x++) {
+						if (map[x][rect.y1] != tileID) {
+							// If a floor is encountered on the horizonal axis
+							rect.x2 = x - 1;
+							break;
+						}
+					}
+
+					// Find smallest Y value
+					let yValues = [];
+					for (let x = rect.x1; x <= rect.x2; x++) {
+						for (let y = rect.y1; y < HEIGHT; y++) {
+							if (y == HEIGHT - 1) {
+								yValues.push(HEIGHT - 1);
+								break;
+							}
+							if (map[x][y] != tileID) {
+								yValues.push(y - 1);
+								break;
+							}
+						}
+					}
+
+					const lowestY = Math.min(...yValues);
+					rect.y2 = lowestY;
+
+					// Calculate area
+					rect.area = (rect.x2 - rect.x1 + 1) * (rect.y2 - rect.y1 + 1);
+
+					// Move to next rectangle
+					x += 1;
+					if (x == WIDTH) {
+						// Reached the right edge of the map
+						x = 0;
+						y += 1;
+
+						if (y == HEIGHT) {
+							// Reached the bottom right, thus the end of the loop
+							break;;
+						}
+					}
+
+					if (rect.area > biggestRect.area){
+						biggestRect = rect;
+					}
+				}
+			}
+
+			return biggestRect;
+		};
+
+		while (this.containsTile(map, tileID)) {
+			const largestRect = findLargestRect();
+
+			rectangles.push(largestRect);
+
+			let newTile;
+			
+			switch (tileID){
+				case FLOOR:
+					newTile = NONE;
+					break;
+				case INVIS_WALL:
+					newTile = WATER;
+					break;
+				case WALL:
+					newTile = FLOOR;
+					break;
+				case COIN:
+					newTile = FLOOR;
+					break;
+				default:
+					newTile = FLOOR;
+					break;
+			}
+
+			// Remove rectangle from map so it doesn't get found again
+			for (let y = largestRect.y1; y <= largestRect.y2; y++) {
+				for (let x = largestRect.x1; x <= largestRect.x2; x++) {
+					map[x][y] = newTile;
+				}
+			}
 		}
+		return rectangles;
+	}
+
+	static containsTile(map, tileID) {
+		// console.log("Checking for walls");
+		for (let x = 0; x < map.length; x++) {
+			if (map[x].includes(tileID)) return true;
+		}
+		return false;
+	}
+
+	static addToLevel(obj) {
+		this.#level.add(obj);
 	}
 
 	static initLevelData(n) {
@@ -200,120 +364,6 @@ export class Level {
 
 			this.#level.add(helper);
 		}
-	}
-
-	/** Will find rectangles in a matrix/2d array */
-	static getRectangles(tileID) {
-		let map = this.#levelGenData;
-
-		let rectangles = [];
-
-		const WIDTH = map.length;
-		const HEIGHT = map[0].length;
-
-		const findLargestRect = (x, y) => {
-			const rect = {
-				x1: x,
-				y1: y,
-				x2: WIDTH - 1,
-				y2: HEIGHT - 1,
-				area: 0,
-				invisible: false,
-			};
-
-			if (map[x][y] != tileID) {
-				// Tile is a floor
-				x += 1;
-				if (x == WIDTH) {
-					// Reached the right edge of the map
-					x = 0;
-					y += 1;
-
-					if (y == HEIGHT) {
-						// Reached the bottom right, thus the end of the loop
-						return null;
-					}
-				}
-				return findLargestRect(x, y);
-			}
-
-			if (map[x][y] == tileID) {
-				// Tile is a wall, so we get the biggest rectangle possible from this location
-
-				// Find bottom right corner
-				// First we find largest possible X value
-				for (let x = rect.x1; x < WIDTH; x++) {
-					if (map[x][rect.y1] != tileID) {
-						// If a floor is encountered on the horizonal axis
-						rect.x2 = x - 1;
-						break;
-					}
-				}
-
-				// Find smallest Y value
-				let yValues = [];
-				for (let x = rect.x1; x <= rect.x2; x++) {
-					for (let y = rect.y1; y < HEIGHT; y++) {
-						if (y == HEIGHT - 1) {
-							yValues.push(HEIGHT - 1);
-							break;
-						}
-						if (map[x][y] != tileID) {
-							yValues.push(y - 1);
-							break;
-						}
-					}
-				}
-
-				const lowestY = Math.min(...yValues);
-				rect.y2 = lowestY;
-
-				// Calculate area
-				rect.area = (rect.x2 - rect.x1 + 1) * (rect.y2 - rect.y1 + 1);
-
-				// Move to next rectangle
-				x += 1;
-				if (x == WIDTH) {
-					// Reached the right edge of the map
-					x = 0;
-					y += 1;
-
-					if (y == HEIGHT) {
-						// Reached the bottom right, thus the end of the loop
-						return null;
-					}
-				}
-
-				const nextRect = findLargestRect(x, y);
-				if (nextRect == null) return rect;
-				if (nextRect.area > rect.area) {
-					return nextRect;
-				}
-				return rect;
-			}
-		};
-
-		while (this.containsTile(map, tileID)) {
-			const largestRect = findLargestRect(0, 0);
-
-			rectangles.push(largestRect);
-
-			// Remove rectangle from map so it doesn't get found again
-			for (let y = largestRect.y1; y <= largestRect.y2; y++) {
-				for (let x = largestRect.x1; x <= largestRect.x2; x++) {
-					map[x][y] = FLOOR;
-				}
-			}
-		}
-		return rectangles;
-	}
-
-	static containsTile(map, tileID) {
-		// console.log("Checking for walls");
-		for (let x = 0; x < map.length; x++) {
-			if (map[x].includes(tileID)) return true;
-		}
-		return false;
 	}
 }
 

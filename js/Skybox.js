@@ -8,12 +8,16 @@ export class Skybox {
 
 	#ready = false;
 
+<<<<<<< HEAD
 	#SUNSPEED = 0.05;
+=======
+	#SUNSPEED = 0.005;
+>>>>>>> 948a7cbd87d2ad15d3f7f5944550748af08166f3
 
 	skyGeometry;
 
 	#sunAxis = new THREE.Vector3(1, 0, 0);
-	#sunVector = new THREE.Vector3(0, 100, -500);
+	#sunVector = new THREE.Vector3(0, -100, -500);
 	#isNight = false;
 	#lightIntensity;
 

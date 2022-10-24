@@ -1,31 +1,52 @@
 import * as THREE from "../../node_modules/three/build/three.module.js";
 import { StaticBody } from "../CollisionSystem/StaticBody.js";
 import { Level } from "../Level.js";
+import { loadShader } from "../ShaderLoader.js";
 
-export class Wall extends StaticBody {
-	constructor(posX, posZ, width, height) {
+export class Water extends StaticBody {
+	constructor(width, height) {
 		super();
 
-		const SCALE_FACTOR = Level.getScaleFactor;
+		const self = this;
+		loadShader("water", shaderLoaded);
 
-		const mat = new THREE.MeshStandardMaterial({ color: 0x679bf0 });
-
-		this.model = new THREE.Mesh(
+		function shaderLoaded(mat) {
+			mat.lights = true;
+			// mat.transparent = true;
+			
+			const SCALE_FACTOR = Level.getScaleFactor;
+			const waterWidth = width * SCALE_FACTOR;
+			const waterHeight = 0;
+			const waterDepth = height * SCALE_FACTOR;
+	
+			self.model = new THREE.Mesh(
 			new THREE.BoxGeometry(
-				SCALE_FACTOR * width,
-				SCALE_FACTOR,
-				SCALE_FACTOR * height
-			),
-			mat
-		);
+					waterWidth,
+					waterHeight,
+					waterDepth,
+					waterWidth,
+					1,
+					waterDepth
+				),
+				mat
+			);
+			
+			self.model.layers.enable(1);
+			self.model.receiveShadow = true;
+			self.model.position.x = waterDepth / 2 - SCALE_FACTOR / 2;
+			self.model.position.y = -1.2;
+			self.model.position.z = waterWidth / 2 - SCALE_FACTOR / 2;
+	
+			self.model.name = "Water";
+	
+			self.calcExtents(self.model.geometry);
 
-		this.model.layers.enable(1);
-		this.model.receiveShadow = true;
-		this.model.castShadow = true;
-		this.model.position.x = posX * SCALE_FACTOR - 0.5 * SCALE_FACTOR;
-		this.model.position.y = 0;
-		this.model.position.z = posZ * SCALE_FACTOR - 0.5 * SCALE_FACTOR;
+			Level.addToLevel(self.model);
+			Level.cameraCollisionObjects.push(self.model);
+		}
+	}
 
-		this.calcExtents(this.model.geometry);
+	update(elapsedTime){
+		this.model.material.uniforms.u_time.value = elapsedTime;
 	}
 }
