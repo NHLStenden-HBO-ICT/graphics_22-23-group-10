@@ -11,11 +11,15 @@ export class Ai extends DynamicBody {
 	//add general code for the AI (pathfinding etc)
 	raycastOrigin = new THREE.Vector3();
 	raycastEnd = new THREE.Vector3();
+	lastPos = new THREE.Vector3();
 
 	astar = new Astar();
 	graph = new Graph(Level.getLevelData);
 	graphStart;
 	graphEnd;
+
+	hasDestination = false;
+	runningAwayCD = 0;
 
 	intersectObjects = Level.cameraCollisionObjects.slice();
 
@@ -23,6 +27,7 @@ export class Ai extends DynamicBody {
 
 	raycaster = new THREE.Raycaster();
 
+	pacmanState = new PacmanStatemachine();
 	switchMovePattern = new Event("switchMovePattern");
 
 	constructor(playerMesh){
@@ -31,6 +36,15 @@ export class Ai extends DynamicBody {
 	}
 
 	getPath(pacmanPos, playerPos, cycleState, moveState, playerModel) {
+		if ((this.lastPos.x == pacmanPos.x || this.lastPos.z == pacmanPos.z) && this.hasDestination){
+			// console.log(pacmanPos);
+			return [];
+		}
+		else{
+			// console.log(pacmanPos, this.lastPos);
+			this.lastPos = pacmanPos;
+		}
+
 		this.graph.diagonal = true;
 		this.graph.dontCrossCorners = true;
 
@@ -83,15 +97,17 @@ export class Ai extends DynamicBody {
 		}
 		
 		var result = this.astar.search(this.graph, this.graphStart, this.graphEnd);
+		this.hasDestination = true;
 
 		return result;
 	}
 
 	RunGraphEnd(targetPos){
 		const pacmanPos = this.model.position;
-		targetPos.multiplyScalar(Level.getScaleFactor);
+		let target = new THREE.Vector3(targetPos.x * Level.getScaleFactor, 0, targetPos.z * Level.getScaleFactor);
+		// target.multiplyScalar(Level.getScaleFactor);
 		let dir = new THREE.Vector3();
-		dir.subVectors(targetPos, pacmanPos).normalize();
+		dir.subVectors(target, pacmanPos).normalize();
 
 		// Position away from player
 		let pos = new THREE.Vector3(
@@ -110,10 +126,10 @@ export class Ai extends DynamicBody {
 
 	InVisionRange(_pacmanPos, targetPos, playerModel, moveState) {
 		const pacmanPos = this.model.position;
-		targetPos.multiplyScalar(Level.getScaleFactor);
+		let target = new THREE.Vector3(targetPos.x * Level.getScaleFactor, 0, targetPos.z * Level.getScaleFactor);
 		// this.raycaster.layers.set(2);
 		let dir = new THREE.Vector3();
-		dir.subVectors(targetPos, pacmanPos).normalize();
+		dir.subVectors(target, pacmanPos).normalize();
 		// console.log(dir);
 		this.raycaster.set(pacmanPos, dir);
 
@@ -121,22 +137,23 @@ export class Ai extends DynamicBody {
 		this.raycaster.ray.at(100, this.raycastEnd);
 		this.raycastEnd.y = 2;
 
-		const intersect = this.raycaster.intersectObjects(this.intersectObjects);
+		const intersect = this.raycaster.intersectObject(playerModel);
 		
 		if (intersect.length > 0) {
 			const isct = intersect[0];
-			console.log(isct);
-			if (isct.distance < 100) {
-				if(isct.object.name == "player"){
-					console.log("inrange");
+			// console.log(isct);
+			if (isct.distance < 500) {
+				if(isct.object.name == "Ghost"){
+					// console.log("inrange");
 					if(moveState != PacmanStatemachine.MovePattern.RUN){
+						this.runningAwayCD = 0;
 						dispatchEvent(this.switchMovePattern);
 					}
 				}
-				
 			}
 		}
-		if(moveState == PacmanStatemachine.MovePattern.RUN){
+		else if(moveState == PacmanStatemachine.MovePattern.RUN && this.runningAwayCD > 5){
+			this.runningAwayCD = 0;
 			dispatchEvent(this.switchMovePattern);
 		}
 	}
@@ -157,6 +174,9 @@ export class Ai extends DynamicBody {
 		const lowestPath = Math.min(...CoinPathResults);
 
 		return allExistingCoins[CoinPathResults.indexOf(lowestPath)]
+	}
+	getStateMachine(){
+		return this.pacmanState;
 	}
 
 	// not used atm

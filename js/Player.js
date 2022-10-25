@@ -33,7 +33,7 @@ export class Player extends DynamicBody {
 	SHIFT = "shift";
 	DIRECTIONS = [this.W, this.A, this.S, this.D];
 
-	model;
+	// model;
 	camera;
 
 	lamp;
