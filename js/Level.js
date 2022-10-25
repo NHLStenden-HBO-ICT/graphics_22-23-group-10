@@ -2,6 +2,7 @@ import * as THREE from "../node_modules/three/build/three.module.js";
 import { Wall } from "./Objects/Wall.js";
 import { Water } from "./Objects/Water.js";
 import { Floor } from "./Objects/Floor.js";
+import { Coin } from "./Objects/Coin.js";
 
 const LEVELFOLDER = "../levels/";
 
@@ -28,6 +29,7 @@ export class Level {
 	static cameraCollisionObjects = [];
 	static coins = [];
 	static water;
+	static floors = [];
 
 	static levelLoaded = new Event("levelLoaded");
 
@@ -110,6 +112,10 @@ export class Level {
 					} else if (equals(data, [50, 50, 50, 255])) {
 						// DARK GRAY | Invisible wall
 						tile = INVIS_WALL;
+					} else if (equals(data, [255, 255, 0, 255])) {
+						// YELLOW | Coin
+						tile = FLOOR;
+						this.coins.push(new Coin(x, y));
 					} else if (equals(data, [255, 0, 0, 255])) {
 						// RED | Player spawnpoint
 						tile = FLOOR;
@@ -164,8 +170,17 @@ export class Level {
 	}
 
 	static generateLevel(width, height) {
-		// Add the water
+		// Add the level's defined water
 		this.water = new Water(width, height);
+
+		// Add the distant water
+		const waterWidth = this.#mapSize.x * 5 * SCALE_FACTOR;
+		const waterDepth = this.#mapSize.y * 5 * SCALE_FACTOR;
+		const waterGeometry = new THREE.BoxGeometry(waterWidth, 0.1, waterDepth);
+		const waterMaterial = new THREE.MeshBasicMaterial({ color: 0x0062ff });
+		const water = new THREE.Mesh(waterGeometry, waterMaterial);
+		water.position.y = -2;
+		this.add(water);
 
 		// Get invisible walls
 		const invisibleWalls = this.getRectangles(INVIS_WALL);
@@ -201,8 +216,8 @@ export class Level {
 
 			const floor = new Floor(rect.x1 + w / 2, rect.y1 + h / 2, w, h);
 			this.#level.add(floor.model);
-			this.collisionObjects.push(floor);
-			this.cameraCollisionObjects.push(floor.model);
+			this.floors.push(floor);
+			// this.cameraCollisionObjects.push(floor.model);
 		}
 	}
 
@@ -369,8 +384,12 @@ export class Level {
 				this.collisionObjects[i].boundingBox,
 				0xff0000
 			);
+			this.add(helper);
+		}
 
-			this.#level.add(helper);
+		for (let i = 0; i < this.floors.length; i++) {
+			let helper = new THREE.Box3Helper(this.floors[i].boundingBox, 0xff0000);
+			this.add(helper);
 		}
 	}
 }

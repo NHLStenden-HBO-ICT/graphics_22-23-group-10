@@ -54,7 +54,7 @@ class InvertedPacman {
 		const addSun = () => {
 			const mapSize = Level.getMapSize;
 
-			console.log(mapSize);
+			// console.log(mapSize);
 
 			this.sun = new THREE.DirectionalLight(0xffffff);
 			this.sun.position.set(100, 0, -500);
@@ -182,7 +182,7 @@ class InvertedPacman {
 	updateFog() {
 		const lightLevel = this.skybox.getLightIntensity;
 
-		this.scene.fog.far = map(lightLevel, 0, 1, 50, 500);
+		this.scene.fog.far = map(lightLevel, 0, 1, 50, 2000);
 	}
 
 	clock = new THREE.Clock();
