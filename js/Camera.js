@@ -84,6 +84,12 @@ export class Camera extends THREE.PerspectiveCamera {
 	}
 
 	update(delta, playerPos) {
+		this.rotateCamera(delta, playerPos);
+
+		this.checkCollision(playerPos);
+	}
+
+	rotateCamera(delta, playerPos) {
 		this.position.set(0, 0, 12);
 		if (this.moveX) {
 			this.rotY.rotateY(-this.moveX * delta * SENS);
@@ -95,16 +101,10 @@ export class Camera extends THREE.PerspectiveCamera {
 
 		this.rotY.position.set(playerPos.x, playerPos.y + HEIGHT, playerPos.z);
 
-		this.rotX.rotation.x = clamp(
-			this.rotX.rotation.x,
-			-(Math.PI / 2),
-			Math.PI / 2
-		);
+		this.rotX.rotation.x = clamp(this.rotX.rotation.x, -(Math.PI / 2), 0.16);
 
 		this.moveX = 0;
 		this.moveY = 0;
-
-		this.checkCollision(playerPos);
 	}
 
 	checkCollision(playerPos) {
@@ -128,11 +128,7 @@ export class Camera extends THREE.PerspectiveCamera {
 		if (intersects.length > 0) {
 			const isct = intersects[0];
 			if (isct.distance < 12) {
-				// console.log(isct);
 				this.position.z = isct.distance - 1;
-				// if (isct.object.name == "Floor") {
-				// 	this.position.y += 5;
-				// }
 			}
 		}
 	}

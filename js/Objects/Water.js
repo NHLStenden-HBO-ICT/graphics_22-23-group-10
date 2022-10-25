@@ -42,7 +42,7 @@ export class Water extends StaticBody {
 			self.calcExtents(self.model.geometry);
 
 			Level.add(self.model);
-			Level.cameraCollisionObjects.push(self.model);
+			// Level.cameraCollisionObjects.push(self.model);
 		}
 	}
 
