@@ -355,6 +355,10 @@ export class Level {
 		this.#level.add(obj);
 	}
 
+	static remove(obj) {
+		this.#level.remove(obj);
+	}
+
 	static initLevelData(n) {
 		let array = [];
 		for (let i = 0; i < n; i++) {

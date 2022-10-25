@@ -62,6 +62,8 @@ export class Pacman extends Ai {
 	update(delta, playerPos, playerModel) {
 
 		this._movePacman(delta, playerPos, playerModel);
+		this.checkCoinPacmanCollision();
+
 		this.runningAwayCD += delta;
 		console.log(this.runningAwayCD);
 
@@ -139,5 +141,19 @@ export class Pacman extends Ai {
 		);
 
 		this.move(movementVector);
+	}
+
+	checkCoinPacmanCollision() {
+		if (this.closestCoin == null){
+			return;
+		}
+		if (this.closestCoin.boundingBox.intersectsBox(this.boundingBox)) {
+			let index = Level.coins.indexOf(this.closestCoin);
+			if(index > -1){
+				Level.coins.splice(index);
+				Level.remove(this.closestCoin.model);
+				this.closestCoin = null;
+			}
+		}
 	}
 }

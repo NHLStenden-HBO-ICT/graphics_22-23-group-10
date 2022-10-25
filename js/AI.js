@@ -53,6 +53,9 @@ export class Ai extends DynamicBody {
 		if(!this.closestCoin){
 			this.closestCoin = this.GetClosestCoin();
 		}
+		if(this.closestCoin == null){
+			return [];
+		}
 
 		switch (cycleState) {
 			case PacmanStatemachine.Cycles.DAY:
@@ -160,6 +163,10 @@ export class Ai extends DynamicBody {
 
 	GetClosestCoin(){
 		let allExistingCoins = Level.coins;
+		if(allExistingCoins.length == 0){
+			return null; // pacman wins when there are no coins left	 TODO: switch to end screen, to be inplemented
+		}
+
 		let CoinPathResults = [];
 
 		this.graphStart = this.graph.grid[this.getPosition.x][this.getPosition.z];
