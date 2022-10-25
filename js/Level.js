@@ -1,4 +1,5 @@
 import * as THREE from "../node_modules/three/build/three.module.js";
+// import { LoadingScreen } from "./LoadingScreen.js";
 import { Wall } from "./Objects/Wall.js";
 import { Water } from "./Objects/Water.js";
 import { Floor } from "./Objects/Floor.js";
@@ -332,7 +333,6 @@ export class Level {
 
 		while (this.containsTile(map, tileID)) {
 			const largestRect = findLargestRect();
-
 			rectangles.push(largestRect);
 
 			let newTile;
