@@ -12,7 +12,7 @@ export class Pacman extends Ai {
 
 	#MODELPATH = "../models/pacmanEvil.glb";
 
-	#walkVelocity = 8;
+	#walkVelocity = 16;
 	#walkDirection = new THREE.Vector3();
 	#rotateAngle = new THREE.Vector3(0, 1, 0);
 	#rotateQuaternion = new THREE.Quaternion();
@@ -142,13 +142,13 @@ export class Pacman extends Ai {
 	}
 
 	checkCoinPacmanCollision() {
-		if (this.closestCoin == null){
+		if (this.closestCoin == null) {
 			return;
 		}
 		if (this.closestCoin.boundingBox.intersectsBox(this.boundingBox)) {
 			let index = Level.coins.indexOf(this.closestCoin);
-			if(index > -1){
-				Level.coins.splice(index);
+			if (index > -1) {
+				Level.coins.splice(index, 1);
 				Level.remove(this.closestCoin.model);
 				this.closestCoin = null;
 			}

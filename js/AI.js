@@ -55,7 +55,7 @@ export class Ai extends DynamicBody {
 		if (!this.closestCoin) {
 			this.closestCoin = this.GetClosestCoin();
 		}
-		if(this.closestCoin == null){
+		if (this.closestCoin == null) {
 			return [];
 		}
 
@@ -180,19 +180,25 @@ export class Ai extends DynamicBody {
 			this.runningAwayCD > 5
 		) {
 			this.runningAwayCD = 0;
+			this.closestCoin = this.GetClosestCoin();
 			dispatchEvent(this.switchMovePattern);
 		}
 	}
 
 	GetClosestCoin() {
 		let allExistingCoins = Level.coins;
-		if(allExistingCoins.length == 0){
+		if (allExistingCoins.length == 0) {
 			return null; // pacman wins when there are no coins left	 TODO: switch to end screen, to be inplemented
 		}
 
 		let CoinPathResults = [];
+		let pos = new THREE.Vector3(
+			this.getPosition.x / Level.getScaleFactor,
+			0,
+			this.getPosition.z / Level.getScaleFactor
+		).round();
 
-		this.graphStart = this.graph.grid[this.getPosition.x][this.getPosition.z];
+		this.graphStart = this.graph.grid[pos.x][pos.z];
 
 		for (let i = 0; i < allExistingCoins.length; i++) {
 			const coin = allExistingCoins[i];
