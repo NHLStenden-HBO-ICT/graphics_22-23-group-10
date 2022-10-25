@@ -11,12 +11,12 @@ export class Water extends StaticBody {
 		loadShader("water", shaderLoaded);
 
 		function shaderLoaded(mat) {
+			mat.transparent = true;
 			mat.lights = true;
-			// mat.transparent = true;
 
 			const SCALE_FACTOR = Level.getScaleFactor;
 			const waterWidth = width * SCALE_FACTOR;
-			const waterHeight = 0;
+			const waterHeight = 0.1;
 			const waterDepth = height * SCALE_FACTOR;
 
 			self.model = new THREE.Mesh(
