@@ -1,4 +1,5 @@
 import * as THREE from "../node_modules/three/build/three.module.js";
+import { LoadingScreen } from "./LoadingScreen.js";
 import { EffectComposer } from "../node_modules/three/examples/jsm/postprocessing/EffectComposer.js";
 import { RenderPass } from "../node_modules/three/examples/jsm/postprocessing/RenderPass.js";
 import { UnrealBloomPass } from "../node_modules/three/examples/jsm/postprocessing/UnrealBloomPass";
@@ -11,15 +12,17 @@ THREE.Cache.enabled = true;
 
 const DEBUG_MODE = false;
 
-const LEVEL_TO_LOAD = "test2";
+const LEVEL_TO_LOAD = "level";
 
 class InvertedPacman {
 	playerPacmanCollision = new Event("playerPacmanCollision");
 
 	constructor() {
-		this._init();
-
+		LoadingScreen.init();
+		LoadingScreen.set("Initializing...");
 		this.update();
+
+		this._init();
 	}
 
 	_init() {
@@ -30,6 +33,7 @@ class InvertedPacman {
 	}
 
 	_initRenderer() {
+		LoadingScreen.set("Creating renderer...");
 		const canvas = document.querySelector("canvas.webgl");
 		this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 		// this.renderer.setClearColor(0xd4e6f1, 1);
@@ -49,6 +53,7 @@ class InvertedPacman {
 	}
 
 	_initScene() {
+		LoadingScreen.set("Creating level...\n(This might take a while!)");
 		this.scene = new THREE.Scene();
 
 		const addSun = () => {
@@ -101,6 +106,7 @@ class InvertedPacman {
 	}
 
 	_initPostProcessing() {
+		LoadingScreen.set("Applying post processing...");
 		this.composer = new EffectComposer(this.renderer);
 		const renderPass = new RenderPass(this.scene, this.player.camera);
 		const unrealBloom = new UnrealBloomPass(
@@ -134,6 +140,7 @@ class InvertedPacman {
 	}
 
 	_initPlayer() {
+		LoadingScreen.set("Creating player...");
 		this.player = new Player();
 
 		addEventListener("playerLoaded", () => {
@@ -151,10 +158,12 @@ class InvertedPacman {
 	}
 
 	_initPacman() {
+		LoadingScreen.set("Creating Pacman...");
 		this.pacman = new Pacman(this.player.getModel.children[0]);
 
 		addEventListener("pacmanLoaded", () => {
 			this.scene.add(this.pacman.getPacmanModel);
+			LoadingScreen.remove();
 			this.ready = true;
 		});
 	}
