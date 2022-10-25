@@ -19,6 +19,12 @@ export class Pacman extends Ai {
 
 	mixer;
 
+	teethObjectModel;
+	bodyObjectModel;
+
+	dayTimeMaterial = new THREE.MeshPhongMaterial({color: 0xffe100, opacity: 1});
+	nightTimeMaterial = new THREE.MeshPhongMaterial({color: 0xf20505, opacity: 1});
+
 	get getPacmanModel() {
 		return this.model;
 	}
@@ -26,6 +32,20 @@ export class Pacman extends Ai {
 	constructor(playerModel) {
 		super(playerModel);
 		this._loadPacman();
+
+		// keeps track of day/night cycle
+		addEventListener(
+			"switchCycle",
+			() => {
+				this.teethObjectModel.visible = !this.teethObjectModel.visible;
+
+				if(this.bodyObjectModel.material == this.dayTimeMaterial){
+					this.bodyObjectModel.material = this.nightTimeMaterial;
+				}else
+					this.bodyObjectModel.material = this.dayTimeMaterial;
+			},
+			false
+		);
 	}
 
 	_loadPacman() {
@@ -38,19 +58,30 @@ export class Pacman extends Ai {
 			mesh.position.z = Level.getPacmanSpawn.z;
 			self.model = mesh;
 
-			mesh.scale.set(3, 3, 3);
+			mesh.scale.set(0.8, 0.8, 0.8);
 
 			mesh.traverse(function (obj) {
 				if (obj.isMesh) {
 					obj.castShadow = true;
 					obj.receiveShadow = true;
+					console.log(obj);
+					if(obj.name == "TEETH"){
+						self.teethObjectModel = obj;
+						self.teethObjectModel.visible = false;
+					}
+					if(obj.name == "Sphere009"){
+						self.bodyObjectModel = obj;
+						console.log(obj);
+						self.bodyObjectModel.material = self.dayTimeMaterial;
+					}
 				}
 			});
 
 			// animation related
 			self.mixer = new THREE.AnimationMixer(mesh);
 			const clips = model.animations;
-			const clip = THREE.AnimationClip.findByName(clips, "Walk.002");
+
+			const clip = THREE.AnimationClip.findByName(clips, "walk strong big");
 			const action = self.mixer.clipAction(clip);
 			action.play();
 
