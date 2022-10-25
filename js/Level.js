@@ -73,6 +73,10 @@ export class Level {
 		return WALL;
 	}
 
+	static get COIN() {
+		return COIN;
+	}
+
 	static load(levelName) {
 		const level = LEVELFOLDER + levelName + ".png";
 
@@ -148,6 +152,9 @@ export class Level {
 						case INVIS_WALL:
 							this.#levelDataAi[x][y] = WALL;
 							this.#levelGenData[x][y] = INVIS_WALL;
+						case COIN:
+							this.#levelDataAi[x][y] = WALL;
+							this.#levelGenData[x][y] = COIN;
 						default:
 							this.#levelDataAi[x][y] = tile;
 							this.#levelGenData[x][y] = tile;
@@ -338,9 +345,6 @@ export class Level {
 					newTile = WATER;
 					break;
 				case WALL:
-					newTile = FLOOR;
-					break;
-				case COIN:
 					newTile = FLOOR;
 					break;
 				default:

@@ -18,5 +18,7 @@ export class Coin extends StaticBody {
 		this.model.position.z = posZ * SCALE_FACTOR;
 
 		this.calcExtents(this.model.geometry);
+
+		this.ready = true;
 	}
 }

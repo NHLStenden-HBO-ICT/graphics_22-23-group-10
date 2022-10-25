@@ -19,14 +19,12 @@ export class Pacman extends Ai {
 
 	mixer;
 
-	pacmanState = new PacmanStatemachine();
-
 	get getPacmanModel() {
 		return this.model;
 	}
 
-	constructor() {
-		super();
+	constructor(playerModel) {
+		super(playerModel);
 		this._loadPacman();
 	}
 
@@ -62,7 +60,10 @@ export class Pacman extends Ai {
 	}
 
 	update(delta, playerPos, playerModel) {
+
 		this._movePacman(delta, playerPos, playerModel);
+		this.runningAwayCD += delta;
+		console.log(this.runningAwayCD);
 
 		// update animations
 		this.mixer.update(delta);
@@ -109,8 +110,10 @@ export class Pacman extends Ai {
 			playerModel
 		);
 
+
 		// when there is no specified path, move to random point
 		if (path.length == 0) {
+			this.hasDestination = false;
 			return;
 		}
 

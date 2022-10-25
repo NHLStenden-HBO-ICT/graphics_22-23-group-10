@@ -1,3 +1,4 @@
+import { DefaultLoadingManager } from "three";
 import * as THREE from "../node_modules/three/build/three.module.js";
 import { Pacman } from "./Pacman.js";
 
@@ -14,28 +15,11 @@ export class PacmanStatemachine {
 
 	constructor() {
 		// nighttime events
-		addEventListener("nightTimeWander", () => {
+		addEventListener("switchMovePattern", () => {
 			this.dispatch("switchMovePattern");
 		});
 
-		addEventListener("nightTimeRun", () => {
-			this.dispatch("switchMovePattern");
-		});
-
-		addEventListener("nightTimeStart", () => {
-			this.dispatch("switchCycle");
-		});
-
-		// daytime events
-		addEventListener("dayTimeWander", () => {
-			this.dispatch("switchMovePattern");
-		});
-
-		addEventListener("dayTimeRun", () => {
-			this.dispatch("switchMovePattern");
-		});
-
-		addEventListener("dayTimeStart", () => {
+		addEventListener("switchCycle", () => {
 			this.dispatch("switchCycle");
 		});
 	}
