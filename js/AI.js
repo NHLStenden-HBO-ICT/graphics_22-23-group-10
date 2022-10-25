@@ -19,7 +19,7 @@ export class Ai extends DynamicBody {
 	graphEnd;
 
 	hasDestination = false;
-	runningAwayCD = 0;
+	switchCD = 0;
 
 	intersectObjects = Level.cameraCollisionObjects.slice();
 
@@ -35,7 +35,7 @@ export class Ai extends DynamicBody {
 		this.intersectObjects.push(playerMesh);
 	}
 
-	getPath(pacmanPos, playerPos, cycleState, moveState, playerModel) {
+	getPath(pacmanPos, playerPos, playerModel) {
 		if (
 			(this.lastPos.x == pacmanPos.x || this.lastPos.z == pacmanPos.z) &&
 			this.hasDestination
@@ -50,7 +50,7 @@ export class Ai extends DynamicBody {
 		this.graph.diagonal = true;
 		this.graph.dontCrossCorners = true;
 
-		this.InVisionRange(pacmanPos, playerPos, playerModel, moveState);
+		this.InVisionRange(pacmanPos, playerPos, playerModel);
 
 		if (!this.closestCoin) {
 			this.closestCoin = this.GetClosestCoin();
@@ -59,9 +59,9 @@ export class Ai extends DynamicBody {
 			return [];
 		}
 
-		switch (cycleState) {
+		switch (this.pacmanState.getCycleState()) {
 			case PacmanStatemachine.Cycles.DAY:
-				switch (moveState) {
+				switch (this.pacmanState.getMoveState()) {
 					case PacmanStatemachine.MovePattern.WANDER:
 						this.graphStart = this.graph.grid[pacmanPos.x][pacmanPos.z];
 						const coinpos = new THREE.Vector3(
@@ -85,7 +85,7 @@ export class Ai extends DynamicBody {
 				break;
 
 			case PacmanStatemachine.Cycles.NIGHT:
-				switch (moveState) {
+				switch (this.pacmanState.getMoveState()) {
 					case PacmanStatemachine.MovePattern.WANDER:
 						this.graphStart = this.graph.grid[pacmanPos.x][pacmanPos.z];
 						const coinpos = new THREE.Vector3(
@@ -144,7 +144,7 @@ export class Ai extends DynamicBody {
 		return this.graph.grid[pos.x][pos.z];
 	}
 
-	InVisionRange(_pacmanPos, targetPos, playerModel, moveState) {
+	InVisionRange(_pacmanPos, targetPos, playerModel) {
 		const pacmanPos = this.model.position;
 		let target = new THREE.Vector3(
 			targetPos.x * Level.getScaleFactor,
@@ -169,19 +169,28 @@ export class Ai extends DynamicBody {
 			if (isct.distance < 500) {
 				if (isct.object.name == "Ghost") {
 					// console.log("inrange");
-					if (moveState != PacmanStatemachine.MovePattern.RUN) {
-						this.runningAwayCD = 0;
-						dispatchEvent(this.switchMovePattern);
+					if (this.pacmanState.getCycleState() == PacmanStatemachine.Cycles.DAY){
+						if (this.pacmanState.getMoveState() != PacmanStatemachine.MovePattern.RUN) {
+							this.switchCD = 0;
+							// console.log("switched");
+							dispatchEvent(this.switchMovePattern);
+						}
+					}
+					else if (this.pacmanState.getCycleState() == PacmanStatemachine.Cycles.NIGHT){
+						if (this.pacmanState.getMoveState() != PacmanStatemachine.MovePattern.CHASE) {
+							this.switchCD = 0;
+							// console.log("switched");
+							dispatchEvent(this.switchMovePattern);
+						}
 					}
 				}
 			}
-		} else if (
-			moveState == PacmanStatemachine.MovePattern.RUN &&
-			this.runningAwayCD > 5
-		) {
-			this.runningAwayCD = 0;
+		} else if ((this.pacmanState.getMoveState() == PacmanStatemachine.MovePattern.RUN || 
+					this.pacmanState.getMoveState() == PacmanStatemachine.MovePattern.CHASE) && this.switchCD > 5) { // check for daytime movement
+			this.switchCD = 0;
 			this.closestCoin = this.GetClosestCoin();
 			dispatchEvent(this.switchMovePattern);
+			// console.log("switched");
 		}
 	}
 

@@ -63,8 +63,8 @@ export class Pacman extends Ai {
 		this._movePacman(delta, playerPos, playerModel);
 		this.checkCoinPacmanCollision();
 
-		this.runningAwayCD += delta;
-		// console.log(this.runningAwayCD);
+		this.switchCD += delta;
+		// console.log(this.switchCD);
 
 		// update animations
 		this.mixer.update(delta);
@@ -106,8 +106,6 @@ export class Pacman extends Ai {
 		path = this.getPath(
 			pacmanPos.round(),
 			ghostPos.round(),
-			this.pacmanState.getCycleState(),
-			this.pacmanState.getMoveState(),
 			playerModel
 		);
 
