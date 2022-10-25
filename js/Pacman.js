@@ -60,10 +60,9 @@ export class Pacman extends Ai {
 	}
 
 	update(delta, playerPos, playerModel) {
-
 		this._movePacman(delta, playerPos, playerModel);
 		this.runningAwayCD += delta;
-		console.log(this.runningAwayCD);
+		// console.log(this.runningAwayCD);
 
 		// update animations
 		this.mixer.update(delta);
@@ -109,7 +108,6 @@ export class Pacman extends Ai {
 			this.pacmanState.getMoveState(),
 			playerModel
 		);
-
 
 		// when there is no specified path, move to random point
 		if (path.length == 0) {
