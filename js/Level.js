@@ -34,8 +34,6 @@ export class Level {
 
 	static levelLoaded = new Event("levelLoaded");
 
-	grassTexture = new THREE.TextureLoader().load( './textures/grass-ttx.jpg' );
-
 	static get getLevelData() {
 		if (this.#isLevelLoaded) return this.#levelDataAi;
 		else return [];
@@ -168,7 +166,7 @@ export class Level {
 
 			this.generateLevel(img.width, img.height);
 
-			this.addHelpers();
+			// this.addHelpers();
 
 			this.#isLevelLoaded = true;
 			dispatchEvent(this.levelLoaded);

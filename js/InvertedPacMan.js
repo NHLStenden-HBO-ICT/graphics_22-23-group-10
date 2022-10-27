@@ -10,7 +10,7 @@ import { Pacman } from "./Pacman.js";
 
 THREE.Cache.enabled = true;
 
-const DEBUG_MODE = true;
+const DEBUG_MODE = false;
 
 const LEVEL_TO_LOAD = "test2";
 
@@ -36,7 +36,6 @@ class InvertedPacman {
 		LoadingScreen.set("Creating renderer...");
 		const canvas = document.querySelector("canvas.webgl");
 		this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-		// this.renderer.setClearColor(0xd4e6f1, 1);
 		this.renderer.setPixelRatio(window.devicePixelRatio);
 		this.renderer.setSize(innerWidth, innerHeight);
 
