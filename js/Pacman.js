@@ -6,11 +6,9 @@ import { Graph } from "./Astar/Graph.js";
 import { PacmanStatemachine } from "./PacmanStatemachine.js";
 
 export class Pacman extends Ai {
-	//add code for pacman (movement related, model, animation)
-
 	pacmanLoaded = new Event("pacmanLoaded");
 
-	#MODELPATH = "../models/pacmanEvil.glb";
+	#MODELPATH = "../models/pacmanEvil3.glb";
 
 	#walkVelocity = 16;
 	#walkDirection = new THREE.Vector3();
@@ -39,7 +37,7 @@ export class Pacman extends Ai {
 		super(playerModel);
 		this._loadPacman();
 
-		// keeps track of day/night cycle
+		// Keeps track of day/night cycle
 		addEventListener(
 			"switchCycle",
 			() => {
@@ -63,7 +61,7 @@ export class Pacman extends Ai {
 			mesh.position.z = Level.getPacmanSpawn.z;
 			self.model = mesh;
 
-			mesh.scale.set(0.8, 0.8, 0.8);
+			mesh.scale.set(6, 6, 6);
 
 			mesh.traverse(function (obj) {
 				if (obj.isMesh) {
@@ -73,6 +71,11 @@ export class Pacman extends Ai {
 					if (obj.name == "TEETH") {
 						self.teethObjectModel = obj;
 						self.teethObjectModel.visible = false;
+
+						// add red glow
+						const light = new THREE.PointLight( 0xff0000, 1, 100 );
+						light.position.set(0, mesh.position.y, 0);
+						obj.add(light);
 					}
 					if (obj.name == "Sphere009") {
 						self.bodyObjectModel = obj;
@@ -82,10 +85,9 @@ export class Pacman extends Ai {
 				}
 			});
 
-			// animation related
+			// Animations
 			self.mixer = new THREE.AnimationMixer(mesh);
 			const clips = model.animations;
-
 			const clip = THREE.AnimationClip.findByName(clips, "walk strong big");
 			const action = self.mixer.clipAction(clip);
 			action.play();
@@ -100,22 +102,10 @@ export class Pacman extends Ai {
 		this.checkCoinPacmanCollision();
 
 		this.switchCD += delta;
-		// console.log(this.switchCD);
 
 		// update animations
 		this.mixer.update(delta);
 	}
-
-	// _movePacman(delta, playerPos, playerModel) {
-	// 	if (!this.ready) {
-	// 		return;
-	// 	}
-
-	// 	this._movePacman(delta, playerPos);
-
-	// 	// update animations
-	// 	this.mixer.update(delta);
-	// }
 
 	_movePacman(delta, playerPos, playerModel) {
 		// Calculate direction
@@ -155,7 +145,8 @@ export class Pacman extends Ai {
 			nextPos.z - this.model.position.z / SF
 		).normalize();
 
-		let directionAngle = Math.atan2(dir.x, dir.z); // Get angle to next point
+		// Get angle to next point
+		let directionAngle = Math.atan2(dir.x, dir.z); 
 
 		// Rotate pacman
 		this.#rotateQuaternion.setFromAxisAngle(this.#rotateAngle, directionAngle);

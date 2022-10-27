@@ -36,7 +36,6 @@ class InvertedPacman {
 		LoadingScreen.set("Creating renderer...");
 		const canvas = document.querySelector("canvas.webgl");
 		this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-		// this.renderer.setClearColor(0xd4e6f1, 1);
 		this.renderer.setPixelRatio(window.devicePixelRatio);
 		this.renderer.setSize(innerWidth, innerHeight);
 
@@ -165,6 +164,7 @@ class InvertedPacman {
 			this.scene.add(this.pacman.getPacmanModel);
 			LoadingScreen.remove();
 			this.ready = true;
+			console.log(this.pacman.model);
 		});
 	}
 
@@ -214,6 +214,10 @@ class InvertedPacman {
 			this.skybox.update(delta, this.sun);
 
 			Level.water.update(this.clock.getElapsedTime());
+
+			for(let i = 0; i<Level.coins.length; i++){
+				Level.coins[i].update(delta, this.clock.getElapsedTime());
+			}
 
 			this.updateFog();
 
