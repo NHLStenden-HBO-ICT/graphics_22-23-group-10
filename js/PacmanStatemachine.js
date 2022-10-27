@@ -14,7 +14,6 @@ export class PacmanStatemachine {
 	});
 
 	constructor() {
-		// nighttime events
 		addEventListener("switchMovePattern", () => {
 			this.dispatch("switchMovePattern");
 		});

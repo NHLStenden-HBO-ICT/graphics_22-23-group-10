@@ -5,8 +5,6 @@ import * as THREE from "../node_modules/three/build/three.module.js";
 import { DynamicBody } from "./CollisionSystem/DynamicBody.js";
 import { PacmanStatemachine } from "./PacmanStatemachine.js";
 
-const THRESHOLD = 0.2;
-
 export class Ai extends DynamicBody {
 	//add general code for the AI (pathfinding etc)
 	raycastOrigin = new THREE.Vector3();
@@ -35,15 +33,15 @@ export class Ai extends DynamicBody {
 		this.intersectObjects.push(playerMesh);
 	}
 
+	// Returns 2D array with x and z coordinates rounded to intergers,
+	// This is used by pacman to navigate to a point in a certain way
 	getPath(pacmanPos, playerPos, playerModel) {
 		if (
 			(this.lastPos.x == pacmanPos.x || this.lastPos.z == pacmanPos.z) &&
 			this.hasDestination
 		) {
-			// console.log(pacmanPos);
 			return [];
 		} else {
-			// console.log(pacmanPos, this.lastPos);
 			this.lastPos = pacmanPos;
 		}
 
@@ -52,7 +50,8 @@ export class Ai extends DynamicBody {
 
 		this.InVisionRange(pacmanPos, playerPos, playerModel);
 
-		if (!this.closestCoin) {
+		// Search for closest coin to AI when none are found yet
+		if (!this.closestCoin) { 
 			this.closestCoin = this.GetClosestCoin();
 		}
 		if (this.closestCoin == null) {
@@ -114,7 +113,7 @@ export class Ai extends DynamicBody {
 
 		return result;
 	}
-
+	
 	RunGraphEnd(targetPos) {
 		const pacmanPos = this.model.position;
 		let target = new THREE.Vector3(
@@ -122,7 +121,6 @@ export class Ai extends DynamicBody {
 			0,
 			targetPos.z * Level.getScaleFactor
 		);
-		// target.multiplyScalar(Level.getScaleFactor);
 		let dir = new THREE.Vector3();
 		dir.subVectors(target, pacmanPos).normalize();
 
@@ -133,6 +131,7 @@ export class Ai extends DynamicBody {
 			Math.round(pacmanPos.z * -dir.z)
 		);
 
+		// Max and min posible position
 		pos.clamp(
 			new THREE.Vector3(0, 0, 0),
 			new THREE.Vector3(
@@ -151,10 +150,9 @@ export class Ai extends DynamicBody {
 			0,
 			targetPos.z * Level.getScaleFactor
 		);
-		// this.raycaster.layers.set(2);
+
 		let dir = new THREE.Vector3();
 		dir.subVectors(target, pacmanPos).normalize();
-		// console.log(dir);
 		this.raycaster.set(pacmanPos, dir);
 
 		this.raycastOrigin = pacmanPos;
@@ -163,37 +161,35 @@ export class Ai extends DynamicBody {
 
 		const intersect = this.raycaster.intersectObject(playerModel);
 
-		if (intersect.length > 0) {
+		// Check if AI has intersects with player
+		if (intersect.length > 0) { 
 			const isct = intersect[0];
-			// console.log(isct);
-			if (isct.distance < 500) {
+			if (isct.distance < 500) { // Only detect player (Ghost) within a certain range
 				if (isct.object.name == "Ghost") {
-					// console.log("inrange");
 					if (this.pacmanState.getCycleState() == PacmanStatemachine.Cycles.DAY){
 						if (this.pacmanState.getMoveState() != PacmanStatemachine.MovePattern.RUN) {
-							this.switchCD = 0;
-							// console.log("switched");
+							this.switchCD = 0; // Reset switch cooldown
 							dispatchEvent(this.switchMovePattern);
 						}
 					}
 					else if (this.pacmanState.getCycleState() == PacmanStatemachine.Cycles.NIGHT){
 						if (this.pacmanState.getMoveState() != PacmanStatemachine.MovePattern.CHASE) {
-							this.switchCD = 0;
-							// console.log("switched");
+							this.switchCD = 0; // Reset switch cooldown
 							dispatchEvent(this.switchMovePattern);
 						}
 					}
 				}
 			}
-		} else if ((this.pacmanState.getMoveState() == PacmanStatemachine.MovePattern.RUN || 
-					this.pacmanState.getMoveState() == PacmanStatemachine.MovePattern.CHASE) && this.switchCD > 5) { // check for daytime movement
+		// Switch to wandering and search for new coin
+		// only when there are no intersects and switching is possible while pacman is not wandering
+		} else if (this.pacmanState.getMoveState() != PacmanStatemachine.MovePattern.WANDER && this.switchCD > 5) {
 			this.switchCD = 0;
 			this.closestCoin = this.GetClosestCoin();
 			dispatchEvent(this.switchMovePattern);
-			// console.log("switched");
 		}
 	}
 
+	// Returns current closest coin from AI
 	GetClosestCoin() {
 		let allExistingCoins = Level.coins;
 		if (allExistingCoins.length == 0) {
@@ -201,6 +197,8 @@ export class Ai extends DynamicBody {
 		}
 
 		let CoinPathResults = [];
+
+		// Get position of AI relative to level
 		let pos = new THREE.Vector3(
 			this.getPosition.x / Level.getScaleFactor,
 			0,
@@ -209,6 +207,7 @@ export class Ai extends DynamicBody {
 
 		this.graphStart = this.graph.grid[pos.x][pos.z];
 
+		// Go trough all existing coins and calculate their current distance to AI
 		for (let i = 0; i < allExistingCoins.length; i++) {
 			const coin = allExistingCoins[i];
 			const coinpos = new THREE.Vector3(
@@ -224,28 +223,14 @@ export class Ai extends DynamicBody {
 			);
 			CoinPathResults.push(result.length);
 		}
+		// Take the closest coin object
 		const lowestPath = Math.min(...CoinPathResults);
 
+		// And return the closest coin
 		return allExistingCoins[CoinPathResults.indexOf(lowestPath)];
 	}
+
 	getStateMachine() {
 		return this.pacmanState;
 	}
-
-	// not used atm
-	// isPositionReached(pos, targetpos) {
-	// 	let deltaPos = new THREE.Vector3(
-	// 		pos.x - targetpos.x,
-	// 		0,
-	// 		pos.z - targetpos.z
-	// 	);
-
-	// 	if (deltaPos.x > THRESHOLD || deltaPos.x < -THRESHOLD) {
-	// 		return false;
-	// 	}
-	// 	if (deltaPos.z > THRESHOLD || deltaPos.z < -THRESHOLD) {
-	// 		return false;
-	// 	}
-	// 	return true;
-	// }
 }
