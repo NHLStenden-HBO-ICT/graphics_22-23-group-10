@@ -10,7 +10,7 @@ import { Pacman } from "./Pacman.js";
 
 THREE.Cache.enabled = true;
 
-const DEBUG_MODE = false;
+const DEBUG_MODE = true;
 
 const LEVEL_TO_LOAD = "test2";
 
@@ -165,6 +165,7 @@ class InvertedPacman {
 			this.scene.add(this.pacman.getPacmanModel);
 			LoadingScreen.remove();
 			this.ready = true;
+			console.log(this.pacman.model);
 		});
 	}
 

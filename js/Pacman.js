@@ -10,7 +10,7 @@ export class Pacman extends Ai {
 
 	pacmanLoaded = new Event("pacmanLoaded");
 
-	#MODELPATH = "../models/pacmanEvil.glb";
+	#MODELPATH = "../models/pacmanEvil2.glb";
 
 	#walkVelocity = 16;
 	#walkDirection = new THREE.Vector3();
@@ -58,14 +58,14 @@ export class Pacman extends Ai {
 			mesh.position.z = Level.getPacmanSpawn.z;
 			self.model = mesh;
 
-			mesh.scale.set(0.8, 0.8, 0.8);
+			mesh.scale.set(4, 4, 4);
 
 			mesh.traverse(function (obj) {
 				if (obj.isMesh) {
 					obj.castShadow = true;
 					obj.receiveShadow = true;
 					console.log(obj);
-					if(obj.name == "TEETH"){
+					if(obj.name == "Sphere002"){
 						self.teethObjectModel = obj;
 						self.teethObjectModel.visible = false;
 
@@ -74,7 +74,7 @@ export class Pacman extends Ai {
 						light.position.set(0, mesh.position.y, 0);
 						obj.add(light);
 					}
-					if(obj.name == "Sphere009"){
+					if(obj.name == "BODY"){
 						self.bodyObjectModel = obj;
 						console.log(obj);
 						self.bodyObjectModel.material = self.dayTimeMaterial;

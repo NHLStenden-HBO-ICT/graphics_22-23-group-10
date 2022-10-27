@@ -21,6 +21,7 @@ export class Coin extends StaticBody {
 
 			mesh.traverse(function (obj) {
 				if (obj.isMesh) {
+					self.calculateExtents(obj.geometry);
 					obj.castShadow = true;
 					obj.receiveShadow = true;
 					console.log(obj);
