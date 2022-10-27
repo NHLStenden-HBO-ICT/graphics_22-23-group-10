@@ -8,7 +8,7 @@ import { PacmanStatemachine } from "./PacmanStatemachine.js";
 export class Pacman extends Ai {
 	pacmanLoaded = new Event("pacmanLoaded");
 
-	#MODELPATH = "../models/pacmanEvil2.glb";
+	#MODELPATH = "../models/pacmanEvil3.glb";
 
 	#walkVelocity = 16;
 	#walkDirection = new THREE.Vector3();
@@ -56,14 +56,14 @@ export class Pacman extends Ai {
 			mesh.position.z = Level.getPacmanSpawn.z;
 			self.model = mesh;
 
-			mesh.scale.set(4, 4, 4);
+			mesh.scale.set(6, 6, 6);
 
 			mesh.traverse(function (obj) {
 				if (obj.isMesh) {
 					obj.castShadow = true;
 					obj.receiveShadow = true;
 					console.log(obj);
-					if(obj.name == "Sphere002"){ // teeth of pacman model
+					if(obj.name == "Sphere001"){ // teeth of pacman model
 						self.teethObjectModel = obj;
 						self.teethObjectModel.visible = false;
 
