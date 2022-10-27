@@ -3,11 +3,15 @@ import { GridNode } from "./Gridnode.js";
 import { Astar } from "./Astar.js";
 
 export class Graph {
+	level = [];
 	constructor(gridIn) {
+		this.level = gridIn;
 		this.nodes = [];
 		this.rotationToNextNode = 0;
-		this.diagonal = !!this.diagonalOption;
-		this.dontCrossCorners = !!this.dontCrossCornersOption;
+		// this.diagonal = !!this.diagonalOption;
+		// this.dontCrossCorners = !!this.dontCrossCornersOption;
+		this.diagonal = true;
+		this.dontCrossCorners = true;
 		this.grid = [];
 		for (var x = 0; x < gridIn.length; x++) {
 			this.grid[x] = [];
@@ -37,19 +41,24 @@ export class Graph {
 	}
 	//returns true when node is a floor
 	isWalkableAt(x, y) {
-		return Level.getLevelData[x][y] == 1;
+		// console.log(x, y);
+		if (x >= this.level.length || x < 0) return false;
+		if (y >= this.level[0].length || y < 0) return false;
+		return this.level[x][y] == Level.FLOOR;
 	}
 	neighbors(node) {
-		var 
-		x = node.x, 
-		y = node.y, 
-		neighbors = [], 
-		grid = this.grid, 
-		s0 = false, d0 = false, 
-		s1 = false, d1 = false, 
-		s2 = false, d2 = false, 
-		s3 = false, d3 = false;
-
+		var x = node.x,
+			y = node.y,
+			neighbors = [],
+			grid = this.grid,
+			s0 = false,
+			d0 = false,
+			s1 = false,
+			d1 = false,
+			s2 = false,
+			d2 = false,
+			s3 = false,
+			d3 = false;
 
 		// North
 		if (this.isWalkableAt(x, y - 1)) {

@@ -1,12 +1,17 @@
-import { OrbitControls } from "../node_modules/three/examples/jsm/controls/OrbitControls.js";
 import * as THREE from "../node_modules/three/build/three.module.js";
-import { Menu } from "./Menu";
+import { LoadingScreen } from "./LoadingScreen.js";
+import { EffectComposer } from "../node_modules/three/examples/jsm/postprocessing/EffectComposer.js";
+import { RenderPass } from "../node_modules/three/examples/jsm/postprocessing/RenderPass.js";
+import { UnrealBloomPass } from "../node_modules/three/examples/jsm/postprocessing/UnrealBloomPass";
 import { Player } from "./Player.js";
 import { Skybox } from "./Skybox.js";
 import { Level } from "./Level.js";
 import { Pacman } from "./Pacman.js";
+import { Menu } from "./Menu";
 
 THREE.Cache.enabled = true;
+
+const DEBUG_MODE = false;
 
 const LEVEL_TO_LOAD = "test2";
 
@@ -15,15 +20,18 @@ class InvertedPacman {
 
 	constructor() {
 		this.menu = new Menu();
-		document.getElementById('play_button').addEventListener('click', () => {
+		document.getElementById("play_button").addEventListener("click", () => {
 			this.startGame();
-			document.getElementById('main_menu').remove();
+			document.getElementById("main_menu").remove();
 		});
 	}
 
 	startGame() {
+		LoadingScreen.init();
+		LoadingScreen.set("Initializing...");
+		this.update();
+
 		this._init();
-		this._RAF();
 	}
 
 	addToScene(object) {
@@ -35,10 +43,10 @@ class InvertedPacman {
 
 		this._initRenderer();
 		this._initScene();
-		// this._initDebugCam();
 	}
 
 	_initRenderer() {
+		LoadingScreen.set("Creating renderer...");
 		const canvas = document.querySelector("canvas.webgl");
 		this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 		// this.renderer.setClearColor(0xd4e6f1, 1);
@@ -58,27 +66,41 @@ class InvertedPacman {
 	}
 
 	_initScene() {
+		LoadingScreen.set("Creating level...\n(This might take a while!)");
 		this.scene = new THREE.Scene();
 
-		this.sun = new THREE.DirectionalLight(0xffffff);
-		this.sun.position.set(0, 1, 0);
-		this.sun.target.position.set(0, 0, 0);
-		this.sun.castShadow = true;
-		this.sun.shadow.mapSize.width = 4096 * 10;
-		this.sun.shadow.mapSize.height = 4096 * 10;
-		this.sun.shadow.camera.near = 0.1;
-		this.sun.shadow.camera.far = 1000;
-		this.sun.shadow.camera.left = -500;
-		this.sun.shadow.camera.right = 500;
-		this.sun.shadow.camera.top = 500;
-		this.sun.shadow.camera.bottom = -500;
-		this.sun.shadow.bias = -0.0001;
-		this.scene.add(this.sun);
+		const addSun = () => {
+			const mapSize = Level.getMapSize;
 
-		let light = new THREE.HemisphereLight(0x404040, 0x12782d, 0.5);
+			// console.log(mapSize);
+
+			this.sun = new THREE.DirectionalLight(0xffffff);
+			this.sun.position.set(100, 0, -500);
+			this.sun.target.position.set(
+				(mapSize.x * Level.getScaleFactor) / 2,
+				0,
+				(mapSize.y * Level.getScaleFactor) / 2
+			);
+			this.sun.castShadow = true;
+			this.sun.shadow.mapSize.width = 40960;
+			this.sun.shadow.mapSize.height = 40960;
+			this.sun.shadow.camera.near = 0.1;
+			this.sun.shadow.camera.far = 1000;
+			this.sun.shadow.camera.left = -mapSize.x * Level.getScaleFactor;
+			this.sun.shadow.camera.right = mapSize.x * Level.getScaleFactor;
+			this.sun.shadow.camera.top = mapSize.y * Level.getScaleFactor;
+			this.sun.shadow.camera.bottom = -mapSize.y * Level.getScaleFactor;
+			this.sun.shadow.bias = -0.0001;
+
+			this.scene.add(this.sun.target);
+			this.scene.add(this.sun);
+		};
+
+		this.scene.fog = new THREE.Fog(0x0c0908, 0, 50);
+
+		let light = new THREE.HemisphereLight(0xa5dfe8, 0x12782d, 0.5);
+		// let light = new THREE.AmbientLight(0xbfd7d9, 0.3);
 		this.scene.add(light);
-
-		this.skybox = new Skybox();
 
 		addEventListener("skyboxLoaded", () => {
 			this.scene.add(this.skybox.skyGeometry);
@@ -87,14 +109,28 @@ class InvertedPacman {
 		Level.load(LEVEL_TO_LOAD);
 
 		addEventListener("levelLoaded", () => {
+			addSun();
+
 			this.scene.add(Level.getLevel);
+			this.skybox = new Skybox();
 
-			this._initPlayer(this.renderer.domElement);
-
-			this._initPacman();
-
-			// this._addDebugShapes();
+			this._initPlayer();
 		});
+	}
+
+	_initPostProcessing() {
+		LoadingScreen.set("Applying post processing...");
+		this.composer = new EffectComposer(this.renderer);
+		const renderPass = new RenderPass(this.scene, this.player.camera);
+		const unrealBloom = new UnrealBloomPass(
+			new THREE.Vector2(window.innerWidth, window.innerHeight),
+			1,
+			0.1,
+			0.99
+		);
+
+		this.composer.addPass(renderPass);
+		this.composer.addPass(unrealBloom);
 	}
 
 	_addDebugShapes() {
@@ -109,11 +145,16 @@ class InvertedPacman {
 		this.scene.add(this.playerBoxHelper);
 		this.scene.add(this.pacmanBoxHelper);
 
-		// this.scene.add(new THREE.CameraHelper(this.sun.shadow.camera));
+		this.scene.add(new THREE.CameraHelper(this.sun.shadow.camera));
+		this.scene.add(new THREE.SpotLightHelper(this.player.lamp));
+		this.scene.add(new THREE.AxesHelper());
+
+		Level.addHelpers();
 	}
 
-	_initPlayer(rendererDomElement) {
-		this.player = new Player(rendererDomElement);
+	_initPlayer() {
+		LoadingScreen.set("Creating player...");
+		this.player = new Player();
 
 		addEventListener("playerLoaded", () => {
 			this.scene.add(this.player.getModel);
@@ -121,28 +162,23 @@ class InvertedPacman {
 
 			this._OnWindowResize();
 
-			this.ready = true;
+			this._initPostProcessing();
+
+			this._initPacman();
+
+			if (DEBUG_MODE) this._addDebugShapes();
 		});
 	}
 
 	_initPacman() {
-		this.pacman = new Pacman();
+		LoadingScreen.set("Creating Pacman...");
+		this.pacman = new Pacman(this.player.getModel.children[0]);
 
 		addEventListener("pacmanLoaded", () => {
 			this.scene.add(this.pacman.getPacmanModel);
+			LoadingScreen.remove();
+			this.ready = true;
 		});
-	}
-
-	_initDebugCam() {
-		const fov = 80;
-		const aspect = 2;
-		const near = 0.1;
-		const far = 1000.0;
-		this.camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-		this.camera.position.set(0, 10, 10);
-		this.camera.lookAt(new THREE.Vector3());
-
-		this.controls = new OrbitControls(this.camera, this.renderer.domElement);
 	}
 
 	_OnWindowResize() {
@@ -159,38 +195,49 @@ class InvertedPacman {
 		this.player.boundingBox.setFromObject(this.player.model);
 		this.pacman.boundingBox.setFromObject(this.pacman.model);
 
-		// this.playerBoxHelper.box = this.player.boundingBox;
-		// this.pacmanBoxHelper.box = this.pacman.boundingBox;
-
 		if (this.player.boundingBox.intersectsBox(this.pacman.boundingBox)) {
 			dispatchEvent(this.playerPacmanCollision);
 		}
 	}
 
+	updateFog() {
+		const lightLevel = this.skybox.getLightIntensity;
+
+		this.scene.fog.far = map(lightLevel, 0, 1, 50, 2000);
+	}
+
 	clock = new THREE.Clock();
 
-	_RAF() {
+	update() {
 		requestAnimationFrame(() => {
 			if (!this.ready) {
-				this._RAF();
+				this.update();
 				return;
 			}
-			this.renderer.render(this.scene, this.player.camera);
-			// this.renderer.render(this.scene, this.camera);
 			let delta = this.clock.getDelta();
-			// delta = THREE.getDelta();
 
-			this.player.update(delta);
+			this.player.update(
+				delta,
+				this.clock.getElapsedTime(),
+				this.skybox.getLightIntensity
+			);
 
-			this.pacman.update(delta, this.player.getPosition);
+			this.pacman.update(delta, this.player.getPosition, this.player.model);
 
 			this.skybox.update(delta, this.sun);
 
-			this.checkPlayerPacmanCollision();
+			Level.water.update(this.clock.getElapsedTime());
 
-			this._RAF();
+			this.updateFog();
+
+			this.checkPlayerPacmanCollision();
+			this.composer.render(delta);
+			this.update();
 		});
 	}
 }
 
 new InvertedPacman();
+
+const map = (value, x1, y1, x2, y2) =>
+	((value - x1) * (y2 - x2)) / (y1 - x1) + x2;

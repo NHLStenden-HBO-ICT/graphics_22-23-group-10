@@ -9,11 +9,10 @@ export class StaticBody extends Collision {
 
 	constructor() {
 		super();
-
-		Level.collidableObjects.push(this);
 	}
 
-	calcExtents() {
+	calcExtents(geom) {
+		this.calculateExtents(geom);
 		this.left = this.model.position.x + this.size.x / 2; // Positive X
 		this.right = this.model.position.x - this.size.x / 2; // Negative X
 		this.front = this.model.position.z + this.size.z / 2; // Positive Z

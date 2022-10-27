@@ -12,7 +12,13 @@ export function loadShader(shaderName, onLoad) {
 			const material = new THREE.ShaderMaterial();
 			material.vertexShader = vertex_text;
 			material.fragmentShader = fragment_text;
-			// material.wireframe = true;
+			material.uniforms = {
+				...THREE.UniformsLib.lights,
+				u_time: {
+					type: "f",
+					value: 0,
+				},
+			};
 			onLoad(material);
 		});
 	});

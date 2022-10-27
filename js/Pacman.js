@@ -3,66 +3,122 @@ import * as THREE from "../node_modules/three/build/three.module.js";
 import { Ai } from "./AI.js";
 import { Level } from "./Level.js";
 import { Graph } from "./Astar/Graph.js";
+import { PacmanStatemachine } from "./PacmanStatemachine.js";
 
 export class Pacman extends Ai {
 	//add code for pacman (movement related, model, animation)
 
 	pacmanLoaded = new Event("pacmanLoaded");
 
-	#MODELPATH = "../models/Duck.glb";
+	#MODELPATH = "../models/pacmanEvil.glb";
 
-	#walkVelocity = 8;
+	#walkVelocity = 16;
 	#walkDirection = new THREE.Vector3();
 	#rotateAngle = new THREE.Vector3(0, 1, 0);
 	#rotateQuaternion = new THREE.Quaternion();
+
+	mixer;
+
+	teethObjectModel;
+	bodyObjectModel;
+
+	dayTimeMaterial = new THREE.MeshPhongMaterial({color: 0xffe100, opacity: 1});
+	nightTimeMaterial = new THREE.MeshPhongMaterial({color: 0xf20505, opacity: 1});
 
 	get getPacmanModel() {
 		return this.model;
 	}
 
-	constructor() {
-		super();
+	constructor(playerModel) {
+		super(playerModel);
 		this._loadPacman();
+
+		// keeps track of day/night cycle
+		addEventListener(
+			"switchCycle",
+			() => {
+				this.teethObjectModel.visible = !this.teethObjectModel.visible;
+
+				if(this.bodyObjectModel.material == this.dayTimeMaterial){
+					this.bodyObjectModel.material = this.nightTimeMaterial;
+				}else
+					this.bodyObjectModel.material = this.dayTimeMaterial;
+			},
+			false
+		);
 	}
 
 	_loadPacman() {
 		let self = this;
 		new GLTFLoader().load(this.#MODELPATH, function (model) {
 			const mesh = model.scene;
+
 			mesh.position.x = Level.getPacmanSpawn.x;
+			mesh.position.y = 3;
 			mesh.position.z = Level.getPacmanSpawn.z;
 			self.model = mesh;
 
-			// mesh.scale.set(1, 1, 1); // TEMPORARY
+			mesh.scale.set(0.8, 0.8, 0.8);
 
 			mesh.traverse(function (obj) {
 				if (obj.isMesh) {
 					obj.castShadow = true;
 					obj.receiveShadow = true;
+					console.log(obj);
+					if(obj.name == "TEETH"){
+						self.teethObjectModel = obj;
+						self.teethObjectModel.visible = false;
+					}
+					if(obj.name == "Sphere009"){
+						self.bodyObjectModel = obj;
+						console.log(obj);
+						self.bodyObjectModel.material = self.dayTimeMaterial;
+					}
 				}
 			});
+
+			// animation related
+			self.mixer = new THREE.AnimationMixer(mesh);
+			const clips = model.animations;
+
+			const clip = THREE.AnimationClip.findByName(clips, "walk strong big");
+			const action = self.mixer.clipAction(clip);
+			action.play();
 
 			self.ready = true;
 			dispatchEvent(self.pacmanLoaded);
 		});
 	}
 
-	update(delta, playerPos) {
-		this._movePacman(delta, playerPos);
+	update(delta, playerPos, playerModel) {
+		this._movePacman(delta, playerPos, playerModel);
+		this.checkCoinPacmanCollision();
+
+		this.switchCD += delta;
+		// console.log(this.switchCD);
+
+		// update animations
+		this.mixer.update(delta);
 	}
 
-	_movePacman(delta, playerPos) {
-		if (!this.ready) {
-			return;
-		}
+	// _movePacman(delta, playerPos, playerModel) {
+	// 	if (!this.ready) {
+	// 		return;
+	// 	}
 
+	// 	this._movePacman(delta, playerPos);
+
+	// 	// update animations
+	// 	this.mixer.update(delta);
+	// }
+
+	_movePacman(delta, playerPos, playerModel) {
 		// Calculate direction
 		let p11 = playerPos;
 		let p22 = this.model.position;
 		this.#walkDirection = new THREE.Vector3(p11.x - p22.x, 0, p11.z - p22.z);
 		this.#walkDirection.normalize();
 		this.#rotateAngle.normalize();
-		// console.log(this.#walkDirection);
 
 		const velocity = this.#walkVelocity;
 
@@ -76,8 +132,17 @@ export class Pacman extends Ai {
 
 		const ghostPos = new THREE.Vector3(playerPos.x / SF, 0, playerPos.z / SF);
 
-		let path = this.getPath(pacmanPos.round(), ghostPos.round());
+		let path = [];
+
+		path = this.getPath(
+			pacmanPos.round(),
+			ghostPos.round(),
+			playerModel
+		);
+
+		// when there is no specified path, move to random point
 		if (path.length == 0) {
+			this.hasDestination = false;
 			return;
 		}
 
@@ -92,10 +157,7 @@ export class Pacman extends Ai {
 		let directionAngle = Math.atan2(dir.x, dir.z); // Get angle to next point
 
 		// Rotate pacman
-		this.#rotateQuaternion.setFromAxisAngle(
-			this.#rotateAngle,
-			directionAngle + Math.PI * -0.5
-		);
+		this.#rotateQuaternion.setFromAxisAngle(this.#rotateAngle, directionAngle);
 
 		this.model.quaternion.rotateTowards(this.#rotateQuaternion, 0.2);
 
@@ -106,5 +168,19 @@ export class Pacman extends Ai {
 		);
 
 		this.move(movementVector);
+	}
+
+	checkCoinPacmanCollision() {
+		if (this.closestCoin == null) {
+			return;
+		}
+		if (this.closestCoin.boundingBox.intersectsBox(this.boundingBox)) {
+			let index = Level.coins.indexOf(this.closestCoin);
+			if (index > -1) {
+				Level.coins.splice(index, 1);
+				Level.remove(this.closestCoin.model);
+				this.closestCoin = null;
+			}
+		}
 	}
 }
