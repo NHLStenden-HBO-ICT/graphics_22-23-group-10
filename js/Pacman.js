@@ -22,8 +22,14 @@ export class Pacman extends Ai {
 	teethObjectModel;
 	bodyObjectModel;
 
-	dayTimeMaterial = new THREE.MeshPhongMaterial({color: 0xffe100, opacity: 1});
-	nightTimeMaterial = new THREE.MeshPhongMaterial({color: 0xf20505, opacity: 1});
+	dayTimeMaterial = new THREE.MeshPhongMaterial({
+		color: 0xffe100,
+		opacity: 1,
+	});
+	nightTimeMaterial = new THREE.MeshPhongMaterial({
+		color: 0xf20505,
+		opacity: 1,
+	});
 
 	get getPacmanModel() {
 		return this.model;
@@ -39,10 +45,9 @@ export class Pacman extends Ai {
 			() => {
 				this.teethObjectModel.visible = !this.teethObjectModel.visible;
 
-				if(this.bodyObjectModel.material == this.dayTimeMaterial){
+				if (this.bodyObjectModel.material == this.dayTimeMaterial) {
 					this.bodyObjectModel.material = this.nightTimeMaterial;
-				}else
-					this.bodyObjectModel.material = this.dayTimeMaterial;
+				} else this.bodyObjectModel.material = this.dayTimeMaterial;
 			},
 			false
 		);
@@ -64,14 +69,14 @@ export class Pacman extends Ai {
 				if (obj.isMesh) {
 					obj.castShadow = true;
 					obj.receiveShadow = true;
-					console.log(obj);
-					if(obj.name == "TEETH"){
+					// console.log(obj);
+					if (obj.name == "TEETH") {
 						self.teethObjectModel = obj;
 						self.teethObjectModel.visible = false;
 					}
-					if(obj.name == "Sphere009"){
+					if (obj.name == "Sphere009") {
 						self.bodyObjectModel = obj;
-						console.log(obj);
+						// console.log(obj);
 						self.bodyObjectModel.material = self.dayTimeMaterial;
 					}
 				}
@@ -134,11 +139,7 @@ export class Pacman extends Ai {
 
 		let path = [];
 
-		path = this.getPath(
-			pacmanPos.round(),
-			ghostPos.round(),
-			playerModel
-		);
+		path = this.getPath(pacmanPos.round(), ghostPos.round(), playerModel);
 
 		// when there is no specified path, move to random point
 		if (path.length == 0) {

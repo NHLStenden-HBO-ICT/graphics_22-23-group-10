@@ -1,48 +1,58 @@
-#include <common>
-#include <shadowmap_pars_vertex>
 
-uniform float u_time;
+#define PHONG
+uniform float time;
 
-varying vec2 vUv;
-varying vec3 vNormal;
 varying vec3 vViewPosition;
+varying vec3 pos;
+
+const float WAVE_LENGTH = 6.0;
+const float AMPLITUDE = 4.0;
+
+#include <common>
+#include <uv_pars_vertex>
+#include <uv2_pars_vertex>
+#include <displacementmap_pars_vertex>
+#include <envmap_pars_vertex>
+#include <color_pars_vertex>
+#include <fog_pars_vertex>
+#include <normal_pars_vertex>
+#include <morphtarget_pars_vertex>
+#include <skinning_pars_vertex>
+#include <shadowmap_pars_vertex>
+#include <logdepthbuf_pars_vertex>
+#include <clipping_planes_pars_vertex>
 
 void main() {
+	#include <uv_vertex>
+	#include <uv2_vertex>
+	#include <color_vertex>
+	#include <morphcolor_vertex>
+	#include <beginnormal_vertex>
+	#include <morphnormal_vertex>
+	#include <skinbase_vertex>
+	#include <skinnormal_vertex>
+	#include <defaultnormal_vertex>
+	#include <normal_vertex>
 
-	vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+    float newY = (cos((position.x / WAVE_LENGTH) + time) / AMPLITUDE) - (cos((position.z / WAVE_LENGTH) + time) / AMPLITUDE) + (cos(((position.x + position.z) / WAVE_LENGTH) + time) / AMPLITUDE);
 
-	vUv = uv;
-	vNormal = normalize( normalMatrix * normal );
-	vViewPosition = -mvPosition.xyz;
+    vec3 transformed = vec3(
+        position.x,
+        position.y + newY,
+        position.z
+    );
 
-	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+    pos = transformed;
 
+	#include <morphtarget_vertex>
+	#include <skinning_vertex>
+	#include <displacementmap_vertex>
+	#include <project_vertex>
+	#include <logdepthbuf_vertex>
+	#include <clipping_planes_vertex>
+	vViewPosition = - mvPosition.xyz;
+	#include <worldpos_vertex>
+	#include <envmap_vertex>
+	#include <shadowmap_vertex>
+	#include <fog_vertex>
 }
-
-// varying vec3 vNormal;
-// // varying vec3 vViewDir;
-
-// void main() {
-//     #include <beginnormal_vertex>
-//     #include <defaultnormal_vertex>
-
-//     #include <begin_vertex>
-
-//     #include <worldpos_vertex>
-//     #include <shadowmap_vertex>
-
-//     vec4 result = vec4(
-//         position.x,
-//         cos((position.x / 2.0) + u_time) / 4.0,
-//         position.z,
-//         1.0
-//     );
-
-//     vec4 modelPosition = modelMatrix * result;
-//     vec4 viewPosition = viewMatrix * modelPosition;
-//     vec4 clipPosition = projectionMatrix * viewPosition;
-
-//     vNormal = normalize(normalMatrix * normal);
-
-//     gl_Position = clipPosition;
-// }

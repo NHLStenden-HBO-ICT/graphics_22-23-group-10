@@ -10,21 +10,18 @@ export class Floor extends StaticBody {
 
 		const mat = new THREE.MeshStandardMaterial({ color: 0x015900 });
 
-        const floorWidth = width * SCALE_FACTOR;
-        const floorHeight = SCALE_FACTOR;
-        const floorDepth = height * SCALE_FACTOR;
+		const floorWidth = width * SCALE_FACTOR;
+		const floorHeight = SCALE_FACTOR;
+		const floorDepth = height * SCALE_FACTOR;
 
 		this.model = new THREE.Mesh(
-			new THREE.BoxGeometry(
-				floorWidth,
-				floorHeight,
-				floorDepth
-			),
+			new THREE.BoxGeometry(floorWidth, floorHeight, floorDepth),
 			mat
 		);
 
 		this.model.layers.enable(1);
 		this.model.receiveShadow = true;
+		this.model.castShadow = true;
 		this.model.position.x = posX * SCALE_FACTOR - 0.5 * SCALE_FACTOR;
 		this.model.position.y = SCALE_FACTOR * -0.5;
 		this.model.position.z = posZ * SCALE_FACTOR - 0.5 * SCALE_FACTOR;
