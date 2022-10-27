@@ -8,13 +8,23 @@ export class Wall extends StaticBody {
 
 		const SCALE_FACTOR = Level.getScaleFactor;
 
-		const mat = new THREE.MeshStandardMaterial({ color: 0xd6d6d6 });
+		const wallTexture = new THREE.TextureLoader().load( './textures/Brick_01_512.png' );
+		wallTexture.wrapS = THREE.RepeatWrapping;
+		wallTexture.wrapT = THREE.RepeatWrapping;
+		
+		if(width > height)
+			wallTexture.repeat.set( width / 3, SCALE_FACTOR);
+		else
+			wallTexture.repeat.set( height / 3, SCALE_FACTOR);
+		
+		const mat = new THREE.MeshStandardMaterial({ map: wallTexture });
 
 		this.model = new THREE.Mesh(
 			new THREE.BoxGeometry(
 				SCALE_FACTOR * width,
 				SCALE_FACTOR * 5,
-				SCALE_FACTOR * height
+				SCALE_FACTOR * height,
+				
 			),
 			mat
 		);

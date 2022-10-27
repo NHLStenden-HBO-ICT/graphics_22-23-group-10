@@ -8,7 +8,15 @@ export class Floor extends StaticBody {
 
 		const SCALE_FACTOR = Level.getScaleFactor;
 
-		const mat = new THREE.MeshStandardMaterial({ color: 0x015900 });
+		const grassTexture = new THREE.TextureLoader().load( './textures/Grass_01_512.png' );
+		grassTexture.wrapS = THREE.RepeatWrapping;
+		grassTexture.wrapT = THREE.RepeatWrapping;
+		
+		if(width > height)
+			grassTexture.repeat.set( width / 10, SCALE_FACTOR);
+		else
+			grassTexture.repeat.set( height / 10, SCALE_FACTOR*5);
+		const mat = new THREE.MeshStandardMaterial({map: grassTexture});
 
         const floorWidth = width * SCALE_FACTOR;
         const floorHeight = SCALE_FACTOR;

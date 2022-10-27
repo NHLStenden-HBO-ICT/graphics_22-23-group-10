@@ -215,6 +215,10 @@ class InvertedPacman {
 
 			Level.water.update(this.clock.getElapsedTime());
 
+			for(let i = 0; i<Level.coins.length; i++){
+				Level.coins[i].update(delta, this.clock.getElapsedTime());
+			}
+
 			this.updateFog();
 
 			this.checkPlayerPacmanCollision();

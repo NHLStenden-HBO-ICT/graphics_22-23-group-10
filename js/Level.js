@@ -34,6 +34,8 @@ export class Level {
 
 	static levelLoaded = new Event("levelLoaded");
 
+	grassTexture = new THREE.TextureLoader().load( './textures/grass-ttx.jpg' );
+
 	static get getLevelData() {
 		if (this.#isLevelLoaded) return this.#levelDataAi;
 		else return [];
@@ -225,6 +227,8 @@ export class Level {
 			const floor = new Floor(rect.x1 + w / 2, rect.y1 + h / 2, w, h);
 			this.#level.add(floor.model);
 			this.floors.push(floor);
+
+			
 			// this.cameraCollisionObjects.push(floor.model);
 		}
 	}
