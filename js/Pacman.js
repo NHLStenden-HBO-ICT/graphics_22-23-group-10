@@ -68,6 +68,11 @@ export class Pacman extends Ai {
 					if(obj.name == "TEETH"){
 						self.teethObjectModel = obj;
 						self.teethObjectModel.visible = false;
+
+						// add red glow
+						const light = new THREE.PointLight( 0xff0000, 1, 100 );
+						light.position.set(0, mesh.position.y, 0);
+						obj.add(light);
 					}
 					if(obj.name == "Sphere009"){
 						self.bodyObjectModel = obj;
@@ -80,7 +85,6 @@ export class Pacman extends Ai {
 			// animation related
 			self.mixer = new THREE.AnimationMixer(mesh);
 			const clips = model.animations;
-
 			const clip = THREE.AnimationClip.findByName(clips, "walk strong big");
 			const action = self.mixer.clipAction(clip);
 			action.play();
