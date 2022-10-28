@@ -75,6 +75,7 @@ export class Pacman extends Ai {
 						// add red glow
 						const light = new THREE.PointLight( 0xff0000, 1, 100 );
 						light.position.set(0, mesh.position.y, 0);
+						light.castShadow = true;
 						obj.add(light);
 					}
 					if (obj.name == "BODY") {

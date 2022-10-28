@@ -13,7 +13,7 @@ export class Skybox {
 	skyGeometry;
 
 	#sunAxis = new THREE.Vector3(1, 0, 0);
-	#sunVector = new THREE.Vector3(0, -100, 500);
+	#sunVector = new THREE.Vector3(0, 10, -500);
 	#isNight = false;
 	#lightIntensity;
 
