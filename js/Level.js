@@ -166,7 +166,7 @@ export class Level {
 
 			this.generateLevel(img.width, img.height);
 
-			this.addHelpers();
+			// this.addHelpers();
 
 			this.#isLevelLoaded = true;
 			dispatchEvent(this.levelLoaded);
@@ -187,7 +187,7 @@ export class Level {
 		const waterGeometry = new THREE.BoxGeometry(waterWidth, 0.1, waterDepth);
 		const waterMaterial = new THREE.MeshBasicMaterial({ color: 0x0062ff });
 		const water = new THREE.Mesh(waterGeometry, waterMaterial);
-		water.position.y = -2;
+		water.position.y = -5;
 		this.add(water);
 
 		// Get invisible walls
@@ -225,6 +225,8 @@ export class Level {
 			const floor = new Floor(rect.x1 + w / 2, rect.y1 + h / 2, w, h);
 			this.#level.add(floor.model);
 			this.floors.push(floor);
+
+			
 			// this.cameraCollisionObjects.push(floor.model);
 		}
 	}

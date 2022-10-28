@@ -13,12 +13,16 @@ THREE.Cache.enabled = true;
 
 const DEBUG_MODE = false;
 
-const LEVEL_TO_LOAD = "test2";
+const LEVEL_TO_LOAD = "test";
+
+let self;
 
 class InvertedPacman {
 	playerPacmanCollision = new Event("playerPacmanCollision");
+	paused = false;
 
 	constructor() {
+		self = this;
 		this.menu = new Menu();
 		document.getElementById("play_button").addEventListener("click", () => {
 			this.startGame();
@@ -43,13 +47,14 @@ class InvertedPacman {
 
 		this._initRenderer();
 		this._initScene();
+
+		addEventListener("pause", self.pauseGame);
 	}
 
 	_initRenderer() {
 		LoadingScreen.set("Creating renderer...");
 		const canvas = document.querySelector("canvas.webgl");
 		this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-		// this.renderer.setClearColor(0xd4e6f1, 1);
 		this.renderer.setPixelRatio(window.devicePixelRatio);
 		this.renderer.setSize(innerWidth, innerHeight);
 
@@ -178,6 +183,7 @@ class InvertedPacman {
 			this.scene.add(this.pacman.getPacmanModel);
 			LoadingScreen.remove();
 			this.ready = true;
+			console.log(this.pacman.model);
 		});
 	}
 
@@ -206,15 +212,23 @@ class InvertedPacman {
 		this.scene.fog.far = map(lightLevel, 0, 1, 50, 2000);
 	}
 
+	pauseGame() {
+		self.paused = !self.paused;
+		console.log("Paused: " + self.paused);
+		if (!self.paused) self.update(true);
+	}
+
 	clock = new THREE.Clock();
 
-	update() {
+	update(deltaReset) {
 		requestAnimationFrame(() => {
 			if (!this.ready) {
 				this.update();
 				return;
 			}
 			let delta = this.clock.getDelta();
+			if (this.paused) return;
+			if (deltaReset) delta = 0;
 
 			this.player.update(
 				delta,
@@ -228,7 +242,13 @@ class InvertedPacman {
 
 			Level.water.update(this.clock.getElapsedTime());
 
+			for (let i = 0; i < Level.coins.length; i++) {
+				Level.coins[i].update(delta, this.clock.getElapsedTime());
+			}
+
 			this.updateFog();
+
+			console.log("Update");
 
 			this.checkPlayerPacmanCollision();
 			this.composer.render(delta);

@@ -1,24 +1,42 @@
+import { GLTFLoader } from "../../node_modules/three/examples/jsm/loaders/GLTFLoader.js";
 import * as THREE from "../../node_modules/three/build/three.module.js";
 import { StaticBody } from "../CollisionSystem/StaticBody.js";
 import { Level } from "../Level.js";
 
 export class Coin extends StaticBody {
+	#MODELPATH = "../../models/coin.glb";
 	constructor(posX, posZ) {
 		super();
 
 		const SCALE_FACTOR = Level.getScaleFactor;
 
-		const box = new THREE.BoxGeometry(1, 1);
-		const mat = new THREE.MeshPhongMaterial({ color: 0xffff00 });
-		this.model = new THREE.Mesh(box, mat);
-		Level.add(this.model);
+		let self = this;
+		new GLTFLoader().load(this.#MODELPATH, function (model){
+			const mesh = model.scene;
 
-		this.model.position.x = posX * SCALE_FACTOR;
-		this.model.position.y = 0.5;
-		this.model.position.z = posZ * SCALE_FACTOR;
+			mesh.position.x = posX * SCALE_FACTOR;
+			mesh.position.y = 2;
+			mesh.position.z = posZ * SCALE_FACTOR;
+			self.model = mesh;
 
-		this.calcExtents(this.model.geometry);
+			mesh.traverse(function (obj) {
+				if (obj.isMesh) {
+					self.calculateExtents(obj.geometry);
+					obj.castShadow = true;
+					obj.receiveShadow = true;
+					console.log(obj);
+				}
+			});
 
-		this.ready = true;
+			Level.add(self.model);
+
+			self.ready = true;
+
+		});
+	}
+
+	update(delta, elapsedTime){
+		this.model.rotation.y += 0.5 * delta;
+		this.model.position.y = (Math.sin(elapsedTime) * delta * 100) + 1.5;
 	}
 }
