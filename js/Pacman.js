@@ -68,7 +68,7 @@ export class Pacman extends Ai {
 					obj.castShadow = true;
 					obj.receiveShadow = true;
 					// console.log(obj);
-					if (obj.name == "TEETH") {
+					if (obj.name == "Sphere001") {
 						self.teethObjectModel = obj;
 						self.teethObjectModel.visible = false;
 
@@ -77,7 +77,7 @@ export class Pacman extends Ai {
 						light.position.set(0, mesh.position.y, 0);
 						obj.add(light);
 					}
-					if (obj.name == "Sphere009") {
+					if (obj.name == "BODY") {
 						self.bodyObjectModel = obj;
 						// console.log(obj);
 						self.bodyObjectModel.material = self.dayTimeMaterial;
