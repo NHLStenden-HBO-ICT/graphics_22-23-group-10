@@ -4,6 +4,7 @@ import { Wall } from "./Objects/Wall.js";
 import { Water } from "./Objects/Water.js";
 import { Floor } from "./Objects/Floor.js";
 import { Coin } from "./Objects/Coin.js";
+import { LoadingScreen } from "./LoadingScreen.js";
 
 const LEVELFOLDER = "../levels/";
 
@@ -18,10 +19,11 @@ const COIN = 5;
 const SCALE_FACTOR = 2;
 
 export class Level {
+	static #isLevelLoaded = false;
+	static #isLoading = false;
 	static #levelDataAi;
 	static #levelGenData;
 	static #level = new THREE.Object3D();
-	static #isLevelLoaded = false;
 	static #playerSpawn = new THREE.Vector3();
 	static #pacmanSpawn = new THREE.Vector3();
 	static #mapSize = new THREE.Vector2();
@@ -46,6 +48,10 @@ export class Level {
 
 	static get isLevelLoaded() {
 		return this.#isLevelLoaded;
+	}
+
+	static get isLoading() {
+		return this.#isLoading;
 	}
 
 	static get getPlayerSpawn() {
@@ -79,6 +85,8 @@ export class Level {
 	}
 
 	static load(levelName) {
+		LoadingScreen.set("Reading map data...");
+
 		const level = LEVELFOLDER + levelName + ".png";
 
 		let canvas = document.createElement("canvas");
@@ -163,10 +171,14 @@ export class Level {
 					}
 				}
 			}
+			
+			// canvas.remove();
+			// this.#isLoading = true;
 
+			// -- OLD CODE --
 			this.generateLevel(img.width, img.height);
 
-			// this.addHelpers();
+			this.addHelpers();
 
 			this.#isLevelLoaded = true;
 			dispatchEvent(this.levelLoaded);
@@ -177,9 +189,13 @@ export class Level {
 		img.src = level;
 	}
 
-	static generateLevel(width, height) {
+	static update(){
+		// TODO: Make loading frame-based instead of trying to do it all in one frame
+	}
+
+	static generateLevel() {
 		// Add the level's defined water
-		this.water = new Water(width, height);
+		this.water = new Water(this.#mapSize.x, this.#mapSize.y);
 
 		// Add the distant water
 		const waterWidth = this.#mapSize.x * 5 * SCALE_FACTOR;
