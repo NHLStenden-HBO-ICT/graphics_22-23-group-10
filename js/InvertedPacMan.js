@@ -12,12 +12,16 @@ THREE.Cache.enabled = true;
 
 const DEBUG_MODE = false;
 
-const LEVEL_TO_LOAD = "test2";
+const LEVEL_TO_LOAD = "test";
+
+let self;
 
 class InvertedPacman {
 	playerPacmanCollision = new Event("playerPacmanCollision");
+	paused = false;
 
 	constructor() {
+		self = this;
 		LoadingScreen.init();
 		LoadingScreen.set("Initializing...");
 		this.update();
@@ -30,6 +34,8 @@ class InvertedPacman {
 
 		this._initRenderer();
 		this._initScene();
+
+		addEventListener("pause", self.pauseGame);
 	}
 
 	_initRenderer() {
@@ -193,15 +199,23 @@ class InvertedPacman {
 		this.scene.fog.far = map(lightLevel, 0, 1, 50, 2000);
 	}
 
+	pauseGame() {
+		self.paused = !self.paused;
+		console.log("Paused: " + self.paused);
+		if (!self.paused) self.update(true);
+	}
+
 	clock = new THREE.Clock();
 
-	update() {
+	update(deltaReset) {
 		requestAnimationFrame(() => {
 			if (!this.ready) {
 				this.update();
 				return;
 			}
 			let delta = this.clock.getDelta();
+			if (this.paused) return;
+			if (deltaReset) delta = 0;
 
 			this.player.update(
 				delta,
@@ -215,11 +229,13 @@ class InvertedPacman {
 
 			Level.water.update(this.clock.getElapsedTime());
 
-			for(let i = 0; i<Level.coins.length; i++){
+			for (let i = 0; i < Level.coins.length; i++) {
 				Level.coins[i].update(delta, this.clock.getElapsedTime());
 			}
 
 			this.updateFog();
+
+			console.log("Update");
 
 			this.checkPlayerPacmanCollision();
 			this.composer.render(delta);

@@ -20,6 +20,8 @@ export class Camera extends THREE.PerspectiveCamera {
 	rotX = new THREE.Object3D();
 	rotY = new THREE.Object3D();
 
+	pause = new Event("pause");
+
 	constructor(playerPos) {
 		super(FOV, ASPECT, NEAR, FAR);
 		this._init(playerPos);
@@ -74,6 +76,8 @@ export class Camera extends THREE.PerspectiveCamera {
 			};
 		} else {
 			// pointer lock is no longer active, remove the callback
+			console.log("Releasing cursor");
+			dispatchEvent(self.pause);
 			CANVAS.onmousemove = () => {};
 		}
 	}
