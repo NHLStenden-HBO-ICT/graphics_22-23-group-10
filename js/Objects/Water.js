@@ -78,7 +78,7 @@ export class Water extends StaticBody {
 			self.model.receiveShadow = true;
 			self.model.position.x = (width * SCALE_FACTOR) / 2;
 			// waterDepth / 2 - SCALE_FACTOR / 2 - LOCAL_SCALE * SCALE_FACTOR;
-			self.model.position.y = -1.2;
+			self.model.position.y = -1.8;
 			self.model.position.z = (height * SCALE_FACTOR) / 2;
 			// waterWidth / 2 - SCALE_FACTOR / 2 - LOCAL_SCALE * SCALE_FACTOR;
 

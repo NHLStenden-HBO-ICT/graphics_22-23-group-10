@@ -37,10 +37,20 @@ const float THRESHOLD = 50.0;
 #include <specularmap_pars_fragment>
 #include <logdepthbuf_pars_fragment>
 #include <clipping_planes_pars_fragment>
+
+float map(float value, float min1, float max1, float min2, float max2) {
+  return min2 + (value - min1) * (max2 - min2) / (max1 - min1);
+}
+
 void main() {
 	#include <clipping_planes_fragment>
 
-    vec3 newCol = vec3(diffuse + (pos.y * subColor) + vec3(0.2));
+	float mult = map(pos.y, -2.1, 1.6, 0.0, 1.5);
+
+    vec3 newCol = vec3(diffuse + (mult * subColor) );
+	// if (pos.y > 1.6){
+	// 	newCol = vec3(1.0);
+	// }
 
     float opacityMult = 1.0;
 
@@ -89,3 +99,4 @@ void main() {
 	#include <premultiplied_alpha_fragment>
 	#include <dithering_fragment>
 }
+

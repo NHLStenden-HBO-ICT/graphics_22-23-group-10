@@ -187,7 +187,7 @@ export class Level {
 		const waterGeometry = new THREE.BoxGeometry(waterWidth, 0.1, waterDepth);
 		const waterMaterial = new THREE.MeshBasicMaterial({ color: 0x0062ff });
 		const water = new THREE.Mesh(waterGeometry, waterMaterial);
-		water.position.y = -2.5;
+		water.position.y = -5;
 		this.add(water);
 
 		// Get invisible walls
