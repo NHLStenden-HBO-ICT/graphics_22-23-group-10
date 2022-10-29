@@ -7,12 +7,13 @@ import { Player } from "./Player.js";
 import { Skybox } from "./Skybox.js";
 import { Level } from "./Level.js";
 import { Pacman } from "./Pacman.js";
+import {HUD} from "./HUD";
 
 THREE.Cache.enabled = true;
 
 const DEBUG_MODE = false;
 
-const LEVEL_TO_LOAD = "level";
+const LEVEL_TO_LOAD = "test2";
 
 let self;
 
@@ -34,6 +35,7 @@ class InvertedPacman {
 
 		this._initRenderer();
 		this._initScene();
+		this._initHud();
 
 		addEventListener("pause", self.pauseGame);
 	}
@@ -204,6 +206,10 @@ class InvertedPacman {
 		if (!self.paused) self.update(true);
 	}
 
+	_initHud(){
+		this.hud = new HUD();
+	}
+
 	clock = new THREE.Clock();
 
 	update(deltaReset) {
@@ -239,6 +245,7 @@ class InvertedPacman {
 			}
 
 			this.updateFog();
+			this.hud.staminaBar(this.player.getStaminaLevel);
 
 			this.checkPlayerPacmanCollision();
 			this.composer.render(delta);

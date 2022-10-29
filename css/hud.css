@@ -1,0 +1,25 @@
+.progress{
+    background-color: white;
+    border-radius: 20px;
+    height: 25px;
+    width: 25%;
+    float: right;
+}
+
+
+.progress-done{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-image: repeating-linear-gradient(
+            to left,
+            #02B0CD,
+            #03E2E2
+    );
+    box-shadow: 0 5px 5px -6px #02B0CD;
+    border-radius: 15px;
+    color: white;
+    height: 100%;
+    width: 0;
+    /*transition: 0.5s ease 0.3s;*/
+}
