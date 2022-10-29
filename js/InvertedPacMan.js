@@ -17,7 +17,7 @@ const LEVEL_TO_LOAD = "test";
 
 let self;
 
-class InvertedPacman {
+export class InvertedPacman {
 	playerPacmanCollision = new Event("playerPacmanCollision");
 	paused = false;
 
@@ -26,11 +26,11 @@ class InvertedPacman {
 		this.menu = new Menu();
 		document.getElementById("play_button").addEventListener("click", () => {
 			this.startGame();
-			document.getElementById("main_menu").remove();
 		});
 	}
 
 	startGame() {
+		this.hideMainMenu()
 		LoadingScreen.init();
 		LoadingScreen.set("Initializing...");
 		this.update();
@@ -47,8 +47,7 @@ class InvertedPacman {
 
 		this._initRenderer();
 		this._initScene();
-
-		addEventListener("pause", self.pauseGame);
+		this._initPauseMenu();
 	}
 
 	_initRenderer() {
@@ -175,6 +174,21 @@ class InvertedPacman {
 		});
 	}
 
+	_initPauseMenu() {
+		addEventListener("pause", self.togglePause);
+        const continueBtn = document.getElementById('continueBtn');
+        const quitBtn = document.getElementById('quitBtn');
+
+        continueBtn.addEventListener('click', () => {
+            self.togglePause();
+        })
+
+		quitBtn.addEventListener('click', () => {
+			// Little hack to save time for the things that we can't finish before deadline
+			location.reload();
+        })
+    }
+
 	_initPacman() {
 		LoadingScreen.set("Creating Pacman...");
 		this.pacman = new Pacman(this.player.getModel.children[0]);
@@ -212,10 +226,37 @@ class InvertedPacman {
 		this.scene.fog.far = map(lightLevel, 0, 1, 50, 2000);
 	}
 
-	pauseGame() {
+	showMainMenu() {
+		document.getElementById("main_menu").style.display = 'flex';
+		document.getElementById("main_menu").style.zIndex = '999';
+		document.getElementById("main_menu").style.pointerEvents = 'all';
+	}
+
+	hideMainMenu() {
+		document.getElementById("main_menu").style.display = 'none';
+		document.getElementById("main_menu").style.zIndex = '-999';
+		document.getElementById("main_menu").style.pointerEvents = 'none';
+	}
+
+	showPauseMenu() {
+		document.getElementById('pause_menu').style.visibility = "visible";
+		document.getElementById('pause_menu').style.zIndex = "999";
+	}
+
+	hidePauseMenu() {
+		document.getElementById('pause_menu').style.visibility = "hidden";
+		document.getElementById('pause_menu').style.zIndex = "-999";
+	}
+
+	togglePause() {
 		self.paused = !self.paused;
 		console.log("Paused: " + self.paused);
-		if (!self.paused) self.update(true);
+		self.showPauseMenu();
+		if (!self.paused) {
+			self.hidePauseMenu();
+			self.player.camera.getPointerLock();
+			self.update(true);
+		}
 	}
 
 	clock = new THREE.Clock();
@@ -256,8 +297,6 @@ class InvertedPacman {
 		});
 	}
 }
-
-new InvertedPacman();
 
 const map = (value, x1, y1, x2, y2) =>
 	((value - x1) * (y2 - x2)) / (y1 - x1) + x2;

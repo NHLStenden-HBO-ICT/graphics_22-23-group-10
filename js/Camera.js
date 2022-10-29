@@ -53,15 +53,17 @@ export class Camera extends THREE.PerspectiveCamera {
 			false
 		);
 
-		CANVAS.addEventListener("click", function () {
-			CANVAS.requestPointerLock =
-				CANVAS.requestPointerLock ||
-				CANVAS.mozRequestPointerLock ||
-				CANVAS.webkitRequestPointerLock;
+		CANVAS.addEventListener("click", this.getPointerLock);
+	}
 
-			// Ask the browser to lock the pointer)
-			CANVAS.requestPointerLock();
-		});
+	getPointerLock() {
+		CANVAS.requestPointerLock =
+			CANVAS.requestPointerLock ||
+			CANVAS.mozRequestPointerLock ||
+			CANVAS.webkitRequestPointerLock;
+
+		// Ask the browser to lock the pointer)
+		CANVAS.requestPointerLock();
 	}
 
 	changeCallback(e) {
@@ -76,7 +78,6 @@ export class Camera extends THREE.PerspectiveCamera {
 			};
 		} else {
 			// pointer lock is no longer active, remove the callback
-			console.log("Releasing cursor");
 			dispatchEvent(self.pause);
 			CANVAS.onmousemove = () => {};
 		}
