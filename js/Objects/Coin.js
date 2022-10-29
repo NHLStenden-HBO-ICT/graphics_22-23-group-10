@@ -24,7 +24,7 @@ export class Coin extends StaticBody {
 					self.calculateExtents(obj.geometry);
 					obj.castShadow = true;
 					obj.receiveShadow = true;
-					console.log(obj);
+					// console.log(obj);
 				}
 			});
 

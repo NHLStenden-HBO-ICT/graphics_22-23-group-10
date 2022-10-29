@@ -170,7 +170,6 @@ class InvertedPacman {
 			this.scene.add(this.pacman.getPacmanModel);
 			LoadingScreen.remove();
 			this.ready = true;
-			console.log(this.pacman.model);
 		});
 	}
 
@@ -208,11 +207,17 @@ class InvertedPacman {
 	clock = new THREE.Clock();
 
 	update(deltaReset) {
+
 		requestAnimationFrame(() => {
+			if (Level.isLoading){
+				Level.update();
+			}
+
 			if (!this.ready) {
 				this.update();
 				return;
 			}
+
 			let delta = this.clock.getDelta();
 			if (this.paused) return;
 			if (deltaReset) delta = 0;
@@ -234,8 +239,6 @@ class InvertedPacman {
 			}
 
 			this.updateFog();
-
-			console.log("Update");
 
 			this.checkPlayerPacmanCollision();
 			this.composer.render(delta);
