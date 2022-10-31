@@ -220,6 +220,7 @@ export class InvertedPacman {
 
 		if (this.player.boundingBox.intersectsBox(this.pacman.boundingBox)) {
 			dispatchEvent(this.playerPacmanCollision);
+			this.showEndScreen();
 		}
 	}
 
@@ -227,6 +228,29 @@ export class InvertedPacman {
 		const lightLevel = this.skybox.getLightIntensity;
 
 		this.scene.fog.far = map(lightLevel, 0, 1, 50, 2000);
+	}
+
+	showEndScreen() {
+		this.paused = true;
+		const end_screen = document.getElementById("end_screen");
+		const s = end_screen.style;
+
+		if (this.pacman.pacmanState.getCycleState() == "day") {
+			end_screen.innerText = "!NOW UOY";
+		} else {
+			end_screen.innerText = "!TSOL UOY";
+		}
+
+		end_screen.classList.add("end_title");
+		// end_screen.style.color = "white";
+		// end_screen.style.fontSize = "8rem";
+
+		end_screen.style.visibility = "visible";
+		end_screen.style.zIndex = "1000";
+
+		setInterval(() => {
+			location.reload();
+		}, 5000);
 	}
 
 	showMainMenu() {

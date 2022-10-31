@@ -1,6 +1,6 @@
-import { DefaultLoadingManager } from "three";
-import * as THREE from "../node_modules/three/build/three.module.js";
-import { Pacman } from "./Pacman.js";
+// import { DefaultLoadingManager } from "three";
+// import * as THREE from "../node_modules/three/build/three.module.js";
+// import { Pacman } from "./Pacman.js";
 
 export class PacmanStatemachine {
 	static Cycles = Object.freeze({
@@ -87,7 +87,7 @@ export class PacmanStatemachine {
 			action.call(this);
 		} else {
 			console.log("invalid action");
-		}		
+		}
 	}
 
 	getCycleState() {
