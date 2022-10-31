@@ -32,7 +32,6 @@ export class Camera extends THREE.PerspectiveCamera {
 		self = this;
 	}
 
-	
 	_init(playerPos) {
 		this.raycast.layers.set(1);
 
@@ -46,6 +45,7 @@ export class Camera extends THREE.PerspectiveCamera {
 
 	_setupPointerLock() {
 		// register the callback when a pointerlock event occurs
+
 		document.addEventListener("pointerlockchange", this.changeCallback, false);
 		document.addEventListener(
 			"mozpointerlockchange",
