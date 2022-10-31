@@ -1,6 +1,7 @@
 import * as THREE from "../node_modules/three/build/three.module.js";
 import { Level } from "./Level.js";
 
+// Some constants
 const FOV = 80;
 const ASPECT = 2;
 const NEAR = 0.1;
@@ -12,6 +13,9 @@ const HEIGHT = 2;
 const CANVAS = document.getElementById("webgl");
 let self;
 
+/**
+ * Custom camera class
+ */
 export class Camera extends THREE.PerspectiveCamera {
 	raycast = new THREE.Raycaster();
 	moveX;
@@ -28,6 +32,7 @@ export class Camera extends THREE.PerspectiveCamera {
 		self = this;
 	}
 
+	
 	_init(playerPos) {
 		this.raycast.layers.set(1);
 

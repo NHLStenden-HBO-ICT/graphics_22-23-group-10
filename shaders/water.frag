@@ -54,6 +54,8 @@ void main() {
 
     float opacityMult = 1.0;
 
+	// Get the pixels near the edge to fade out
+	// There's probably a better way for this
     if (pos.x > (width - THRESHOLD)){
         float dist = width - pos.x;
         opacityMult = dist / THRESHOLD * opacityMult;

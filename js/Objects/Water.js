@@ -3,11 +3,14 @@ import { StaticBody } from "../CollisionSystem/StaticBody.js";
 import { Level } from "../Level.js";
 import { loadShader } from "../ShaderLoader.js";
 
+/**
+ * Shaded water class
+ */
 export class Water extends StaticBody {
 	constructor(width, height) {
 		super();
 
-		const self = this;
+		const self = this; // Callbacks :(
 		loadShader("water", shaderLoaded);
 
 		function shaderLoaded(material) {
@@ -18,7 +21,8 @@ export class Water extends StaticBody {
 			const waterWidth = width * SCALE_FACTOR * LOCAL_SCALE;
 			const waterHeight = 0.1;
 			const waterDepth = height * SCALE_FACTOR * LOCAL_SCALE;
-
+			
+			// Modify an existing material for shadow and lighting interaction
 			mat.onBeforeCompile = function (shader) {
 				shader.uniforms.time = { value: 0 };
 				shader.uniforms.width = { value: width * LOCAL_SCALE };
@@ -44,27 +48,25 @@ export class Water extends StaticBody {
 				),
 				mat
 			);
-
+			
+			// Position mesh correctly
 			self.model.layers.enable(1);
 			self.model.receiveShadow = true;
 			self.model.position.x = (width * SCALE_FACTOR) / 2;
-			// waterDepth / 2 - SCALE_FACTOR / 2 - LOCAL_SCALE * SCALE_FACTOR;
 			self.model.position.y = -1.8;
 			self.model.position.z = (height * SCALE_FACTOR) / 2;
-			// waterWidth / 2 - SCALE_FACTOR / 2 - LOCAL_SCALE * SCALE_FACTOR;
 
 			self.model.name = "Water";
 
 			self.calcExtents(self.model.geometry);
 
 			Level.add(self.model);
-			// Level.cameraCollisionObjects.push(self.model);
 		}
 	}
-
+	
 	update(elapsedTime) {
 		if (!this.ready) return;
+		// Animate the water
 		this.model.material.userData.shader.uniforms.time.value = elapsedTime;
-		// console.log(this.model.material);
 	}
 }

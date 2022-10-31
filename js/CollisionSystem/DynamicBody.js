@@ -3,19 +3,31 @@ import { Level } from "../Level.js";
 
 const cTHRESHOLD = 0.2;
 
+/**
+ * Collision object that can move
+ */
 export class DynamicBody extends Collision {
 	constructor() {
 		super();
 	}
-
+	
+	/**
+	 * Move without colliding
+	 * @param  {} movement - Vector3 to move with
+	 */
 	move(movement) {
 		this.model.position.x += movement.x;
 		this.model.position.z += movement.z;
 	}
 
+	/**
+	 * Move with collision
+	 * @param  {} movement - Vector3 to move with
+	 */
 	moveAndCollide(movement) {
 		let objects = Level.collisionObjects;
 
+		// Calculate coords of all sides
 		const pLeft = this.model.position.x + this.size.x / 2; // Positive X
 		const pRight = this.model.position.x - this.size.x / 2; // Negative X
 		const pFront = this.model.position.z + this.size.z / 2; // Positive Z
@@ -24,10 +36,11 @@ export class DynamicBody extends Collision {
 		let moveX = movement.x;
 		let moveZ = movement.z;
 
+		// Loop over all collidable objects
 		for (let i = 0; i < objects.length; i++) {
 			const obj = objects[i];
 
-			// Difference as seen from the player
+			// Difference as seen from the dynamicbody
 			const deltaLeft = obj.right - pLeft;
 			const deltaRight = obj.left - pRight;
 			const deltaFront = obj.back - pFront;

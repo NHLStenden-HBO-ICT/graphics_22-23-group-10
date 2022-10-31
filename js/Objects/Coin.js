@@ -1,10 +1,18 @@
 import { GLTFLoader } from "../../node_modules/three/examples/jsm/loaders/GLTFLoader.js";
-import * as THREE from "../../node_modules/three/build/three.module.js";
 import { StaticBody } from "../CollisionSystem/StaticBody.js";
 import { Level } from "../Level.js";
 
+/**
+ * Coin class
+ */
 export class Coin extends StaticBody {
 	#MODELPATH = "../../models/coin.glb";
+	
+	/**
+	 * Position to spawn object at
+	 * @param  {} posX
+	 * @param  {} posZ
+	 */
 	constructor(posX, posZ) {
 		super();
 
@@ -35,8 +43,14 @@ export class Coin extends StaticBody {
 		});
 	}
 
+	
+	/**
+	 * Animate the coin
+	 * @param  {} delta
+	 * @param  {} elapsedTime
+	 */
 	update(delta, elapsedTime){
 		this.model.rotation.y += 0.5 * delta;
-		this.model.position.y = (Math.sin(elapsedTime) * delta * 100) + 1.5;
+		this.model.position.y = 100 * (Math.sin(elapsedTime) * delta) + 1.5;
 	}
 }

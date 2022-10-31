@@ -1,5 +1,8 @@
 import * as THREE from "../../node_modules/three/build/three.module.js";
 
+/**
+ * Base class for objects that have collision
+ */
 export class Collision {
 	ready = false;
 	model;
@@ -21,6 +24,11 @@ export class Collision {
 
 	constructor() {}
 
+	
+	/**
+	 * Calculates the bounding box from the given geometry
+	 * @param  {} geometry
+	 */
 	calculateExtents(geometry) {
 		geometry.computeBoundingBox();
 		this.boundingBox.setFromObject(this.model);
