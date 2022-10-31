@@ -14,7 +14,7 @@ THREE.Cache.enabled = true;
 
 const DEBUG_MODE = false;
 
-const LEVEL_TO_LOAD = "test2";
+const LEVEL_TO_LOAD = "level";
 
 let self;
 

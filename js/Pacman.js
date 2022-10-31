@@ -10,7 +10,7 @@ export class Pacman extends Ai {
 
 	#MODELPATH = "../models/pacmanEvil3.glb";
 
-	#walkVelocity = 16;
+	#walkVelocity = 25;
 	#walkDirection = new THREE.Vector3();
 	#rotateAngle = new THREE.Vector3(0, 1, 0);
 	#rotateQuaternion = new THREE.Quaternion();
@@ -115,8 +115,14 @@ export class Pacman extends Ai {
 		this.#walkDirection = new THREE.Vector3(p11.x - p22.x, 0, p11.z - p22.z);
 		this.#walkDirection.normalize();
 		this.#rotateAngle.normalize();
-
-		const velocity = this.#walkVelocity;
+		
+		let velocity = this.#walkVelocity;
+		if(this.pacmanState.getCycleState == PacmanStatemachine.Cycles.DAY){
+			velocity = this.#walkVelocity;
+		}
+		else{
+			velocity = this.#walkVelocity / 1.2;
+		}
 
 		const SF = Level.getScaleFactor;
 
