@@ -1,8 +1,8 @@
 .progress{
-    background-color: white;
     border-radius: 20px;
+    top: 5rem;
     height: 25px;
-    width: 25%;
+    width: 15%;
     float: right;
 }
 
@@ -20,6 +20,7 @@
     border-radius: 15px;
     color: white;
     height: 100%;
-    width: 0;
-    /*transition: 0.5s ease 0.3s;*/
+    width: 100;
+    /* top: 5rem; */
+    /* transition: 0.5s ease 0.3s; */
 }

@@ -77,27 +77,27 @@ canvas {
 }
 
 .main_menu .pacman .img_pacman {
-    height: 40rem;
-    left: 20rem;
-    top: 15rem;
+    height: 50rem;
+    left: 30rem;
+    top: 20rem;
 }
 
 
 .main_menu .ghost .img_ghost {
-    height: 40rem;
-    right: 18rem;
-    top: 14rem;
+    height: 50rem;
+    right: 32rem;
+    top: 19rem;
 }
 
 .main_menu .ghost .img_pupil {
-    height: 6rem;
+    height: 10rem;
     position: absolute;
-    right: 35rem;
-    top: 28rem;
+    right: 49rem;
+    top: 33rem;
 }
 
 .main_menu_container {
-    margin-top: 3rem;
+    margin-top: 8rem;
     display: inherit;
     flex-direction: column;
 }
