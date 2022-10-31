@@ -33,6 +33,10 @@ export class Pacman extends Ai {
 		return this.model;
 	}
 
+	get getCycle() {
+		return this.pacmanState.getCycleState();
+	}
+
 	constructor(playerModel) {
 		super(playerModel);
 		this._loadPacman();
@@ -73,7 +77,7 @@ export class Pacman extends Ai {
 						self.teethObjectModel.visible = false;
 
 						// add red glow
-						const light = new THREE.PointLight( 0xff0000, 1, 100 );
+						const light = new THREE.PointLight(0xff0000, 1, 100);
 						light.position.set(0, mesh.position.y, 0);
 						light.castShadow = true;
 						obj.add(light);
@@ -115,12 +119,11 @@ export class Pacman extends Ai {
 		this.#walkDirection = new THREE.Vector3(p11.x - p22.x, 0, p11.z - p22.z);
 		this.#walkDirection.normalize();
 		this.#rotateAngle.normalize();
-		
+
 		let velocity = this.#walkVelocity;
-		if(this.pacmanState.getCycleState == PacmanStatemachine.Cycles.DAY){
+		if (this.pacmanState.getCycleState == PacmanStatemachine.Cycles.DAY) {
 			velocity = this.#walkVelocity;
-		}
-		else{
+		} else {
 			velocity = this.#walkVelocity / 1.2;
 		}
 
@@ -153,7 +156,7 @@ export class Pacman extends Ai {
 		).normalize();
 
 		// Get angle to next point
-		let directionAngle = Math.atan2(dir.x, dir.z); 
+		let directionAngle = Math.atan2(dir.x, dir.z);
 
 		// Rotate pacman
 		this.#rotateQuaternion.setFromAxisAngle(this.#rotateAngle, directionAngle);

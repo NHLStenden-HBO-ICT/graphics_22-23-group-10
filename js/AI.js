@@ -27,6 +27,7 @@ export class Ai extends DynamicBody {
 
 	pacmanState = new PacmanStatemachine();
 	switchMovePattern = new Event("switchMovePattern");
+	allCoinsFound = new Event("allCoinsFound");
 
 	constructor(playerMesh) {
 		super();
@@ -51,10 +52,12 @@ export class Ai extends DynamicBody {
 		this.InVisionRange(pacmanPos, playerPos, playerModel);
 
 		// Search for closest coin to AI when none are found yet
-		if (!this.closestCoin) { 
+		if (!this.closestCoin) {
 			this.closestCoin = this.GetClosestCoin();
 		}
 		if (this.closestCoin == null) {
+			Level.allCoinsFound = true;
+			dispatchEvent(this.allCoinsFound);
 			return [];
 		}
 
@@ -113,7 +116,7 @@ export class Ai extends DynamicBody {
 
 		return result;
 	}
-	
+
 	RunGraphEnd(targetPos) {
 		const pacmanPos = this.model.position;
 		let target = new THREE.Vector3(
@@ -162,27 +165,41 @@ export class Ai extends DynamicBody {
 		const intersect = this.raycaster.intersectObject(playerModel);
 
 		// Check if AI has intersects with player
-		if (intersect.length > 0) { 
+		if (intersect.length > 0) {
 			const isct = intersect[0];
-			if (isct.distance < 500) { // Only detect player (Ghost) within a certain range
+			if (isct.distance < 500) {
+				// Only detect player (Ghost) within a certain range
 				if (isct.object.name == "Ghost") {
-					if (this.pacmanState.getCycleState() == PacmanStatemachine.Cycles.DAY){
-						if (this.pacmanState.getMoveState() != PacmanStatemachine.MovePattern.RUN) {
+					if (
+						this.pacmanState.getCycleState() == PacmanStatemachine.Cycles.DAY
+					) {
+						if (
+							this.pacmanState.getMoveState() !=
+							PacmanStatemachine.MovePattern.RUN
+						) {
 							this.switchCD = 0; // Reset switch cooldown
 							dispatchEvent(this.switchMovePattern);
 						}
-					}
-					else if (this.pacmanState.getCycleState() == PacmanStatemachine.Cycles.NIGHT){
-						if (this.pacmanState.getMoveState() != PacmanStatemachine.MovePattern.CHASE) {
+					} else if (
+						this.pacmanState.getCycleState() == PacmanStatemachine.Cycles.NIGHT
+					) {
+						if (
+							this.pacmanState.getMoveState() !=
+							PacmanStatemachine.MovePattern.CHASE
+						) {
 							this.switchCD = 0; // Reset switch cooldown
 							dispatchEvent(this.switchMovePattern);
 						}
 					}
 				}
 			}
-		// Switch to wandering and search for new coin
-		// only when there are no intersects and switching is possible while pacman is not wandering
-		} else if (this.pacmanState.getMoveState() != PacmanStatemachine.MovePattern.WANDER && this.switchCD > 5) {
+			// Switch to wandering and search for new coin
+			// only when there are no intersects and switching is possible while pacman is not wandering
+		} else if (
+			this.pacmanState.getMoveState() !=
+				PacmanStatemachine.MovePattern.WANDER &&
+			this.switchCD > 5
+		) {
 			this.switchCD = 0;
 			this.closestCoin = this.GetClosestCoin();
 			dispatchEvent(this.switchMovePattern);

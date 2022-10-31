@@ -20,7 +20,6 @@ const COIN = 5;
 const SCALE_FACTOR = 2;
 
 export class Level {
-	
 	// Variables for loading
 	static #isLevelLoaded = false;
 	static #isLoading = false;
@@ -42,6 +41,7 @@ export class Level {
 	static coins = [];
 	static water;
 	static floors = [];
+	static allCoinsFound = false;
 
 	// Loaded event
 	static levelLoaded = new Event("levelLoaded");
@@ -97,7 +97,7 @@ export class Level {
 
 	/**
 	 * @param  {} levelName
-	 * 
+	 *
 	 * Loads the map which is passed in by name
 	 */
 	static load(levelName) {
@@ -170,7 +170,6 @@ export class Level {
 						tile = FLOOR;
 					}
 
-
 					// In case of 'double' or special tiles (i.e. coin) set what other tile is below it
 					switch (tile) {
 						case DEAD_SPACE:
@@ -204,23 +203,19 @@ export class Level {
 		img.src = level;
 	}
 
-
-	
 	/**
 	 * Finds/places one rectangle each time called
 	 */
-	static update(){
-
+	static update() {
 		// Check if there's still tiles of the current tile we're checking for left
-		if (this.containsTile(this.#levelGenData, this.#tileToScan)){
-			
+		if (this.containsTile(this.#levelGenData, this.#tileToScan)) {
 			// Find largest possible rectangle
 			const rect = this.findLargestRect();
 			this.#rectangles.push(rect);
 
 			this.#count++;
 			let loadingMSG = "";
-			
+
 			let newTile;
 
 			// Get the new tile at this location. A wall becomes a floor for example, to minimize different floor meshes by filling in holes below the walls
@@ -250,14 +245,14 @@ export class Level {
 					this.#levelGenData[x][y] = newTile;
 				}
 			}
-			
+
 			return;
 		}
 
 		// If no more rectangles are found, start placing them
 
 		// Checks if there's still rectangles left to place
-		if (this.#rectangles.length > 0){
+		if (this.#rectangles.length > 0) {
 			let loadingMSG = "";
 			this.#count++;
 
@@ -266,7 +261,7 @@ export class Level {
 			const h = rect.y2 - rect.y1 + 1;
 
 			// Spawn the corresponding object
-			switch (this.#tileToScan){
+			switch (this.#tileToScan) {
 				case INVIS_WALL:
 					loadingMSG = "Placing edges... [$]";
 
@@ -275,7 +270,7 @@ export class Level {
 					this.#level.add(wallI.model);
 					this.collisionObjects.push(wallI);
 					break;
-				
+
 				case WALL:
 					loadingMSG = "Placing walls... [$]";
 
@@ -285,7 +280,7 @@ export class Level {
 					this.collisionObjects.push(wall);
 					this.cameraCollisionObjects.push(wall.model);
 					break;
-				
+
 				case FLOOR:
 					loadingMSG = "Placing floors... [$]";
 
@@ -294,7 +289,6 @@ export class Level {
 					this.#level.add(floor.model);
 					this.floors.push(floor);
 					break;
-
 			}
 
 			LoadingScreen.set(loadingMSG.replace("$", this.#count));
@@ -303,7 +297,7 @@ export class Level {
 		}
 
 		// If no more rectangles found, set next tile to scan for
-		switch(this.#tileToScan){
+		switch (this.#tileToScan) {
 			case INVIS_WALL:
 				this.#tileToScan = WALL;
 				break;
@@ -317,13 +311,12 @@ export class Level {
 				dispatchEvent(this.levelLoaded);
 				break;
 		}
-
 	}
 
 	/**
 	 * Adds water to the level
 	 */
-	static addWater(){
+	static addWater() {
 		// Add the level's defined water
 		this.water = new Water(this.#mapSize.x, this.#mapSize.y);
 
@@ -431,7 +424,7 @@ export class Level {
 		}
 
 		return biggestRect;
-	};
+	}
 
 	/**
 	 * Returns whether the tile is still present in the given matrix
@@ -472,7 +465,7 @@ export class Level {
 		}
 		return array;
 	}
-	
+
 	/**
 	 * Adds debug shapes to the level
 	 */

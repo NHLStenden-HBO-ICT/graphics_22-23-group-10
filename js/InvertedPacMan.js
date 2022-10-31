@@ -51,6 +51,7 @@ export class InvertedPacman {
 		this._initHud();
 
 		addEventListener("pause", self.pauseGame);
+		addEventListener("allCoinsFound", this.showEndScreen);
 		this._initPauseMenu();
 	}
 
@@ -231,19 +232,15 @@ export class InvertedPacman {
 	}
 
 	showEndScreen() {
-		this.paused = true;
+		self.paused = true;
 		const end_screen = document.getElementById("end_screen");
-		const s = end_screen.style;
-
-		if (this.pacman.pacmanState.getCycleState() == "day") {
-			end_screen.innerText = "!NOW UOY";
-		} else {
+		if (self.pacman.getCycle == "night" || Level.allCoinsFound) {
 			end_screen.innerText = "!TSOL UOY";
+		} else {
+			end_screen.innerText = "!NOW UOY";
 		}
 
 		end_screen.classList.add("end_title");
-		// end_screen.style.color = "white";
-		// end_screen.style.fontSize = "8rem";
 
 		end_screen.style.visibility = "visible";
 		end_screen.style.zIndex = "1000";
