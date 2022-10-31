@@ -325,3 +325,35 @@ canvas {
     height: 100%;
     z-index: 100;
 }
+
+#end_screen {
+    visibility: hidden;
+    background-color: #0b2042;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    z-index: -1000;
+}
+
+.end_quit {
+    left: 47%;
+}
+
+.end_title {
+    font-family: 'PacFont', system-ui, -apple-system, sans-serif;
+    font-size: 8rem;
+    font-weight: bold;
+    color: white;
+    -moz-transform: scale(-1, 1);
+    -webkit-transform: scale(-1, 1);
+    -o-transform: scale(-1, 1);
+    -ms-transform: scale(-1, 1);
+    transform: scale(-1, 1);
+    cursor: default;
+}
