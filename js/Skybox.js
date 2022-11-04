@@ -46,22 +46,29 @@ export class Skybox {
 		}
 	}
 
+	/**
+	 * Gets called every frame update
+	 * @param {*} delta 
+	 * @param {*} sun 
+	 */
 	update(delta, sun) {
 		if (!this.#ready) {
 			return;
 		}
-
+		
+		// Rotate the sun
 		this.#sunVector.applyAxisAngle(this.#sunAxis, this.#SUNSPEED * delta);
 		this.skyGeometry.material.uniforms.sunPosition.value = this.#sunVector;
 		sun.position.set(this.#sunVector.x, this.#sunVector.y, this.#sunVector.z);
 
+		// Get a light intensity value based on sun angle
 		let angle = THREE.MathUtils.radToDeg(
 			Math.atan2(this.#sunVector.z, this.#sunVector.y)
 		);
-		let clampedAngle = clamp(angle, -90, 90);
-
+			
 		let value = 1;
-
+		let clampedAngle = clamp(angle, -90, 90);
+		
 		if (angle > 75) {
 			value = map(clampedAngle, 75, 90, 1, 0);
 		} else if (angle < -75) {
@@ -71,6 +78,7 @@ export class Skybox {
 		this.#lightIntensity = value;
 		sun.intensity = value;
 
+		// Dispatch an event when it turns day or night
 		if (angle > 90 && angle > 0 && !this.#isNight) {
 			this.#isNight = true;
 			dispatchEvent(this.switchCycle);

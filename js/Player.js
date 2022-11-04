@@ -59,6 +59,13 @@ export class Player extends DynamicBody {
 		this._initListeners();
 	}
 
+	/**
+	 * Gets called every frame update
+	 * @param {*} delta 
+	 * @param {*} timeElapsed 
+	 * @param {*} sunIntensity 
+	 * @returns 
+	 */
 	update(delta, timeElapsed, sunIntensity) {
 		if (!this.ready) {
 			return;
@@ -72,6 +79,10 @@ export class Player extends DynamicBody {
 		this.updateLamp(sunIntensity);
 	}
 
+	/**
+	 * Updates the player's light based on the brightness of the sun
+	 * @param {*} sunIntensity 
+	 */
 	updateLamp(sunIntensity) {
 		this.lamp.intensity = 1 - sunIntensity;
 
@@ -79,10 +90,18 @@ export class Player extends DynamicBody {
 		this.eye.material.emissiveIntensity = bloomIntensity * 3;
 	}
 
+	/**
+	 * Updates the wave shader
+	 * @param {*} timeElapsed 
+	 */
 	updateShader(timeElapsed) {
 		this.model.children[0].material.uniforms.u_time.value = timeElapsed;
 	}
 
+	/**
+	 * Handles player movement
+	 * @param {*} delta 
+	 */
 	_movePlayer(delta) {
 		const directionPressed = this.DIRECTIONS.some(
 			(key) => this.#keysPressed[key] == true
@@ -155,6 +174,9 @@ export class Player extends DynamicBody {
 		this.camera = new Camera(this.getPosition);
 	}
 
+	/**
+	 * Loads the player model
+	 */
 	_loadPlayer() {
 		let self = this;
 		new GLTFLoader().load(this.#MODELPATH, function (model) {
@@ -211,6 +233,9 @@ export class Player extends DynamicBody {
 		});
 	}
 
+	/**
+	 * Sets up keyboard event listeners
+	 */
 	_initListeners() {
 		document.addEventListener(
 			"keydown",
@@ -228,6 +253,11 @@ export class Player extends DynamicBody {
 		);
 	}
 
+	/**
+	 * Calculates a direction offset based on player input
+	 * @param {*} keysPressed 
+	 * @returns offset angle
+	 */
 	directionOffset(keysPressed) {
 		// Get direction vector
 		let dir = new THREE.Vector2(

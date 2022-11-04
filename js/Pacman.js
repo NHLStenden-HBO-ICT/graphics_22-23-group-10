@@ -2,7 +2,6 @@ import { GLTFLoader } from "../node_modules/three/examples/jsm/loaders/GLTFLoade
 import * as THREE from "../node_modules/three/build/three.module.js";
 import { Ai } from "./AI.js";
 import { Level } from "./Level.js";
-import { Graph } from "./Astar/Graph.js";
 import { PacmanStatemachine } from "./PacmanStatemachine.js";
 
 export class Pacman extends Ai {
@@ -55,6 +54,9 @@ export class Pacman extends Ai {
 		);
 	}
 
+	/**
+	 * Loads the pacman model
+	 */
 	_loadPacman() {
 		let self = this;
 		new GLTFLoader().load(this.#MODELPATH, function (model) {
@@ -71,7 +73,7 @@ export class Pacman extends Ai {
 				if (obj.isMesh) {
 					obj.castShadow = true;
 					obj.receiveShadow = true;
-					// console.log(obj);
+
 					if (obj.name == "Sphere001") {
 						self.teethObjectModel = obj;
 						self.teethObjectModel.visible = false;
@@ -84,7 +86,6 @@ export class Pacman extends Ai {
 					}
 					if (obj.name == "BODY") {
 						self.bodyObjectModel = obj;
-						// console.log(obj);
 						self.bodyObjectModel.material = self.dayTimeMaterial;
 					}
 				}
@@ -102,16 +103,30 @@ export class Pacman extends Ai {
 		});
 	}
 
+	/**
+	 * Gets called every frame update
+	 * @param {*} delta 
+	 * @param {*} playerPos 
+	 * @param {*} playerModel 
+	 */
 	update(delta, playerPos, playerModel) {
 		this._movePacman(delta, playerPos, playerModel);
 		this.checkCoinPacmanCollision();
 
+		// State switching cooldown
 		this.switchCD += delta;
 
 		// update animations
 		this.mixer.update(delta);
 	}
 
+	/**
+	 * Handles pacman movement
+	 * @param {*} delta 
+	 * @param {*} playerPos 
+	 * @param {*} playerModel 
+	 * @returns 
+	 */
 	_movePacman(delta, playerPos, playerModel) {
 		// Calculate direction
 		let p11 = playerPos;
@@ -172,6 +187,9 @@ export class Pacman extends Ai {
 		this.move(movementVector);
 	}
 
+	/**
+	 * Checks if pacman collides with the targeted coin
+	 */
 	checkCoinPacmanCollision() {
 		if (this.closestCoin == null) {
 			return;
