@@ -5,8 +5,12 @@ import * as THREE from "../node_modules/three/build/three.module.js";
 import { DynamicBody } from "./CollisionSystem/DynamicBody.js";
 import { PacmanStatemachine } from "./PacmanStatemachine.js";
 
+/**
+ * This and other code regarding the pacman AI needs some serious refactoring
+ * We unfortunatly didn't have time for that, so enjoy this spaghetti code :)
+ */
+
 export class Ai extends DynamicBody {
-	//add general code for the AI (pathfinding etc)
 	raycastOrigin = new THREE.Vector3();
 	raycastEnd = new THREE.Vector3();
 	lastPos = new THREE.Vector3();
@@ -36,6 +40,13 @@ export class Ai extends DynamicBody {
 
 	// Returns 2D array with x and z coordinates rounded to intergers,
 	// This is used by pacman to navigate to a point in a certain way
+	/**
+	 * Gets a path for the pacman
+	 * @param {*} pacmanPos 
+	 * @param {*} playerPos 
+	 * @param {*} playerModel 
+	 * @returns array of points
+	 */
 	getPath(pacmanPos, playerPos, playerModel) {
 		if (
 			(this.lastPos.x == pacmanPos.x || this.lastPos.z == pacmanPos.z) &&
@@ -49,11 +60,11 @@ export class Ai extends DynamicBody {
 		this.graph.diagonal = true;
 		this.graph.dontCrossCorners = true;
 
-		this.InVisionRange(pacmanPos, playerPos, playerModel);
+		this.checkForPlayer(pacmanPos, playerPos, playerModel);
 
 		// Search for closest coin to AI when none are found yet
 		if (!this.closestCoin) {
-			this.closestCoin = this.GetClosestCoin();
+			this.closestCoin = this.getClosestCoin();
 		}
 		if (this.closestCoin == null) {
 			Level.allCoinsFound = true;
@@ -76,7 +87,7 @@ export class Ai extends DynamicBody {
 
 					case PacmanStatemachine.MovePattern.RUN:
 						this.graphStart = this.graph.grid[pacmanPos.x][pacmanPos.z];
-						this.graphEnd = this.RunGraphEnd(playerPos);
+						this.graphEnd = this.getPosAwayFromPlayer(playerPos);
 						break;
 
 					case PacmanStatemachine.MovePattern.CHASE:
@@ -100,7 +111,7 @@ export class Ai extends DynamicBody {
 
 					case PacmanStatemachine.MovePattern.RUN:
 						this.graphStart = this.graph.grid[pacmanPos.x][pacmanPos.z];
-						this.graphEnd = this.RunGraphEnd(playerPos);
+						this.graphEnd = this.getPosAwayFromPlayer(playerPos);
 						break;
 
 					case PacmanStatemachine.MovePattern.CHASE:
@@ -117,7 +128,12 @@ export class Ai extends DynamicBody {
 		return result;
 	}
 
-	RunGraphEnd(targetPos) {
+	/**
+	 * Tries to find a position that leads pacman away from the player
+	 * @param {*} targetPos 
+	 * @returns position
+	 */
+	getPosAwayFromPlayer(targetPos) {
 		const pacmanPos = this.model.position;
 		let target = new THREE.Vector3(
 			targetPos.x * Level.getScaleFactor,
@@ -146,7 +162,13 @@ export class Ai extends DynamicBody {
 		return this.graph.grid[pos.x][pos.z];
 	}
 
-	InVisionRange(_pacmanPos, targetPos, playerModel) {
+	/**
+	 * Checks if pacman is in range of the player
+	 * @param {*} _pacmanPos 
+	 * @param {*} targetPos 
+	 * @param {*} playerModel 
+	 */
+	checkForPlayer(_pacmanPos, targetPos, playerModel) {
 		const pacmanPos = this.model.position;
 		let target = new THREE.Vector3(
 			targetPos.x * Level.getScaleFactor,
@@ -201,13 +223,16 @@ export class Ai extends DynamicBody {
 			this.switchCD > 5
 		) {
 			this.switchCD = 0;
-			this.closestCoin = this.GetClosestCoin();
+			this.closestCoin = this.getClosestCoin();
 			dispatchEvent(this.switchMovePattern);
 		}
 	}
 
-	// Returns current closest coin from AI
-	GetClosestCoin() {
+	/**
+	 * Finds the coin closes to pacman
+	 * @returns coin
+	 */
+	getClosestCoin() {
 		let allExistingCoins = Level.coins;
 		if (allExistingCoins.length == 0) {
 			return null; // pacman wins when there are no coins left	 TODO: switch to end screen, to be inplemented
