@@ -51,6 +51,6 @@ export class Coin extends StaticBody {
 	 */
 	update(delta, elapsedTime){
 		this.model.rotation.y += 0.5 * delta;
-		this.model.position.y = 100 * (Math.sin(elapsedTime) * delta) + 1.5;
+		// this.model.position.y = 100 * (Math.sin(elapsedTime) * delta) + 1.5;
 	}
 }

@@ -167,7 +167,7 @@ export class Ai extends DynamicBody {
 		// Check if AI has intersects with player
 		if (intersect.length > 0) {
 			const isct = intersect[0];
-			if (isct.distance < 500) {
+			if (isct.distance < 800) {
 				// Only detect player (Ghost) within a certain range
 				if (isct.object.name == "Ghost") {
 					if (

@@ -18,7 +18,8 @@ export class Player extends DynamicBody {
 
 	#walkVelocity = 8;
 	#runVelocity = 16;
-	#runCost = 0.5;
+	#runCost = 0.70;
+	#runRegen = 0.45;
 	#stamina = 100;
 
 	ready = false;
@@ -100,7 +101,7 @@ export class Player extends DynamicBody {
 				this.#currentAction = this.Actions.RUN;
 			}
 		} else {
-			this.#stamina += this.#runCost;
+			this.#stamina += this.#runRegen;
 			if (this.#stamina >= 100) this.#stamina = 100;
 		}
 
