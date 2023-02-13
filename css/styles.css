@@ -1,7 +1,7 @@
 @font-face {
     font-family: 'PacFont';
-    src: url('../assets/fonts/PacFont.woff2') format('woff2'),
-        url('../assets/fonts/PacFont.woff') format('woff');
+    src: url('/assets/fonts/PacFont.woff2') format('woff2'),
+        url('/assets/fonts/PacFont.woff') format('woff');
     font-weight: normal;
     font-style: normal;
     font-display: swap;
@@ -9,8 +9,8 @@
 
 @font-face {
     font-family: 'PacFont Good';
-    src: url('../assets/fonts/PacFontGood.woff2') format('woff2'),
-        url('../assets/fonts/PacFontGood.woff') format('woff');
+    src: url('/assets/fonts/PacFontGood.woff2') format('woff2'),
+        url('/assets/fonts/PacFontGood.woff') format('woff');
     font-weight: normal;
     font-style: normal;
     font-display: swap;
@@ -18,7 +18,7 @@
 
 @font-face {
     font-family: 'Pathway Gothic One Regular';
-    src: url('../assets/fonts/PathwayGothicOne-Regular.woff') format('woff');
+    src: url('assets/fonts/PathwayGothicOne-Regular.woff') format('woff');
     font-weight: normal;
     font-style: normal;
     font-display: swap;
@@ -60,7 +60,7 @@ canvas {
 .main_menu_bg {
     width: 100%;
     height: 100%;
-    background: url('../assets/img/arcade-bg.png') no-repeat;
+    background: url('/assets/img/arcade_bg.png') no-repeat;
     background-size: cover;
     position: inherit;
     top: inherit;

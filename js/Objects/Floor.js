@@ -12,7 +12,7 @@ export class Floor extends StaticBody {
 		const SCALE_FACTOR = Level.getScaleFactor;
 
 		// Load textures and set UV ratio 
-		const grassTexture = new THREE.TextureLoader().load( './textures/Grass_01_512.png' );
+		const grassTexture = new THREE.TextureLoader().load( 'textures/Grass_01_512.png' );
 		grassTexture.wrapS = THREE.RepeatWrapping;
 		grassTexture.wrapT = THREE.RepeatWrapping;
 		grassTexture.repeat.set( width / 10, height / 10);

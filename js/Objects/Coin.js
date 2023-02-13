@@ -6,7 +6,7 @@ import { Level } from "../Level.js";
  * Coin class
  */
 export class Coin extends StaticBody {
-	#MODELPATH = "../../models/coin.glb";
+	#MODELPATH = "models/coin.glb";
 	
 	/**
 	 * Position to spawn object at

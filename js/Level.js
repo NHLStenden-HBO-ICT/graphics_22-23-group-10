@@ -6,7 +6,7 @@ import { Coin } from "./Objects/Coin.js";
 import { LoadingScreen } from "./LoadingScreen.js";
 
 // Some constants
-const LEVELFOLDER = "../levels/";
+const LEVELFOLDER = "levels/";
 
 const NONE = -1;
 const FLOOR = 0;

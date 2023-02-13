@@ -12,7 +12,7 @@ export class Wall extends StaticBody {
 		const SCALE_FACTOR = Level.getScaleFactor;
 
 		// Load texture
-		const wallTexture = new THREE.TextureLoader().load( './textures/Brick_01_512.png' );
+		const wallTexture = new THREE.TextureLoader().load( 'textures/Brick_01_512.png' );
 		wallTexture.wrapS = THREE.RepeatWrapping;
 		wallTexture.wrapT = THREE.RepeatWrapping;
 		
