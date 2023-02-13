@@ -227,13 +227,13 @@ canvas {
 }
 
 .continue_button {
-    background: url('/assets/img/continue-btn.png') no-repeat;
+    background: url('assets/img/continue-btn.png') no-repeat;
     background-size: cover;
 }
 
 .quit_button {
     margin-top: 15rem;
-    background: url('/assets/img/quit-btn.png') no-repeat;
+    background: url('assets/img/quit-btn.png') no-repeat;
     background-size: cover;
 }
 
