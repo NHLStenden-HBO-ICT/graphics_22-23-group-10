@@ -1,7 +1,3 @@
-// import { DefaultLoadingManager } from "three";
-// import * as THREE from "../node_modules/three/build/three.module.js";
-// import { Pacman } from "./Pacman.js";
-
 export class PacmanStatemachine {
 	static Cycles = Object.freeze({
 		DAY: "day",

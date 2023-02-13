@@ -14,7 +14,7 @@ export class Player extends DynamicBody {
 
 	playerLoaded = new Event("playerLoaded");
 
-	#MODELPATH = "../models/ghost.glb";
+	#MODELPATH = "models/ghost.glb";
 
 	#walkVelocity = 8;
 	#runVelocity = 16;

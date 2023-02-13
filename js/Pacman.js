@@ -7,7 +7,7 @@ import { PacmanStatemachine } from "./PacmanStatemachine.js";
 export class Pacman extends Ai {
 	pacmanLoaded = new Event("pacmanLoaded");
 
-	#MODELPATH = "../models/pacmanEvil3.glb";
+	#MODELPATH = "models/pacmanEvil3.glb";
 
 	#walkVelocity = 25;
 	#walkDirection = new THREE.Vector3();
