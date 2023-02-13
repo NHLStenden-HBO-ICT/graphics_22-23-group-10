@@ -206,6 +206,8 @@ export class InvertedPacman {
 	}
 
 	_OnWindowResize() {
+		if (this.player.camera == undefined) return;
+		console.log(this.player)
 		this.player.camera.aspect = window.innerWidth / window.innerHeight;
 		this.player.camera.updateProjectionMatrix();
 		this.renderer.setSize(window.innerWidth, window.innerHeight);

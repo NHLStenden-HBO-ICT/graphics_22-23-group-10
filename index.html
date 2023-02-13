@@ -5,7 +5,9 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Inverted Pacman</title>
-		<link href="css/styles.css" rel="stylesheet" type="text/css" />
+		
+		<script type="module" crossorigin src="/assets/index.a61aea29.js"></script>
+		<link rel="stylesheet" href="/assets/index.b7ef6b5f.css">
 	</head>
 	<body>
 		<canvas class="webgl" id="webgl"></canvas>
@@ -28,14 +30,14 @@
 				</div>
 
 				<div class="pacman">
-					<img class="img_pacman" src="./assets/img/Pacman.png" alt="" />
+					<img class="img_pacman" src="/assets/Pacman.32471a4a.png" alt="" />
 				</div>
 				<div class="ghost">
-					<img class="img_ghost" src="./assets/img/Ghost.png" alt="" />
+					<img class="img_ghost" src="/assets/Ghost.eafb2ddc.png" alt="" />
 					<img
 						id="pupil"
 						class="img_pupil"
-						src="./assets/img/Pupil2.png"
+						src="data:image/png;base64,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"
 						alt=""
 					/>
 				</div>
@@ -44,7 +46,7 @@
 		<div class="pause_menu" id="pause_menu">
 			<div class="pause_menu_bg"></div>
 			<div class="pause_menu_container">
-				<img src="./assets/img/pause-menu.png" alt="" />
+				<img src="/assets/pause-menu.e49ead68.png" alt="" />
 				<button class="continue_button" id="continueBtn"></button>
 				<button class="quit_button" id="quitBtn"></button>
 			</div>
@@ -61,11 +63,11 @@
 		<div id="helpModal" class="modal">
 			<div class="modal_container">
 				<div class="help">
-					<img src="./assets/img/help.png" alt="help menu" />
+					<img src="/assets/help.8fc4b9e3.png" alt="help menu" />
 					<img
 						class="close_button"
 						id="closeBtn"
-						src="./assets/img/close-btn.png"
+						src="/assets/close-btn.d0b21cbf.png"
 						alt="close button"
 					/>
 				</div>
@@ -98,6 +100,6 @@
 			</div>
 			<audio src="./assets/audio/credits.mp3" id="creditsMusic"></audio>
 		</div>
-		<script type="module" src="./js/Main.js"></script>
+		
 	</body>
 </html>
